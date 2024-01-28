@@ -14,12 +14,13 @@ import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
-import edu.wpi.first.wpilibj2.command.button.CommandJoystick;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.Constants.OperatorConstants;
 import frc.robot.commands.swervedrive.drivebase.AbsoluteDriveAdv;
+import frc.robot.commands.swervedrive.drivebase.AbsoluteFieldDrive;
+import frc.robot.commands.swervedrive.drivebase.FieldOrientedDrive;
 import frc.robot.subsystems.swervedrive.SwerveSubsystem;
 import java.io.File;
 
@@ -89,8 +90,24 @@ public class RobotContainer
         () -> MathUtil.applyDeadband(driverXbox.getLeftX(), OperatorConstants.LEFT_X_DEADBAND),
         () -> driverXbox.getRawAxis(2));
 
+    AbsoluteFieldDrive absoluteFieldDrive = new AbsoluteFieldDrive(drivebase, () -> -MathUtil.applyDeadband(driverXbox.getLeftY(),
+                                                                                                OperatorConstants.LEFT_Y_DEADBAND),
+                                                                   () -> -MathUtil.applyDeadband(driverXbox.getLeftX(),
+                                                                                                OperatorConstants.LEFT_X_DEADBAND),
+                                                                   () -> -MathUtil.applyDeadband(driverXbox.getRightX(),
+                                                                                                OperatorConstants.RIGHT_X_DEADBAND));
+
+                                                                                                
+
+    FieldOrientedDrive fieldOrientedDrive = new FieldOrientedDrive(drivebase, () -> -MathUtil.applyDeadband(driverXbox.getLeftY(),
+                                                                                                OperatorConstants.LEFT_Y_DEADBAND),
+                                                                   () -> -MathUtil.applyDeadband(driverXbox.getLeftX(),
+                                                                                                OperatorConstants.LEFT_X_DEADBAND),
+                                                                   () -> -MathUtil.applyDeadband(driverXbox.getRightX(),
+                                                                                                OperatorConstants.RIGHT_X_DEADBAND));
+
     drivebase.setDefaultCommand(
-        !RobotBase.isSimulation() ? closedAbsoluteDriveAdv : driveFieldOrientedDirectAngleSim);
+        !RobotBase.isSimulation() ? fieldOrientedDrive : driveFieldOrientedDirectAngleSim);
   }
 
   /**
@@ -122,7 +139,7 @@ public class RobotContainer
   public Command getAutonomousCommand()
   {
     // An example command will be run in autonomous
-    return drivebase.getAutonomousCommand("New Path", true);
+    return drivebase.getAutonomousCommand("Basic", true);
   }
 
   public void setDriveMode()

@@ -19,6 +19,7 @@ import edu.wpi.first.math.trajectory.Trajectory;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.Timer;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import java.io.File;
@@ -31,6 +32,7 @@ import swervelib.parser.SwerveDriveConfiguration;
 import swervelib.parser.SwerveParser;
 import swervelib.telemetry.SwerveDriveTelemetry;
 import swervelib.telemetry.SwerveDriveTelemetry.TelemetryVerbosity;
+import frc.robot.Constants;
 
 public class SwerveSubsystem extends SubsystemBase
 {
@@ -81,6 +83,10 @@ public class SwerveSubsystem extends SubsystemBase
     setupPathPlanner();
   }
 
+  public void setDriveHeadingCorrection(boolean state) {
+    swerveDrive.setHeadingCorrection(state);
+  }
+
   /**
    * Construct the swerve drive.
    *
@@ -97,6 +103,14 @@ public class SwerveSubsystem extends SubsystemBase
    */
   public void setupPathPlanner()
   {
+    PIDConstants autonRotationPIDConstants = new PIDConstants(Constants.Auton.angleAutoPID.p,
+        Constants.Auton.angleAutoPID.i,
+        Constants.Auton.angleAutoPID.d);
+
+    SmartDashboard.putNumber("Auton Rotation P", autonRotationPIDConstants.kP);
+    SmartDashboard.putNumber("Auton Rotation I", autonRotationPIDConstants.kI);
+    SmartDashboard.putNumber("Auton Rotation D", autonRotationPIDConstants.kD);
+
     AutoBuilder.configureHolonomic(
         this::getPose, // Robot pose supplier
         this::resetOdometry, // Method to reset odometry (will be called if your auto has a starting pose)
@@ -105,9 +119,7 @@ public class SwerveSubsystem extends SubsystemBase
         new HolonomicPathFollowerConfig( // HolonomicPathFollowerConfig, this should likely live in your Constants class
                                          new PIDConstants(5.0, 0.0, 0.0),
                                          // Translation PID constants
-                                         new PIDConstants(swerveDrive.swerveController.config.headingPIDF.p,
-                                                          swerveDrive.swerveController.config.headingPIDF.i,
-                                                          swerveDrive.swerveController.config.headingPIDF.d),
+                                         autonRotationPIDConstants,
                                          // Rotation PID constants
                                          4.5,
                                          // Max module speed, in m/s
