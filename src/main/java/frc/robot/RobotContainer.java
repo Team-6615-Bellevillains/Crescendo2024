@@ -18,10 +18,19 @@ import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.Constants.OperatorConstants;
+import frc.robot.commands.ClimbDownCmd;
+import frc.robot.commands.ClimbUpCmd;
+import frc.robot.commands.arm.IntakeRingCmd;
+import frc.robot.commands.arm.RotateCmd;
+import frc.robot.commands.arm.ShootCmd;
 import frc.robot.commands.swervedrive.drivebase.AbsoluteDriveAdv;
 import frc.robot.commands.swervedrive.drivebase.AbsoluteFieldDrive;
 import frc.robot.commands.swervedrive.drivebase.FieldOrientedDrive;
 import frc.robot.subsystems.swervedrive.SwerveSubsystem;
+import frc.robot.subsystems.arm.RotationSubsystem;
+import frc.robot.subsystems.arm.ShootingSubsystem;
+import frc.robot.subsystems.arm.StorageSubsystem;
+import frc.robot.subsystems.ClimbSubsystem;
 import java.io.File;
 
 /**
@@ -35,13 +44,20 @@ public class RobotContainer
   // The robot's subsystems and commands are defined here...
   private final SwerveSubsystem drivebase = new SwerveSubsystem(new File(Filesystem.getDeployDirectory(),
                                                                          "swerve/neo"));
+  private final StorageSubsystem storageSubsystem = new StorageSubsystem();
+  private final ShootingSubsystem shootingSubsystem = new ShootingSubsystem();
+  private final RotationSubsystem rotationSubsystem = new RotationSubsystem();
+  private final ClimbSubsystem climbSubsystem = new ClimbSubsystem();
+  public Trigger lefTrigger;
+  public Trigger rightTrigger;
+
   // CommandJoystick rotationController = new CommandJoystick(1);
   // Replace with CommandPS4Controller or CommandJoystick if needed
   //CommandJoystick driverController = new CommandJoystick(1);
 
   // CommandJoystick driverController   = new CommandJoystick(3);//(OperatorConstants.DRIVER_CONTROLLER_PORT);
   XboxController driverXbox = new XboxController(0);
-  XboxController operatorXbox = new XboxController(1);
+  CommandXboxController operatorXbox = new CommandXboxController(1);
 
 
   /**
@@ -128,6 +144,15 @@ public class RobotContainer
         Commands.deferredProxy(() -> drivebase.driveToPose(
                                    new Pose2d(new Translation2d(4, 4), Rotation2d.fromDegrees(0)))
                               ));
+    operatorXbox.a().onTrue(new IntakeRingCmd(storageSubsystem, shootingSubsystem));
+    operatorXbox.leftBumper().onTrue(new ShootCmd(shootingSubsystem, 0.3, storageSubsystem)); //Amp Shooter
+    operatorXbox.rightBumper().onTrue(new ShootCmd(shootingSubsystem, 0.6, storageSubsystem)); // Spearker Shooter
+    operatorXbox.x().onTrue(new RotateCmd(rotationSubsystem, 3, 0.3)); //Rotate to Amp
+    operatorXbox.b().onTrue(new RotateCmd(rotationSubsystem, 8, 0.2)); //Rotate to Speaker
+    operatorXbox.y().onTrue(new RotateCmd(rotationSubsystem, 8, -0.2)); //Rotate to intake
+    operatorXbox.leftTrigger().onTrue(new ClimbUpCmd(climbSubsystem));
+    operatorXbox.rightTrigger().onTrue(new ClimbDownCmd(climbSubsystem));
+
 //    new JoystickButton(driverXbox, 3).whileTrue(new RepeatCommand(new InstantCommand(drivebase::lock, drivebase)));
   }
 

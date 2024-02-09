@@ -49,4 +49,19 @@ public final class Constants
     public static final double RIGHT_X_DEADBAND = 0.07;
     public static final double TURN_CONSTANT    = 6;
   }
+
+  public static class ArmConstants {
+    public static final int kStorageMotorPort = 15; //change once wired
+    public static final int kShootingMotorPort = 16; //change once wired
+    public static final int kRotateMotorPort = 17; //change once wired
+
+    public static final double LAUNCH_RUN_TIME = 3; //change once tested
+    public static final double LOAD_RUN_TIME = 2; //change once tested
+  }
+
+  public static class ClimbConstants {
+    public static final int kClimbMotorRightPort = 18; //change once wired
+    public static final int kClimbMotorLeftPort = 19; //change once wired
+
+  }
 }
