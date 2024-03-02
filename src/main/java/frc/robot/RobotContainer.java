@@ -143,11 +143,11 @@ public class RobotContainer
 
     new JoystickButton(driverXbox, 2).onTrue((new InstantCommand(drivebase::zeroGyro)));
     new JoystickButton(driverXbox, 3).onTrue(new InstantCommand(drivebase::addFakeVisionReading));
-    new JoystickButton(driverXbox,
-                       2).whileTrue(
-        Commands.deferredProxy(() -> drivebase.driveToPose(
-                                   new Pose2d(new Translation2d(4, 4), Rotation2d.fromDegrees(0)))
-                              ));
+    // new JoystickButton(driverXbox,
+    //                    2).whileTrue(
+    //     Commands.deferredProxy(() -> drivebase.driveToPose(
+    //                                new Pose2d(new Translation2d(4, 4), Rotation2d.fromDegrees(0)))
+    //                           ));
     operatorXbox.y().onTrue(new IntakeRingCmd(storageSubsystem, shootingSubsystem));
     operatorXbox.a().onTrue(new ShootCmd(shootingSubsystem, -0.1, storageSubsystem, 0.1)); //Amp Shooter
     operatorXbox.b().onTrue(new ShootCmd(shootingSubsystem, -0.6, storageSubsystem, 0.6)); // Spearker Shooter
@@ -156,6 +156,8 @@ public class RobotContainer
     operatorXbox.leftBumper().onTrue(new RotateCmd(rotationSubsystem, 8, -0.1)); //Rotate to Speaker
     operatorXbox.leftTrigger().onTrue(new RotateCmd(rotationSubsystem, 8, 0.1)); //Rotate to stage
     operatorXbox.rightTrigger().onTrue(new RotateCmd(rotationSubsystem, 8, 0.1)); //Rotate to intake
+
+    // new JoystickButton(driverXbox, 4).onTrue(Commands.parallel(upLeft, upRight));
 
     new JoystickButton(driverXbox, 1).onTrue(new ClimbDownRightCmd(climbRightSubsystem));
    // new JoystickButton(driverXbox, 1).onTrue(new ClimbDownLeftCmd(climbLeftSubsystem));
