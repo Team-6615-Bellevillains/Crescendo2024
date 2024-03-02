@@ -2,10 +2,9 @@ package frc.robot.commands;
 
 import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj2.command.Command;
+import frc.robot.Constants.ClimbConstants;
 import frc.robot.subsystems.ClimbRightSubsystem;
 import frc.robot.utils.Direction;
-
-import frc.robot.Constants.ClimbConstants;
 
 public class ClimbRightCmd extends Command {
 
@@ -23,15 +22,16 @@ public class ClimbRightCmd extends Command {
     }
 
     @Override
-    public void initialize(){
+    public void initialize() {
         climbRightSubsystem.setClimbSpeedPercentage(direction == Direction.UP ? 1 : -1);
     }
 
     @Override
-    public void execute() { }
+    public void execute() {
+    }
 
     @Override
-    public void end(boolean interrupted){
+    public void end(boolean interrupted) {
         climbRightSubsystem.setClimbSpeedPercentage(0);
     }
 

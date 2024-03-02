@@ -28,7 +28,7 @@ public class TunableProfiledPIDController {
     private ProfiledPIDController profiledPIDController;
 
     public TunableProfiledPIDController(String identifier, double Kp, double Ki, double Kd,
-            TrapezoidProfile.Constraints constraints, DoubleSupplier measurementSupplier) {
+                                        TrapezoidProfile.Constraints constraints, DoubleSupplier measurementSupplier) {
         profiledPIDController = new ProfiledPIDController(Kp, Ki, Kd, constraints);
 
         this.identifier = identifier;

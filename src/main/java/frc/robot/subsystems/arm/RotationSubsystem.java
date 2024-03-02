@@ -1,9 +1,8 @@
 package frc.robot.subsystems.arm;
 
+import com.revrobotics.CANSparkLowLevel.MotorType;
 import com.revrobotics.CANSparkMax;
 import com.revrobotics.RelativeEncoder;
-import com.revrobotics.CANSparkLowLevel.MotorType;
-
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
@@ -30,7 +29,7 @@ public class RotationSubsystem extends SubsystemBase {
         rotationEncoder.setPositionConversionFactor(RotationConstants.ENCODER_READING_TO_ANGLE_CONVERSION_FACTOR);
         rotationEncoder.setVelocityConversionFactor(RotationConstants.ENCODER_READING_TO_ANGLE_CONVERSION_FACTOR / 60.0);
         rotationEncoder.setPosition(RotationConstants.SPEAKER_SHOOTING_ANGLE_DEGREES);
-    }        
+    }
 
 
     @Override
@@ -43,7 +42,7 @@ public class RotationSubsystem extends SubsystemBase {
     }
 
     public double calculateFeedforward(double currentPositionRadians, double desiredVelocityRadians) {
-       return rotationFeedforward.getController().calculate(currentPositionRadians, desiredVelocityRadians);
+        return rotationFeedforward.getController().calculate(currentPositionRadians, desiredVelocityRadians);
     }
 
     public void setMotorVoltage(double voltage) {
@@ -56,7 +55,7 @@ public class RotationSubsystem extends SubsystemBase {
     public double getRotationEncoderPositionInDegrees() {
         return rotationEncoder.getPosition();
     }
-    
+
     public double getRotationEncoderPositionInRadians() {
         return Units.degreesToRadians(getRotationEncoderPositionInDegrees());
     }
@@ -64,7 +63,7 @@ public class RotationSubsystem extends SubsystemBase {
     public double getRotationEncoderVelocityInDegreesPerSec() {
         return rotationEncoder.getVelocity();
     }
-    
+
     public double getRotationEncoderVelocityInRadsPerSec() {
         return Units.degreesToRadians(getRotationEncoderVelocityInDegreesPerSec());
     }

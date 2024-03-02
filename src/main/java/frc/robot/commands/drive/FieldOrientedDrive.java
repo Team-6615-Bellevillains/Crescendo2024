@@ -1,8 +1,5 @@
 package frc.robot.commands.drive;
 
-import java.util.List;
-import java.util.function.DoubleSupplier;
-
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
@@ -11,6 +8,9 @@ import frc.robot.Constants;
 import frc.robot.subsystems.drive.SwerveSubsystem;
 import swervelib.SwerveController;
 import swervelib.math.SwerveMath;
+
+import java.util.List;
+import java.util.function.DoubleSupplier;
 
 public class FieldOrientedDrive extends Command {
     private final SwerveSubsystem swerve;

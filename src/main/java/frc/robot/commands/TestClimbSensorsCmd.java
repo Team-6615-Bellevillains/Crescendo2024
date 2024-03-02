@@ -7,10 +7,10 @@ import edu.wpi.first.wpilibj2.command.Command;
 
 import static frc.robot.Constants.ClimbConstants;
 
-public class TestClimbSensorsCmd extends Command{
-    
+public class TestClimbSensorsCmd extends Command {
+
     DigitalInput rightDrop, rightClimb, leftDrop, leftClimb;
-    
+
 
     @Override
     public void initialize() {
@@ -22,7 +22,7 @@ public class TestClimbSensorsCmd extends Command{
 
     @Override
     public void execute() {
-        SmartDashboard.putBoolean("rightDrop", rightDrop.get());        
+        SmartDashboard.putBoolean("rightDrop", rightDrop.get());
         SmartDashboard.putBoolean("rightClimb", rightClimb.get());
         SmartDashboard.putBoolean("leftDrop", leftDrop.get());
         SmartDashboard.putBoolean("leftClimb", leftClimb.get());

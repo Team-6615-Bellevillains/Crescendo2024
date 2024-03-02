@@ -56,7 +56,7 @@ public class ArmRotate extends Command {
                 .calculate(rotationSubsystem.getRotationEncoderPositionInRadians());
         double ffOut = rotationSubsystem.calculateFeedforward(rotationSubsystem.getRotationEncoderPositionInRadians(),
                 radiansPositionController.getController().getSetpoint().velocity);
-       
+
         double commandedVoltage = (pidOut + ffOut);
 
         SmartDashboard.putNumber("Rotation pidOutput", pidOut);
