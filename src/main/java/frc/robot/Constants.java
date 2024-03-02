@@ -72,7 +72,7 @@ public final class Constants
     // Feedforward
     public static final double kGRotation = 1.25;
     public static final double kVRotation = 0.0;
-    public static final double kSRotation = 0.8;
+    public static final double kSRotation = 2;
     public static final double kARotation = 0.0;
 
     // Feedback 

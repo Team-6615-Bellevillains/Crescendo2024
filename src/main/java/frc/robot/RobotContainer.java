@@ -118,8 +118,8 @@ public class RobotContainer
     //                           ));
     operatorXbox.y().whileTrue(new IntakeRingCmd(storageSubsystem, shootingSubsystem));
     operatorXbox.a().onTrue(new ShootVoltageFlywheel(shootingSubsystem, -3.25, storageSubsystem, 4)); //Amp Shooter
-    operatorXbox.b().onTrue(new ShootVoltageFlywheel(shootingSubsystem, -5.75, storageSubsystem, 6)); // Spearker Shooter
-    operatorXbox.x().onTrue(new ShootVoltageFlywheel(shootingSubsystem, -10, storageSubsystem, 10)); // Stage Shooter
+    operatorXbox.b().onTrue(new ShootVoltageFlywheel(shootingSubsystem, -7.0, storageSubsystem, 6)); // Stsgr Shooter
+    operatorXbox.x().onTrue(new ShootVoltageFlywheel(shootingSubsystem, -10, storageSubsystem, 10)); // Speaker Shooter
     // operatorXbox.rightBumper().onTrue(new RotateCmd(rotationSubsystem, 3, -0.1)); //Rotate to Amp
     // operatorXbox.leftBumper().onTrue(new RotateCmd(rotationSubsystem, 8, -0.1)); //Rotate to Speaker
     // operatorXbox.leftTrigger().onTrue(new RotateCmd(rotationSubsystem, 8, 0.1)); //Rotate to stage
