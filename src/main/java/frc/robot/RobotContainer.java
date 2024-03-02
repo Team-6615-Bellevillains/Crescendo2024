@@ -14,6 +14,7 @@ import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
+import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
@@ -25,6 +26,7 @@ import frc.robot.commands.ClimbUpRightCmd;
 import frc.robot.commands.TestClimbSensorsCmd;
 import frc.robot.commands.TestIntakeSensorCmd;
 import frc.robot.commands.arm.IntakeRingCmd;
+import frc.robot.commands.arm.IntakeRingUntilCapturedCmd;
 // import frc.robot.commands.arm.RotateCmd;
 import frc.robot.commands.arm.RotateToSpecificAngle;
 import frc.robot.commands.arm.RotationControlJoystick;
@@ -42,6 +44,8 @@ import frc.robot.subsystems.arm.StorageSubsystem;
 import frc.robot.subsystems.ClimbLeftSubsystem;
 import frc.robot.subsystems.ClimbRightSubsystem;
 import java.io.File;
+
+import com.pathplanner.lib.auto.NamedCommands;
 
 /**
  * This class is where the bulk of the robot should be declared. Since Command-based is a "declarative" paradigm, very
@@ -62,11 +66,11 @@ public class RobotContainer
   public Trigger lefTrigger;
   public Trigger rightTrigger;
 
+  private boolean isHoldingSpeakerAngle = true;
+
   private final ShootVoltageFlywheel ampShooter = new ShootVoltageFlywheel(shootingSubsystem, -3.25, storageSubsystem, 4);  
   private final ShootVoltageFlywheel trapShooter = new ShootVoltageFlywheel(shootingSubsystem, -7, storageSubsystem, 6);
   private final ShootVoltageFlywheel speakerShooter = new ShootVoltageFlywheel(shootingSubsystem, -10, storageSubsystem, 10);
-
-  private boolean isHoldingSpeakerAngle = true;
 
   // CommandJoystick rotationController = new CommandJoystick(1);
   // Replace with CommandPS4Controller or CommandJoystick if needed
@@ -102,6 +106,16 @@ public class RobotContainer
 
     drivebase.setDefaultCommand(
         !RobotBase.isSimulation() ? fieldOrientedDrive : driveFieldOrientedDirectAngleSim);
+
+        NamedCommands.registerCommand("shoot", speakerShooter);
+
+        NamedCommands.registerCommand(
+          "rotateDown", Commands.runOnce(() -> isHoldingSpeakerAngle = !isHoldingSpeakerAngle)
+      .andThen(new RotateToSpecificAngle(rotationSubsystem, () -> isHoldingSpeakerAngle)));
+
+        NamedCommands.registerCommand("intake", new IntakeRingUntilCapturedCmd(storageSubsystem, shootingSubsystem)
+      .andThen(Commands.runOnce(() -> isHoldingSpeakerAngle = !isHoldingSpeakerAngle))
+      .andThen(new RotateToSpecificAngle(rotationSubsystem, () -> isHoldingSpeakerAngle)));
   }
 
   /**
@@ -122,7 +136,9 @@ public class RobotContainer
     //     Commands.deferredProxy(() -> drivebase.driveToPose(
     //                                new Pose2d(new Translation2d(4, 4), Rotation2d.fromDegrees(0)))
     //                           ));
-    operatorXbox.y().whileTrue(new IntakeRingCmd(storageSubsystem, shootingSubsystem));
+    operatorXbox.y().onTrue(new IntakeRingUntilCapturedCmd(storageSubsystem, shootingSubsystem)
+      .andThen(Commands.runOnce(() -> isHoldingSpeakerAngle = !isHoldingSpeakerAngle))
+      .andThen(new RotateToSpecificAngle(rotationSubsystem, () -> isHoldingSpeakerAngle)));
     operatorXbox.b().onTrue(trapShooter); // Stsgr Shooter
     operatorXbox.x().onTrue(speakerShooter); // Speaker Shooter
     // operatorXbox.rightBumper().onTrue(new RotateCmd(rotationSubsystem, 3, -0.1)); //Rotate to Amp
@@ -155,7 +171,7 @@ public class RobotContainer
   public Command getAutonomousCommand()
   {
     // An example command will be run in autonomous
-    return speakerShooter;
+    return speakerShooter.andThen(drivebase.getAutonomousCommand("drive to note", true));
   }
 
   public void setDriveMode()

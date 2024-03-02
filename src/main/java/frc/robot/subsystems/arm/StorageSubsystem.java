@@ -20,4 +20,8 @@ public class StorageSubsystem extends SubsystemBase {
     public void setStorageSpeedVoltage(double storageSpeedVoltage) {
         storageMotor.setVoltage(storageSpeedVoltage);
     }
+
+    public double getOutputCurrent() {
+        return storageMotor.getOutputCurrent();
+    }
 }
