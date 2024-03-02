@@ -29,6 +29,7 @@ public class RotationControlJoystick extends Command {
 
     @Override
     public void execute() {
+        SmartDashboard.putNumber("Arm position degrees", rotationSubsystem.getRotationEncoderPositionInDegrees());
         if(rotationSubsystem.getRotationEncoderPositionInDegrees() < 15 + ArmConstants.BOX_TO_COG_ANGLE)
         {
             RobotContainer.controlMultiplier = 0.6;
@@ -38,10 +39,10 @@ public class RotationControlJoystick extends Command {
             RobotContainer.controlMultiplier = 1;
         }
         double suppliedInput = MathUtil.applyDeadband(joystickInputSupplier.getAsDouble(), 0.10);
-        double desiredVelocity = suppliedInput * 20;
+        double desiredVelocityRadiansPerSec = suppliedInput * Units.degreesToRadians(100);
         
-        SmartDashboard.putNumber("DESIRED arm rotation velocity DESIRED", desiredVelocity);
-        rotationSubsystem.setMotorVoltage(rotationSubsystem.calculateFeedforward(rotationSubsystem.getRotationEncoderPositionInRadians(), Units.degreesToRadians(desiredVelocity)));
+        SmartDashboard.putNumber("DESIRED arm rotation velocity DESIRED", desiredVelocityRadiansPerSec);
+        rotationSubsystem.setMotorVoltage(rotationSubsystem.calculateFeedforward(rotationSubsystem.getRotationEncoderPositionInRadians(), desiredVelocityRadiansPerSec));
     }
 
     @Override

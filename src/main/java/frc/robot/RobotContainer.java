@@ -62,6 +62,12 @@ public class RobotContainer
   public Trigger lefTrigger;
   public Trigger rightTrigger;
 
+  private final ShootVoltageFlywheel ampShooter = new ShootVoltageFlywheel(shootingSubsystem, -3.25, storageSubsystem, 4);  
+  private final ShootVoltageFlywheel trapShooter = new ShootVoltageFlywheel(shootingSubsystem, -7, storageSubsystem, 6);
+  private final ShootVoltageFlywheel speakerShooter = new ShootVoltageFlywheel(shootingSubsystem, -10, storageSubsystem, 10);
+
+  private boolean isHoldingSpeakerAngle = true;
+
   // CommandJoystick rotationController = new CommandJoystick(1);
   // Replace with CommandPS4Controller or CommandJoystick if needed
   //CommandJoystick driverController = new CommandJoystick(1);
@@ -117,18 +123,22 @@ public class RobotContainer
     //                                new Pose2d(new Translation2d(4, 4), Rotation2d.fromDegrees(0)))
     //                           ));
     operatorXbox.y().whileTrue(new IntakeRingCmd(storageSubsystem, shootingSubsystem));
-    operatorXbox.a().onTrue(new ShootVoltageFlywheel(shootingSubsystem, -3.25, storageSubsystem, 4)); //Amp Shooter
-    operatorXbox.b().onTrue(new ShootVoltageFlywheel(shootingSubsystem, -7.0, storageSubsystem, 6)); // Stsgr Shooter
-    operatorXbox.x().onTrue(new ShootVoltageFlywheel(shootingSubsystem, -10, storageSubsystem, 10)); // Speaker Shooter
+    operatorXbox.b().onTrue(trapShooter); // Stsgr Shooter
+    operatorXbox.x().onTrue(speakerShooter); // Speaker Shooter
     // operatorXbox.rightBumper().onTrue(new RotateCmd(rotationSubsystem, 3, -0.1)); //Rotate to Amp
     // operatorXbox.leftBumper().onTrue(new RotateCmd(rotationSubsystem, 8, -0.1)); //Rotate to Speaker
     // operatorXbox.leftTrigger().onTrue(new RotateCmd(rotationSubsystem, 8, 0.1)); //Rotate to stage
     // operatorXbox.rightTrigger().onTrue(new RotateCmd(rotationSubsystem, 8, 0.1)); //Rotate to intake
     // operatorXbox.leftBumper().whileTrue(new TuneGravity(rotationSubsystem));
-    rotationSubsystem.setDefaultCommand(new RotationControlJoystick(rotationSubsystem, operatorXbox::getLeftY));
+    // rotationSubsystem.setDefaultCommand(new RotationControlJoystick(rotationSubsystem, operatorXbox::getLeftY));
 
-     new JoystickButton(driverXbox, 4).onTrue(Commands.parallel(new ClimbUpLeftCmd(climbLeftSubsystem),new ClimbUpRightCmd(climbRightSubsystem) ));
-     new JoystickButton(driverXbox, 1).onTrue(Commands.parallel(new ClimbDownLeftCmd(climbLeftSubsystem),new ClimbDownRightCmd(climbRightSubsystem) ));
+    operatorXbox.a().onTrue(
+      Commands.runOnce(() -> isHoldingSpeakerAngle = !isHoldingSpeakerAngle)
+      .andThen(new RotateToSpecificAngle(rotationSubsystem, () -> isHoldingSpeakerAngle))
+    );
+
+    //  new JoystickButton(driverXbox, 4).onTrue(Commands.parallel(new ClimbUpLeftCmd(climbLeftSubsystem),new ClimbUpRightCmd(climbRightSubsystem) ));
+    //  new JoystickButton(driverXbox, 1).onTrue(Commands.parallel(new ClimbDownLeftCmd(climbLeftSubsystem),new ClimbDownRightCmd(climbRightSubsystem) ));
 
   // new JoystickButton(driverXbox, 1).onTrue(new ClimbDownLeftCmd(climbLeftSubsystem));
    //new JoystickButton(driverXbox, 4).onTrue(new ClimbUpLeftCmd(climbLeftSubsystem));
@@ -145,7 +155,7 @@ public class RobotContainer
   public Command getAutonomousCommand()
   {
     // An example command will be run in autonomous
-    return drivebase.getAutonomousCommand("Basic", true);
+    return speakerShooter;
   }
 
   public void setDriveMode()

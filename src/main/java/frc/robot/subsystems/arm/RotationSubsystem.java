@@ -21,19 +21,22 @@ public class RotationSubsystem extends SubsystemBase {
 
     public RotationSubsystem() {
         rotationMotor = new CANSparkMax(ArmConstants.kRotateMotorPort, MotorType.kBrushless);
-        rotationEncoder = rotationMotor.getEncoder();
+        rotationEncoder = rotationMotor.getAlternateEncoder(4096);
 
         rotationMotor.setInverted(true);
         rotationEncoder.setPositionConversionFactor(ArmConstants.ENCODER_READING_TO_ANGLE_CONVERSION_FACTOR);
         rotationEncoder.setVelocityConversionFactor(ArmConstants.ENCODER_READING_TO_ANGLE_CONVERSION_FACTOR / 60.0);
         rotationEncoder.setPosition(ArmConstants.SPEAKER_SHOOTING_ANGLE_DEGREES);
-    }
+    }        
+
 
     @Override
     public void periodic() {
         // SmartDashboard.putNumber("Rotation measurement", rotationEncoder.getPosition());
         // SmartDashboard.putNumber("Rotation measurement [Heartbeat]", Timer.getFPGATimestamp());
-        SmartDashboard.putNumber("ACTUAL Rotation velocity ACTUAL", getRotationEncoderVelocityInDegreesPerSec());
+        SmartDashboard.putNumber("Current reading arm", rotationEncoder.getPosition());
+
+        SmartDashboard.putNumber("ACTUAL Rotation velocity ACTUAL", getRotationEncoderVelocityInRadsPerSec());
     }
 
     public double calculateFeedforward(double currentPositionRadians, double desiredVelocityRadians) {
@@ -41,8 +44,8 @@ public class RotationSubsystem extends SubsystemBase {
     }
 
     public void setMotorVoltage(double voltage) {
-        // SmartDashboard.putNumber("Rotation voltage", voltage);
-        // SmartDashboard.putNumber("Rotation voltage [Heartbeat]", Timer.getFPGATimestamp());
+        SmartDashboard.putNumber("Rotation voltage", voltage);
+        SmartDashboard.putNumber("Rotation voltage [Heartbeat]", Timer.getFPGATimestamp());
 
         rotationMotor.setVoltage(voltage);
     }
@@ -69,5 +72,13 @@ public class RotationSubsystem extends SubsystemBase {
     
     public double getRotationEncoderVelocityInRadsPerSec() {
         return Units.degreesToRadians(getRotationEncoderVelocityInDegreesPerSec());
+    }
+
+    public void activateHoldingCurrentLimit() {
+        rotationMotor.setSmartCurrentLimit(ArmConstants.HOLDING_ANGLE_CURRENT_LIMIT);
+    }
+
+    public void deactivateHoldingCurrentLimit() {
+        rotationMotor.setSmartCurrentLimit(ArmConstants.REGULAR_CURRENT_LIMIT);
     }
 }

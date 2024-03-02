@@ -1,5 +1,7 @@
 package frc.robot.commands.arm;
 
+import java.util.function.BooleanSupplier;
+
 import edu.wpi.first.math.trajectory.TrapezoidProfile;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.Timer;
@@ -13,39 +15,50 @@ public class RotateToSpecificAngle extends Command {
 
     private final RotationSubsystem rotationSubsystem;
 
-    private final TunableProfiledPIDController positionController;
+    private final TunableProfiledPIDController radiansPositionController;
+    private final BooleanSupplier directionSupplier;
+    private boolean isHoldingSpeakerAngle;
 
-    public RotateToSpecificAngle(RotationSubsystem rotationSubsystem, double desiredAngleRadians) {
+    public RotateToSpecificAngle(RotationSubsystem rotationSubsystem, BooleanSupplier directionSupplier) {
         this.rotationSubsystem = rotationSubsystem;
+        this.directionSupplier = directionSupplier;
 
-        this.positionController = new TunableProfiledPIDController("rotation pid", ArmConstants.kPRotation,
+        this.radiansPositionController = new TunableProfiledPIDController("rotation pid", ArmConstants.kPRotation,
                 ArmConstants.kIRotation, ArmConstants.kDRotation,
                 new TrapezoidProfile.Constraints(ArmConstants.kMaxRotationVelocityRadiansPerSecond,
                         ArmConstants.kMaxRotationAccelerationRadiansPerSecondSquared),
                 rotationSubsystem::getRotationEncoderPositionInRadians);
-
-        this.positionController.getController().setGoal(desiredAngleRadians);
 
         this.addRequirements(rotationSubsystem);
     }
 
     @Override
     public void initialize() {
-        positionController.getController().reset(rotationSubsystem.getRotationEncoderPositionInRadians());
+        rotationSubsystem.deactivateHoldingCurrentLimit();
+
+        isHoldingSpeakerAngle = directionSupplier.getAsBoolean();
+        double armSetpointRadians = Units.degreesToRadians(isHoldingSpeakerAngle ? 
+                ArmConstants.SPEAKER_SHOOTING_ANGLE_DEGREES : ArmConstants.FLOOR_RESTING_ANGLE_DEGREES);
+
+        SmartDashboard.putNumber("Arm Setpoint", armSetpointRadians);
+        SmartDashboard.putString("Direction", isHoldingSpeakerAngle ? "Speaker" : "Floor");
+
+        radiansPositionController.getController().setGoal(armSetpointRadians);
+        radiansPositionController.getController().reset(rotationSubsystem.getRotationEncoderPositionInRadians());
     }
 
     @Override
     public void execute() {
         SmartDashboard.putNumber("Rotation Setpoint heartbeat", Timer.getFPGATimestamp());
         SmartDashboard.putNumber("Rotation Setpoint Goal Position",
-                positionController.getController().getGoal().position);
+                radiansPositionController.getController().getGoal().position);
 
-        double pidOut = positionController.getController()
+        double pidOut = radiansPositionController.getController()
                 .calculate(rotationSubsystem.getRotationEncoderPositionInRadians());
         double ffOut = rotationSubsystem.calculateFeedforward(rotationSubsystem.getRotationEncoderPositionInRadians(),
-                positionController.getController().getSetpoint().velocity);
-        // double commandedVoltage = pidOut + ffOut;
-        double commandedVoltage = ffOut;
+                radiansPositionController.getController().getSetpoint().velocity);
+       
+        double commandedVoltage = (pidOut + ffOut);
 
         SmartDashboard.putNumber("Rotation pidOutput", pidOut);
         SmartDashboard.putNumber("Rotation ffout", ffOut);
@@ -62,14 +75,15 @@ public class RotateToSpecificAngle extends Command {
                 rotationSubsystem.getRotationEncoderVelocityInDegreesPerSec());
         SmartDashboard.putNumber("Rotation heartbeat at end", Timer.getFPGATimestamp());
 
-        // rotationSubsystem.setMotorVoltage(
-        //         rotationSubsystem.calculateFeedforward(rotationSubsystem.getRotationEncoderPositionInRadians(), 0));
-        rotationSubsystem.setMotorVoltage(0);
+        rotationSubsystem.activateHoldingCurrentLimit();
+
+        int holdingVoltageSign = isHoldingSpeakerAngle ? 1 : -1;
+        rotationSubsystem.setMotorVoltage(holdingVoltageSign * ArmConstants.HOLDING_ANGLE_VOLTAGE);
     }
 
     @Override
     public boolean isFinished() {
-        return Math.abs(rotationSubsystem.getRotationEncoderPositionInRadians() - positionController.getController()
+        return Math.abs(rotationSubsystem.getRotationEncoderPositionInRadians() - radiansPositionController.getController()
                 .getGoal().position) <= ArmConstants.ROTATION_FINISHED_THRESHOLD_RADIANS;
     }
 
