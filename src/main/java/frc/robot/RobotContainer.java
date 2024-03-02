@@ -23,8 +23,10 @@ import frc.robot.commands.ClimbDownLeftCmd;
 import frc.robot.commands.ClimbUpLeftCmd;
 import frc.robot.commands.ClimbUpRightCmd;
 import frc.robot.commands.arm.IntakeRingCmd;
-import frc.robot.commands.arm.RotateCmd;
+// import frc.robot.commands.arm.RotateCmd;
+import frc.robot.commands.arm.RotateToSpecificAngle;
 import frc.robot.commands.arm.ShootCmd;
+import frc.robot.commands.arm.TuneGravity;
 import frc.robot.commands.swervedrive.drivebase.AbsoluteDriveAdv;
 import frc.robot.commands.swervedrive.drivebase.AbsoluteFieldDrive;
 import frc.robot.commands.swervedrive.drivebase.FieldOrientedDrive;
@@ -152,10 +154,11 @@ public class RobotContainer
     operatorXbox.a().onTrue(new ShootCmd(shootingSubsystem, -0.1, storageSubsystem, 0.1)); //Amp Shooter
     operatorXbox.b().onTrue(new ShootCmd(shootingSubsystem, -0.6, storageSubsystem, 0.6)); // Spearker Shooter
     operatorXbox.x().onTrue(new ShootCmd(shootingSubsystem, -0.78, storageSubsystem, 0.78)); // Stage Shooter
-    operatorXbox.rightBumper().onTrue(new RotateCmd(rotationSubsystem, 3, -0.1)); //Rotate to Amp
-    operatorXbox.leftBumper().onTrue(new RotateCmd(rotationSubsystem, 8, -0.1)); //Rotate to Speaker
-    operatorXbox.leftTrigger().onTrue(new RotateCmd(rotationSubsystem, 8, 0.1)); //Rotate to stage
-    operatorXbox.rightTrigger().onTrue(new RotateCmd(rotationSubsystem, 8, 0.1)); //Rotate to intake
+    // operatorXbox.rightBumper().onTrue(new RotateCmd(rotationSubsystem, 3, -0.1)); //Rotate to Amp
+    // operatorXbox.leftBumper().onTrue(new RotateCmd(rotationSubsystem, 8, -0.1)); //Rotate to Speaker
+    // operatorXbox.leftTrigger().onTrue(new RotateCmd(rotationSubsystem, 8, 0.1)); //Rotate to stage
+    // operatorXbox.rightTrigger().onTrue(new RotateCmd(rotationSubsystem, 8, 0.1)); //Rotate to intake
+    operatorXbox.leftBumper().whileTrue(new TuneGravity(rotationSubsystem));
 
     // new JoystickButton(driverXbox, 4).onTrue(Commands.parallel(upLeft, upRight));
 

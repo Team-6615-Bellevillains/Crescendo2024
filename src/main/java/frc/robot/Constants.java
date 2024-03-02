@@ -57,6 +57,29 @@ public final class Constants
 
     public static final double LAUNCH_RUN_TIME = 3; //change once tested
     public static final double LOAD_RUN_TIME = 2; // change
+
+    // TODO: when hard stop installed, switch this to the angle at rest against the hard stop, and remeasure ROTATIONS_FROM_FLOOR_REST_TO_SPEAKER
+    public static final double FLOOR_RESTING_ANGLE_DEGREES = -61; // -61 degrees when propped against the bumper
+    public static final double SPEAKER_SHOOTING_ANGLE_DEGREES = 57;
+    public static final double ROTATIONS_FROM_FLOOR_REST_TO_SPEAKER = 14.953842;
+
+    public static final double ENCODER_READING_TO_ANGLE_CONVERSION_FACTOR = (SPEAKER_SHOOTING_ANGLE_DEGREES - FLOOR_RESTING_ANGLE_DEGREES) / ROTATIONS_FROM_FLOOR_REST_TO_SPEAKER;
+
+    // Feedforward
+    public static final double kGRotation = 2.6;
+    public static final double kVRotation = 0.0;
+    public static final double kSRotation = 0.0;
+    public static final double kARotation = 0.0;
+
+    // Feedback 
+    public static final double kPRotation = 0.2;    
+    public static final double kIRotation = 0.0;
+    public static final double kDRotation = 0.0;
+
+    public static final double kMaxRotationVelocityRadiansPerSecond = 1.5;
+    public static final double kMaxRotationAccelerationRadiansPerSecondSquared = 3;
+
+    public static final double ROTATION_FINISHED_THRESHOLD_RADIANS = Units.degreesToRadians(5);
   }
 
   public static class ClimbConstants {
