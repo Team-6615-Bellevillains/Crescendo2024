@@ -18,8 +18,10 @@ import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.Constants.OperatorConstants;
-import frc.robot.commands.ClimbDownCmd;
-import frc.robot.commands.ClimbUpCmd;
+import frc.robot.commands.ClimbDownRightCmd;
+import frc.robot.commands.ClimbDownLeftCmd;
+import frc.robot.commands.ClimbUpLeftCmd;
+import frc.robot.commands.ClimbUpRightCmd;
 import frc.robot.commands.arm.IntakeRingCmd;
 import frc.robot.commands.arm.RotateCmd;
 import frc.robot.commands.arm.ShootCmd;
@@ -30,7 +32,8 @@ import frc.robot.subsystems.swervedrive.SwerveSubsystem;
 import frc.robot.subsystems.arm.RotationSubsystem;
 import frc.robot.subsystems.arm.ShootingSubsystem;
 import frc.robot.subsystems.arm.StorageSubsystem;
-import frc.robot.subsystems.ClimbSubsystem;
+import frc.robot.subsystems.ClimbLeftSubsystem;
+import frc.robot.subsystems.ClimbRightSubsystem;
 import java.io.File;
 
 /**
@@ -47,7 +50,8 @@ public class RobotContainer
   private final StorageSubsystem storageSubsystem = new StorageSubsystem();
   private final ShootingSubsystem shootingSubsystem = new ShootingSubsystem();
   private final RotationSubsystem rotationSubsystem = new RotationSubsystem();
-  private final ClimbSubsystem climbSubsystem = new ClimbSubsystem();
+  private final ClimbLeftSubsystem climbLeftSubsystem = new ClimbLeftSubsystem();
+  private final ClimbRightSubsystem climbRightSubsystem = new ClimbRightSubsystem();
   public Trigger lefTrigger;
   public Trigger rightTrigger;
 
@@ -137,23 +141,28 @@ public class RobotContainer
   {
     // Schedule `ExampleCommand` when `exampleCondition` changes to `true`
 
-    new JoystickButton(driverXbox, 1).onTrue((new InstantCommand(drivebase::zeroGyro)));
+    new JoystickButton(driverXbox, 2).onTrue((new InstantCommand(drivebase::zeroGyro)));
     new JoystickButton(driverXbox, 3).onTrue(new InstantCommand(drivebase::addFakeVisionReading));
     new JoystickButton(driverXbox,
                        2).whileTrue(
         Commands.deferredProxy(() -> drivebase.driveToPose(
                                    new Pose2d(new Translation2d(4, 4), Rotation2d.fromDegrees(0)))
                               ));
-    operatorXbox.a().onTrue(new IntakeRingCmd(storageSubsystem, shootingSubsystem));
-    operatorXbox.leftBumper().onTrue(new ShootCmd(shootingSubsystem, 0.3, storageSubsystem)); //Amp Shooter
-    operatorXbox.rightBumper().onTrue(new ShootCmd(shootingSubsystem, 0.6, storageSubsystem)); // Spearker Shooter
-    operatorXbox.x().onTrue(new RotateCmd(rotationSubsystem, 3, 0.3)); //Rotate to Amp
-    operatorXbox.b().onTrue(new RotateCmd(rotationSubsystem, 8, 0.2)); //Rotate to Speaker
-    operatorXbox.y().onTrue(new RotateCmd(rotationSubsystem, 8, -0.2)); //Rotate to intake
-    operatorXbox.leftTrigger().onTrue(new ClimbUpCmd(climbSubsystem));
-    operatorXbox.rightTrigger().onTrue(new ClimbDownCmd(climbSubsystem));
+    operatorXbox.y().onTrue(new IntakeRingCmd(storageSubsystem, shootingSubsystem));
+    operatorXbox.a().onTrue(new ShootCmd(shootingSubsystem, -0.1, storageSubsystem, 0.1)); //Amp Shooter
+    operatorXbox.b().onTrue(new ShootCmd(shootingSubsystem, -0.6, storageSubsystem, 0.6)); // Spearker Shooter
+    operatorXbox.x().onTrue(new ShootCmd(shootingSubsystem, -0.78, storageSubsystem, 0.78)); // Stage Shooter
+    operatorXbox.rightBumper().onTrue(new RotateCmd(rotationSubsystem, 3, -0.1)); //Rotate to Amp
+    operatorXbox.leftBumper().onTrue(new RotateCmd(rotationSubsystem, 8, -0.1)); //Rotate to Speaker
+    operatorXbox.leftTrigger().onTrue(new RotateCmd(rotationSubsystem, 8, 0.1)); //Rotate to stage
+    operatorXbox.rightTrigger().onTrue(new RotateCmd(rotationSubsystem, 8, 0.1)); //Rotate to intake
 
-//    new JoystickButton(driverXbox, 3).whileTrue(new RepeatCommand(new InstantCommand(drivebase::lock, drivebase)));
+    new JoystickButton(driverXbox, 1).onTrue(new ClimbDownRightCmd(climbRightSubsystem));
+   // new JoystickButton(driverXbox, 1).onTrue(new ClimbDownLeftCmd(climbLeftSubsystem));
+   // new JoystickButton(driverXbox, 4).onTrue(new ClimbUpLeftCmd(climbLeftSubsystem));
+    new JoystickButton(driverXbox, 4).onTrue(new ClimbUpRightCmd(climbRightSubsystem));
+
+    //    new JoystickButton.(driverXbox, 3).whileTrue(new RepeatCommand(new InstantCommand(drivebase::lock, drivebase)));
   }
 
   /**

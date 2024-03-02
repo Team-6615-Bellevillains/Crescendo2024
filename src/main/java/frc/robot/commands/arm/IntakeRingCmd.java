@@ -19,11 +19,14 @@ public class IntakeRingCmd extends Command {
    
     @Override
     public void execute() {
-        DigitalInput intakeInput = new DigitalInput(1); //change once wired
-        while (intakeInput.get() == false) {
-        storageSubsystem.setStorageSpeedPercentage(-0.1); //change once we test
-        shootingSubsystem.setShootingSpeedPercentage(-0.1); //change once we test
+        DigitalInput intakeInput = new DigitalInput(0);
+            while (intakeInput.get() == false) {
+            storageSubsystem.setStorageSpeedPercentage(-0.1); 
+            shootingSubsystem.setShootingSpeedPercentage(0.1); 
         }
+        storageSubsystem.setStorageSpeedPercentage(0); 
+        shootingSubsystem.setShootingSpeedPercentage(0); 
+        intakeInput.close();
     }
 
     @Override

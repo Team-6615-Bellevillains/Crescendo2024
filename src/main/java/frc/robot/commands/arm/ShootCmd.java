@@ -11,13 +11,15 @@ public class ShootCmd extends Command {
     private ShootingSubsystem shootingSubsystem;
     private StorageSubsystem storageSubsystem;
     double shootSpeedPercentage;
+    double storageSpeedPercentage;
     private double startTime;
     private boolean hasLauncherFinished = false;
 
-    public ShootCmd(ShootingSubsystem shootingSubsystem, double shootSpeedPercentage, StorageSubsystem storageSubsystem) {
+    public ShootCmd(ShootingSubsystem shootingSubsystem, double shootSpeedPercentage, StorageSubsystem storageSubsystem, double storageSpeedPercentage) {
         this.shootingSubsystem = shootingSubsystem;
         this.storageSubsystem = storageSubsystem;
         this.shootSpeedPercentage = shootSpeedPercentage;
+        this.storageSpeedPercentage = storageSpeedPercentage;
 
         addRequirements(shootingSubsystem, storageSubsystem);
     }
@@ -30,10 +32,8 @@ public class ShootCmd extends Command {
     @Override
     public void execute() {
         while(Timer.getFPGATimestamp() < startTime + Constants.ArmConstants.LAUNCH_RUN_TIME) {
-         shootingSubsystem.setShootingSpeedPercentage(shootSpeedPercentage); //change once we test
-         if(Timer.getFPGATimestamp() > startTime + Constants.ArmConstants.LAUNCH_RUN_TIME - Constants.ArmConstants.LOAD_RUN_TIME){
-            storageSubsystem.setStorageSpeedPercentage(0.1);
-         }
+        shootingSubsystem.setShootingSpeedPercentage(shootSpeedPercentage); 
+        storageSubsystem.setStorageSpeedPercentage(storageSpeedPercentage);
         }
         if(Timer.getFPGATimestamp() > startTime + Constants.ArmConstants.LAUNCH_RUN_TIME){
             hasLauncherFinished = true;
@@ -43,6 +43,8 @@ public class ShootCmd extends Command {
     @Override
     public void end(boolean interrupted){
         shootingSubsystem.setShootingSpeedPercentage(0); 
+        storageSubsystem.setStorageSpeedPercentage(0); 
+
     }
 
     @Override 
