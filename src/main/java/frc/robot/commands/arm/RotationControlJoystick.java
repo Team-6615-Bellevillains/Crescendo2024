@@ -6,6 +6,8 @@ import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
+import frc.robot.RobotContainer;
+import frc.robot.Constants.ArmConstants;
 import frc.robot.subsystems.arm.RotationSubsystem;
 
 public class RotationControlJoystick extends Command {
@@ -27,6 +29,14 @@ public class RotationControlJoystick extends Command {
 
     @Override
     public void execute() {
+        if(rotationSubsystem.getRotationEncoderPositionInDegrees() < 15 + ArmConstants.BOX_TO_COG_ANGLE)
+        {
+            RobotContainer.controlMultiplier = 0.6;
+        }
+        else
+        {
+            RobotContainer.controlMultiplier = 1;
+        }
         double suppliedInput = MathUtil.applyDeadband(joystickInputSupplier.getAsDouble(), 0.10);
         double desiredVelocity = suppliedInput * 20;
         

@@ -55,7 +55,10 @@ public final class Constants
     public static final int kShootingMotorPort = 15; 
     public static final int kRotateMotorPort = 14; 
 
-    public static final double LAUNCH_RUN_TIME = 0.5; //change once tested
+    public static final double TIME_UNTIL_FEED = 0.7;
+    public static final double LAUNCH_RUN_TIME = TIME_UNTIL_FEED + .75; //change once tested
+
+
 
     public static final double BOX_TO_COG_ANGLE = 90 - 13;
 
@@ -67,7 +70,7 @@ public final class Constants
     public static final double ENCODER_READING_TO_ANGLE_CONVERSION_FACTOR = (SPEAKER_SHOOTING_ANGLE_DEGREES - FLOOR_RESTING_ANGLE_DEGREES) / ROTATIONS_FROM_FLOOR_REST_TO_SPEAKER;
 
     // Feedforward
-    public static final double kGRotation = 1.45;
+    public static final double kGRotation = 1.25;
     public static final double kVRotation = 0.0;
     public static final double kSRotation = 0.8;
     public static final double kARotation = 0.0;

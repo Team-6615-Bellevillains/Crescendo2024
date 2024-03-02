@@ -1,7 +1,9 @@
 package frc.robot.commands.arm;
 
 import edu.wpi.first.wpilibj.DigitalInput;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
+import frc.robot.subsystems.ClimbLeftSubsystem;
 import frc.robot.subsystems.arm.ShootingSubsystem;
 import frc.robot.subsystems.arm.StorageSubsystem;
 
@@ -16,22 +18,22 @@ public class IntakeRingCmd extends Command {
 
         addRequirements(storageSubsystem, shootingSubsystem);
     }
-   
+
+    @Override
+    public void initialize(){
+        storageSubsystem.setStorageSpeedVoltage(-3.0); 
+        shootingSubsystem.setShootingSpeedVoltage(6);
+    }
+
     @Override
     public void execute() {
-        DigitalInput intakeInput = new DigitalInput(0);
-            while (intakeInput.get() == false) {
-            storageSubsystem.setStorageSpeedPercentage(-0.1); 
-            shootingSubsystem.setShootingSpeedPercentage(0.1); 
-        }
-        storageSubsystem.setStorageSpeedPercentage(0); 
-        shootingSubsystem.setShootingSpeedPercentage(0); 
-        intakeInput.close();
+
     }
 
     @Override
     public void end(boolean interrupted){
-        storageSubsystem.setStorageSpeedPercentage(0); 
-        shootingSubsystem.setShootingSpeedPercentage(0); 
+        storageSubsystem.setStorageSpeedVoltage(0); 
+        shootingSubsystem.setShootingSpeedVoltage(0);
     }
+
 }

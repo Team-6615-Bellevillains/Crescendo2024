@@ -6,7 +6,7 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants.ArmConstants;
 
 public class StorageSubsystem extends SubsystemBase {
-    
+
     private CANSparkMax storageMotor;
 
     public StorageSubsystem() {
