@@ -40,7 +40,7 @@ public final class Constants
     public static final double WHEEL_LOCK_TIME = 10; // seconds
   }
 
-  public static class OperatorConstants
+  public static final class OperatorConstants
   {
 
     // Joystick Deadband
@@ -50,49 +50,61 @@ public final class Constants
     public static final double TURN_CONSTANT    = 6;
   }
 
-  public static class ArmConstants {
-    public static final int kStorageMotorPort = 45; 
-    public static final int kShootingMotorPort = 15; 
-    public static final int kRotateMotorPort = 14; 
+  public static final class ArmConstants {
+    public static final class RotationConstants {
+      public static final int kRotateMotorPort = 14;
 
-    public static final double TIME_UNTIL_FEED = 0.7;
-    public static final double LAUNCH_RUN_TIME = TIME_UNTIL_FEED + .75; //change once tested
+      public static final double BOX_TO_COG_ANGLE = 90 - 13;
 
+      public static final double FLOOR_RESTING_ANGLE_DEGREES = -61 + BOX_TO_COG_ANGLE;
+      public static final double SPEAKER_SHOOTING_ANGLE_DEGREES = 57 + BOX_TO_COG_ANGLE;
+      public static final double ROTATIONS_FROM_FLOOR_REST_TO_SPEAKER = 0.565673;
 
+      public static final double ENCODER_READING_TO_ANGLE_CONVERSION_FACTOR = (SPEAKER_SHOOTING_ANGLE_DEGREES - FLOOR_RESTING_ANGLE_DEGREES) / ROTATIONS_FROM_FLOOR_REST_TO_SPEAKER;
 
-    public static final double BOX_TO_COG_ANGLE = 90 - 13;
+      public static final int HOLDING_ANGLE_CURRENT_LIMIT = 7;
+      public static final int REGULAR_CURRENT_LIMIT = 80;
+      public static final int HOLDING_ANGLE_VOLTAGE = 12;
 
-    // TODO: when hard stop installed, switch this to the angle at rest against the hard stop, and remeasure ROTATIONS_FROM_FLOOR_REST_TO_SPEAKER
-    public static final double FLOOR_RESTING_ANGLE_DEGREES = -61 + BOX_TO_COG_ANGLE; // -61 degrees when propped against the bumper
-    public static final double SPEAKER_SHOOTING_ANGLE_DEGREES = 57 + BOX_TO_COG_ANGLE;
-    public static final double ROTATIONS_FROM_FLOOR_REST_TO_SPEAKER = 0.565673;
+      // Feedforward
+      public static final double kGRotation = 0.75;
+      public static final double kVRotation = 0.92;
+      public static final double kSRotation = 0.1;
+      public static final double kARotation = 0.0;
 
-    public static final double ENCODER_READING_TO_ANGLE_CONVERSION_FACTOR = (SPEAKER_SHOOTING_ANGLE_DEGREES - FLOOR_RESTING_ANGLE_DEGREES) / ROTATIONS_FROM_FLOOR_REST_TO_SPEAKER;
+      // Feedback
+      public static final double kPRotation = 0.3;
+      public static final double kIRotation = 0.0;
+      public static final double kDRotation = 0.0;
 
-    public static final int HOLDING_ANGLE_CURRENT_LIMIT = 7;
-    public static final int REGULAR_CURRENT_LIMIT = 80;
-    public static final int HOLDING_ANGLE_VOLTAGE = 12;
+      public static final double kMaxRotationVelocityRadiansPerSecond = 2.09;
+      public static final double kMaxRotationAccelerationRadiansPerSecondSquared = 5.02;
 
-    // Feedforward
-    public static final double kGRotation = 0.75;
-    public static final double kVRotation = 0.92;
-    public static final double kSRotation = 0.1;
-    public static final double kARotation = 0.0;
+      public static final double ROTATION_FINISHED_THRESHOLD_RADIANS = Units.degreesToRadians(5);
 
-    // Feedback 
-    public static final double kPRotation = 0.3;    
-    public static final double kIRotation = 0.0;
-    public static final double kDRotation = 0.0;
+      public static final double SLOW_DRIVING_ANGLE_THRESHOLD_DEGREES = 15 + BOX_TO_COG_ANGLE;
+    }
 
-    public static final double kMaxRotationVelocityRadiansPerSecond = 2.09;
-    public static final double kMaxRotationAccelerationRadiansPerSecondSquared = 5.02;
+    public static final class ShooterConstants {
+      public static final int kStorageMotorPort = 45;
+      public static final int kShootingMotorPort = 15;
 
-    public static final double ROTATION_FINISHED_THRESHOLD_RADIANS = Units.degreesToRadians(5);
+      public static final double TIME_UNTIL_FEED = 0.7;
+      public static final double LAUNCH_RUN_TIME = TIME_UNTIL_FEED + .75; //change once tested
+
+      public static final double STORAGE_INTAKE_VOLTAGE = -3.0;
+      public static final double SHOOTING_INTAKE_VOLTAGE = 6.0;
+
+    }
   }
 
   public static class ClimbConstants {
     public static final int kClimbMotorRightPort = 9; 
-    public static final int kClimbMotorLeftPort = 10; 
+    public static final int kClimbMotorLeftPort = 10;
 
+    public static final int kClimbSensorLeftUpPort = 4;
+    public static final int kClimbSensorRightUpPort = 2;
+    public static final int kClimbSensorLeftDownPort = 5;
+    public static final int kClimbSensorRightDownPort = 3;
   }
 }

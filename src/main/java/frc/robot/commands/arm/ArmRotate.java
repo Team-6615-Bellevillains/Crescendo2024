@@ -1,32 +1,30 @@
 package frc.robot.commands.arm;
 
-import java.util.function.BooleanSupplier;
-
 import edu.wpi.first.math.trajectory.TrapezoidProfile;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
-import frc.robot.Constants.ArmConstants;
+import frc.robot.RobotContainer;
 import frc.robot.subsystems.arm.RotationSubsystem;
+import frc.robot.utils.Direction;
 import frc.robot.utils.TunableProfiledPIDController;
 
-public class RotateToSpecificAngle extends Command {
+import static frc.robot.Constants.ArmConstants.RotationConstants;
+
+public class ArmRotate extends Command {
 
     private final RotationSubsystem rotationSubsystem;
 
     private final TunableProfiledPIDController radiansPositionController;
-    private final BooleanSupplier directionSupplier;
-    private boolean isHoldingSpeakerAngle;
 
-    public RotateToSpecificAngle(RotationSubsystem rotationSubsystem, BooleanSupplier directionSupplier) {
+    public ArmRotate(RotationSubsystem rotationSubsystem) {
         this.rotationSubsystem = rotationSubsystem;
-        this.directionSupplier = directionSupplier;
 
-        this.radiansPositionController = new TunableProfiledPIDController("rotation pid", ArmConstants.kPRotation,
-                ArmConstants.kIRotation, ArmConstants.kDRotation,
-                new TrapezoidProfile.Constraints(ArmConstants.kMaxRotationVelocityRadiansPerSecond,
-                        ArmConstants.kMaxRotationAccelerationRadiansPerSecondSquared),
+        this.radiansPositionController = new TunableProfiledPIDController("rotation pid", RotationConstants.kPRotation,
+                RotationConstants.kIRotation, RotationConstants.kDRotation,
+                new TrapezoidProfile.Constraints(RotationConstants.kMaxRotationVelocityRadiansPerSecond,
+                        RotationConstants.kMaxRotationAccelerationRadiansPerSecondSquared),
                 rotationSubsystem::getRotationEncoderPositionInRadians);
 
         this.addRequirements(rotationSubsystem);
@@ -34,14 +32,15 @@ public class RotateToSpecificAngle extends Command {
 
     @Override
     public void initialize() {
-        rotationSubsystem.deactivateHoldingCurrentLimit();
+        RobotContainer.armHoldDirection = RobotContainer.armHoldDirection == Direction.UP ? Direction.DOWN : Direction.UP;
 
-        isHoldingSpeakerAngle = directionSupplier.getAsBoolean();
-        double armSetpointRadians = Units.degreesToRadians(isHoldingSpeakerAngle ? 
-                ArmConstants.SPEAKER_SHOOTING_ANGLE_DEGREES : ArmConstants.FLOOR_RESTING_ANGLE_DEGREES);
+        rotationSubsystem.deactivateHold();
+
+        double armSetpointRadians = Units.degreesToRadians(RobotContainer.armHoldDirection == Direction.UP ?
+                RotationConstants.SPEAKER_SHOOTING_ANGLE_DEGREES : RotationConstants.FLOOR_RESTING_ANGLE_DEGREES);
 
         SmartDashboard.putNumber("Arm Setpoint", armSetpointRadians);
-        SmartDashboard.putString("Direction", isHoldingSpeakerAngle ? "Speaker" : "Floor");
+        SmartDashboard.putString("Direction", RobotContainer.armHoldDirection == Direction.UP ? "Speaker" : "Floor");
 
         radiansPositionController.getController().setGoal(armSetpointRadians);
         radiansPositionController.getController().reset(rotationSubsystem.getRotationEncoderPositionInRadians());
@@ -75,16 +74,13 @@ public class RotateToSpecificAngle extends Command {
                 rotationSubsystem.getRotationEncoderVelocityInDegreesPerSec());
         SmartDashboard.putNumber("Rotation heartbeat at end", Timer.getFPGATimestamp());
 
-        rotationSubsystem.activateHoldingCurrentLimit();
-
-        int holdingVoltageSign = isHoldingSpeakerAngle ? 1 : -1;
-        rotationSubsystem.setMotorVoltage(holdingVoltageSign * ArmConstants.HOLDING_ANGLE_VOLTAGE);
+        rotationSubsystem.activateArmHold();
     }
 
     @Override
     public boolean isFinished() {
         return Math.abs(rotationSubsystem.getRotationEncoderPositionInRadians() - radiansPositionController.getController()
-                .getGoal().position) <= ArmConstants.ROTATION_FINISHED_THRESHOLD_RADIANS;
+                .getGoal().position) <= RotationConstants.ROTATION_FINISHED_THRESHOLD_RADIANS;
     }
 
 }

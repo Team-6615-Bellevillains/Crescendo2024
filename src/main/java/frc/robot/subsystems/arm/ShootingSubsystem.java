@@ -3,21 +3,18 @@ package frc.robot.subsystems.arm;
 import com.revrobotics.CANSparkMax;
 import com.revrobotics.CANSparkLowLevel.MotorType;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
-import frc.robot.Constants.ArmConstants;
+
+import static frc.robot.Constants.ArmConstants.ShooterConstants;
 
 public class ShootingSubsystem extends SubsystemBase {
     
-    private CANSparkMax shootingMotor;
+    private final CANSparkMax shootingMotor;
 
     public ShootingSubsystem() {
-        shootingMotor = new CANSparkMax(ArmConstants.kShootingMotorPort, MotorType.kBrushless);
+        shootingMotor = new CANSparkMax(ShooterConstants.kShootingMotorPort, MotorType.kBrushless);
     }
 
-    public void setShootingSpeedPercentage(double shootingSpeedPercentage) {
-        shootingMotor.set(shootingSpeedPercentage);
-    }
-
-    public void setShootingSpeedVoltage(double shootingSpeedVoltage) {
-        shootingMotor.setVoltage(shootingSpeedVoltage);
+    public void setShootingVoltage(double shootingVoltage) {
+        shootingMotor.setVoltage(shootingVoltage);
     }
 }

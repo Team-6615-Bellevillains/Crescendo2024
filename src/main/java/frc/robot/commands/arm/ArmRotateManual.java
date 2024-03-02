@@ -7,15 +7,16 @@ import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.RobotContainer;
-import frc.robot.Constants.ArmConstants;
 import frc.robot.subsystems.arm.RotationSubsystem;
 
-public class RotationControlJoystick extends Command {
+import static frc.robot.Constants.ArmConstants.RotationConstants;
+
+public class ArmRotateManual extends Command {
 
     private final RotationSubsystem rotationSubsystem;
     private final DoubleSupplier joystickInputSupplier;
 
-    public RotationControlJoystick(RotationSubsystem rotationSubsystem, DoubleSupplier joystickInputSupplier) {
+    public ArmRotateManual(RotationSubsystem rotationSubsystem, DoubleSupplier joystickInputSupplier) {
         this.rotationSubsystem = rotationSubsystem;
         this.joystickInputSupplier = joystickInputSupplier;
 
@@ -23,14 +24,12 @@ public class RotationControlJoystick extends Command {
     }
 
     @Override
-    public void initialize() {
-
-    }
+    public void initialize() { }
 
     @Override
     public void execute() {
         SmartDashboard.putNumber("Arm position degrees", rotationSubsystem.getRotationEncoderPositionInDegrees());
-        if(rotationSubsystem.getRotationEncoderPositionInDegrees() < 15 + ArmConstants.BOX_TO_COG_ANGLE)
+        if(rotationSubsystem.getRotationEncoderPositionInDegrees() < RotationConstants.SLOW_DRIVING_ANGLE_THRESHOLD_DEGREES)
         {
             RobotContainer.controlMultiplier = 0.6;
         }

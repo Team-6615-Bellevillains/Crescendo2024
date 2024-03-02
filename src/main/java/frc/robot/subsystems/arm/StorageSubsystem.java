@@ -3,22 +3,19 @@ package frc.robot.subsystems.arm;
 import com.revrobotics.CANSparkMax;
 import com.revrobotics.CANSparkLowLevel.MotorType;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
-import frc.robot.Constants.ArmConstants;
+
+import static frc.robot.Constants.ArmConstants.ShooterConstants;
 
 public class StorageSubsystem extends SubsystemBase {
 
-    private CANSparkMax storageMotor;
+    private final CANSparkMax storageMotor;
 
     public StorageSubsystem() {
-        storageMotor = new CANSparkMax(ArmConstants.kStorageMotorPort, MotorType.kBrushless);
+        storageMotor = new CANSparkMax(ShooterConstants.kStorageMotorPort, MotorType.kBrushless);
     }
 
-    public void setStorageSpeedPercentage(double storageSpeedPercentage) {
-        storageMotor.set(storageSpeedPercentage);
-    }
-
-    public void setStorageSpeedVoltage(double storageSpeedVoltage) {
-        storageMotor.setVoltage(storageSpeedVoltage);
+    public void setStorageVoltage(double storageVoltage) {
+        storageMotor.setVoltage(storageVoltage);
     }
 
     public double getOutputCurrent() {

@@ -7,7 +7,7 @@ import frc.robot.Constants.ClimbConstants;
 
 public class ClimbRightSubsystem extends SubsystemBase  {
         
-    private CANSparkMax climbMotorRight;
+    private final CANSparkMax climbMotorRight;
 
     public ClimbRightSubsystem() {
         climbMotorRight = new CANSparkMax(ClimbConstants.kClimbMotorRightPort, MotorType.kBrushless);

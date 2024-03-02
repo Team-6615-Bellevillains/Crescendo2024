@@ -5,6 +5,8 @@ import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 
+import static frc.robot.Constants.ClimbConstants;
+
 public class TestClimbSensorsCmd extends Command{
     
     DigitalInput rightDrop, rightClimb, leftDrop, leftClimb;
@@ -12,19 +14,20 @@ public class TestClimbSensorsCmd extends Command{
 
     @Override
     public void initialize() {
-        rightDrop = new DigitalInput(3);
-        rightClimb = new DigitalInput(2);
-        leftDrop = new DigitalInput(5);
-        leftClimb = new DigitalInput(4);
+        rightDrop = new DigitalInput(ClimbConstants.kClimbSensorRightDownPort);
+        rightClimb = new DigitalInput(ClimbConstants.kClimbSensorRightUpPort);
+        leftDrop = new DigitalInput(ClimbConstants.kClimbSensorLeftDownPort);
+        leftClimb = new DigitalInput(ClimbConstants.kClimbSensorLeftUpPort);
     }
 
     @Override
     public void execute() {
         SmartDashboard.putBoolean("rightDrop", rightDrop.get());        
-        SmartDashboard.putNumber("heartbeat", Timer.getFPGATimestamp());
         SmartDashboard.putBoolean("rightClimb", rightClimb.get());
         SmartDashboard.putBoolean("leftDrop", leftDrop.get());
         SmartDashboard.putBoolean("leftClimb", leftClimb.get());
+
+        SmartDashboard.putNumber("heartbeat", Timer.getFPGATimestamp());
     }
 
     @Override
