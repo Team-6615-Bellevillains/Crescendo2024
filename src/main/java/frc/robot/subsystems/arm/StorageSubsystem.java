@@ -16,4 +16,8 @@ public class StorageSubsystem extends SubsystemBase {
     public void setStorageSpeedPercentage(double storageSpeedPercentage) {
         storageMotor.set(storageSpeedPercentage);
     }
+
+    public void setStorageSpeedVoltage(double storageSpeedVoltage) {
+        storageMotor.setVoltage(storageSpeedVoltage);
+    }
 }

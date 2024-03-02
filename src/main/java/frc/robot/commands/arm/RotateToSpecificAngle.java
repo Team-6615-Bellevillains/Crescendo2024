@@ -25,6 +25,8 @@ public class RotateToSpecificAngle extends Command {
                 rotationSubsystem::getRotationEncoderPositionInRadians);
 
         this.positionController.getController().setGoal(desiredAngleRadians);
+
+        this.addRequirements(rotationSubsystem);
     }
 
     @Override

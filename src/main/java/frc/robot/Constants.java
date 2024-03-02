@@ -55,20 +55,21 @@ public final class Constants
     public static final int kShootingMotorPort = 15; 
     public static final int kRotateMotorPort = 14; 
 
-    public static final double LAUNCH_RUN_TIME = 3; //change once tested
-    public static final double LOAD_RUN_TIME = 2; // change
+    public static final double LAUNCH_RUN_TIME = 0.5; //change once tested
+
+    public static final double BOX_TO_COG_ANGLE = 90 - 13;
 
     // TODO: when hard stop installed, switch this to the angle at rest against the hard stop, and remeasure ROTATIONS_FROM_FLOOR_REST_TO_SPEAKER
-    public static final double FLOOR_RESTING_ANGLE_DEGREES = -61; // -61 degrees when propped against the bumper
-    public static final double SPEAKER_SHOOTING_ANGLE_DEGREES = 57;
+    public static final double FLOOR_RESTING_ANGLE_DEGREES = -61 + BOX_TO_COG_ANGLE; // -61 degrees when propped against the bumper
+    public static final double SPEAKER_SHOOTING_ANGLE_DEGREES = 57 + BOX_TO_COG_ANGLE;
     public static final double ROTATIONS_FROM_FLOOR_REST_TO_SPEAKER = 14.953842;
 
     public static final double ENCODER_READING_TO_ANGLE_CONVERSION_FACTOR = (SPEAKER_SHOOTING_ANGLE_DEGREES - FLOOR_RESTING_ANGLE_DEGREES) / ROTATIONS_FROM_FLOOR_REST_TO_SPEAKER;
 
     // Feedforward
-    public static final double kGRotation = 2.6;
+    public static final double kGRotation = 1.45;
     public static final double kVRotation = 0.0;
-    public static final double kSRotation = 0.0;
+    public static final double kSRotation = 0.8;
     public static final double kARotation = 0.0;
 
     // Feedback 

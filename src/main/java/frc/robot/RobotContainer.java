@@ -25,7 +25,10 @@ import frc.robot.commands.ClimbUpRightCmd;
 import frc.robot.commands.arm.IntakeRingCmd;
 // import frc.robot.commands.arm.RotateCmd;
 import frc.robot.commands.arm.RotateToSpecificAngle;
+import frc.robot.commands.arm.RotationControlJoystick;
 import frc.robot.commands.arm.ShootCmd;
+import frc.robot.commands.arm.ShootVoltageCmd;
+import frc.robot.commands.arm.ShootVoltageFlywheel;
 import frc.robot.commands.arm.TuneGravity;
 import frc.robot.commands.swervedrive.drivebase.AbsoluteDriveAdv;
 import frc.robot.commands.swervedrive.drivebase.AbsoluteFieldDrive;
@@ -151,21 +154,20 @@ public class RobotContainer
     //                                new Pose2d(new Translation2d(4, 4), Rotation2d.fromDegrees(0)))
     //                           ));
     operatorXbox.y().onTrue(new IntakeRingCmd(storageSubsystem, shootingSubsystem));
-    operatorXbox.a().onTrue(new ShootCmd(shootingSubsystem, -0.1, storageSubsystem, 0.1)); //Amp Shooter
-    operatorXbox.b().onTrue(new ShootCmd(shootingSubsystem, -0.6, storageSubsystem, 0.6)); // Spearker Shooter
-    operatorXbox.x().onTrue(new ShootCmd(shootingSubsystem, -0.78, storageSubsystem, 0.78)); // Stage Shooter
+    operatorXbox.a().onTrue(new ShootVoltageFlywheel(shootingSubsystem, -3.25, storageSubsystem, 4)); //Amp Shooter
+    operatorXbox.b().onTrue(new ShootVoltageFlywheel(shootingSubsystem, -5.75, storageSubsystem, 6)); // Spearker Shooter
+    operatorXbox.x().onTrue(new ShootVoltageFlywheel(shootingSubsystem, -8, storageSubsystem, 8)); // Stage Shooter
     // operatorXbox.rightBumper().onTrue(new RotateCmd(rotationSubsystem, 3, -0.1)); //Rotate to Amp
     // operatorXbox.leftBumper().onTrue(new RotateCmd(rotationSubsystem, 8, -0.1)); //Rotate to Speaker
     // operatorXbox.leftTrigger().onTrue(new RotateCmd(rotationSubsystem, 8, 0.1)); //Rotate to stage
     // operatorXbox.rightTrigger().onTrue(new RotateCmd(rotationSubsystem, 8, 0.1)); //Rotate to intake
-    operatorXbox.leftBumper().whileTrue(new TuneGravity(rotationSubsystem));
+    // operatorXbox.leftBumper().whileTrue(new TuneGravity(rotationSubsystem));
+    rotationSubsystem.setDefaultCommand(new RotationControlJoystick(rotationSubsystem, operatorXbox::getLeftY));
 
     // new JoystickButton(driverXbox, 4).onTrue(Commands.parallel(upLeft, upRight));
 
-    new JoystickButton(driverXbox, 1).onTrue(new ClimbDownRightCmd(climbRightSubsystem));
-   // new JoystickButton(driverXbox, 1).onTrue(new ClimbDownLeftCmd(climbLeftSubsystem));
-   // new JoystickButton(driverXbox, 4).onTrue(new ClimbUpLeftCmd(climbLeftSubsystem));
-    new JoystickButton(driverXbox, 4).onTrue(new ClimbUpRightCmd(climbRightSubsystem));
+   new JoystickButton(driverXbox, 1).onTrue(new ClimbDownRightCmd(climbRightSubsystem));
+   new JoystickButton(driverXbox, 4).onTrue(new ClimbUpRightCmd(climbRightSubsystem));
 
     //    new JoystickButton.(driverXbox, 3).whileTrue(new RepeatCommand(new InstantCommand(drivebase::lock, drivebase)));
   }

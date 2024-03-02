@@ -16,4 +16,8 @@ public class ShootingSubsystem extends SubsystemBase {
     public void setShootingSpeedPercentage(double shootingSpeedPercentage) {
         shootingMotor.set(shootingSpeedPercentage);
     }
+
+    public void setShootingSpeedVoltage(double shootingSpeedVoltage) {
+        shootingMotor.setVoltage(shootingSpeedVoltage);
+    }
 }

@@ -26,13 +26,14 @@ public class RotationSubsystem extends SubsystemBase {
         rotationMotor.setInverted(true);
         rotationEncoder.setPositionConversionFactor(ArmConstants.ENCODER_READING_TO_ANGLE_CONVERSION_FACTOR);
         rotationEncoder.setVelocityConversionFactor(ArmConstants.ENCODER_READING_TO_ANGLE_CONVERSION_FACTOR / 60.0);
-        rotationEncoder.setPosition(ArmConstants.FLOOR_RESTING_ANGLE_DEGREES);
+        rotationEncoder.setPosition(ArmConstants.SPEAKER_SHOOTING_ANGLE_DEGREES);
     }
 
     @Override
     public void periodic() {
-        SmartDashboard.putNumber("Rotation measurement", rotationEncoder.getPosition());
-        SmartDashboard.putNumber("Rotation measurement [Heartbeat]", Timer.getFPGATimestamp());
+        // SmartDashboard.putNumber("Rotation measurement", rotationEncoder.getPosition());
+        // SmartDashboard.putNumber("Rotation measurement [Heartbeat]", Timer.getFPGATimestamp());
+        SmartDashboard.putNumber("ACTUAL Rotation velocity ACTUAL", getRotationEncoderVelocityInDegreesPerSec());
     }
 
     public double calculateFeedforward(double currentPositionRadians, double desiredVelocityRadians) {
@@ -40,8 +41,8 @@ public class RotationSubsystem extends SubsystemBase {
     }
 
     public void setMotorVoltage(double voltage) {
-        SmartDashboard.putNumber("Rotation voltage", voltage);
-        SmartDashboard.putNumber("Rotation voltage [Heartbeat]", Timer.getFPGATimestamp());
+        // SmartDashboard.putNumber("Rotation voltage", voltage);
+        // SmartDashboard.putNumber("Rotation voltage [Heartbeat]", Timer.getFPGATimestamp());
 
         rotationMotor.setVoltage(voltage);
     }

@@ -20,6 +20,8 @@ public class TuneGravity extends Command {
     @Override
     public void initialize() {
         rotationSubsystem.setMotorVoltage(0);
+        
+        this.addRequirements(rotationSubsystem);
     }
 
     @Override
