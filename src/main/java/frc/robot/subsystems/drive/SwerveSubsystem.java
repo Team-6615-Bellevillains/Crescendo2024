@@ -98,9 +98,9 @@ public class SwerveSubsystem extends SubsystemBase {
      * Setup AutoBuilder for PathPlanner.
      */
     public void setupPathPlanner() {
-        PIDConstants autonRotationPIDConstants = new PIDConstants(Constants.Auton.angleAutoPID.p,
-                Constants.Auton.angleAutoPID.i,
-                Constants.Auton.angleAutoPID.d);
+        PIDConstants autonRotationPIDConstants = new PIDConstants(Constants.AutonConstants.angleAutoPID.p,
+                Constants.AutonConstants.angleAutoPID.i,
+                Constants.AutonConstants.angleAutoPID.d);
 
         SmartDashboard.putNumber("Auton Rotation P", autonRotationPIDConstants.kP);
         SmartDashboard.putNumber("Auton Rotation I", autonRotationPIDConstants.kI);

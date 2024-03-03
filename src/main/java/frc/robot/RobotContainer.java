@@ -17,6 +17,7 @@ import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
+import frc.robot.Constants.AutonConstants;
 import frc.robot.Constants.OperatorConstants;
 import frc.robot.Constants.ArmConstants.ShooterConstants;
 import frc.robot.commands.ClimbLeftCmd;
@@ -166,8 +167,9 @@ public class RobotContainer {
                         new ArmRotate(rotationSubsystem),
                         Commands.parallel(
                                 Commands.runOnce(() -> swerveSubsystem
-                                        .driveFieldOriented(new ChassisSpeeds(Units.inchesToMeters(2), 0, 0))),
+                                        .driveFieldOriented(new ChassisSpeeds(AutonConstants.intakeForwardsSpeedMetersPerSecond, 0, 0))),
                                 new IntakeRingUntilCaptured(storageSubsystem, shootingSubsystem)),
+                        new ArmRotate(rotationSubsystem),
                         swerveSubsystem.getAutonomousCommand(startingPosition + " note return", false),
                         getSpeakerShooterInstance());
                 yield commandGroup;

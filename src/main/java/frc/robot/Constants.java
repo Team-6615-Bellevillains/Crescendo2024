@@ -23,10 +23,12 @@ public final class Constants {
     public static final Matter CHASSIS = new Matter(new Translation3d(0, 0, Units.inchesToMeters(4)), ROBOT_MASS);
     public static final double LOOP_TIME = 0.13; //s, 20ms + 110ms sprk max velocity lag
 
-    public static final class Auton {
+    public static final class AutonConstants {
 
         public static final PIDFConfig TranslationPID = new PIDFConfig(0.7, 0, 0);
         public static final PIDFConfig angleAutoPID = new PIDFConfig(0.75, 0, 0);
+        // speed to move forwards when going to intake during auto
+        public static final double intakeForwardsSpeedMetersPerSecond = Units.inchesToMeters(2);
 
         public static final double MAX_ACCELERATION = 2;
     }
