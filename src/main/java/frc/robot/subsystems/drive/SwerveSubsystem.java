@@ -146,7 +146,7 @@ public class SwerveSubsystem extends SubsystemBase {
         PathPlannerPath path = PathPlannerPath.fromPathFile(pathName);
 
         if (setOdomToStart) {
-            resetOdometry(new Pose2d(path.getPoint(0).position, Rotation2d.fromDegrees(180)));
+            resetOdometry(new Pose2d(path.getPoint(0).position, path.getPreviewStartingHolonomicPose().getRotation()));
         }
 
         // Create a path following command using AutoBuilder. This will also trigger event markers.

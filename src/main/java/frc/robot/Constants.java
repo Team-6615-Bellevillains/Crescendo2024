@@ -91,6 +91,12 @@ public final class Constants {
             public static final double STORAGE_INTAKE_VOLTAGE = -3.0;
             public static final double SHOOTING_INTAKE_VOLTAGE = 6.0;
 
+            public static final double STORAGE_SPEAKER_SHOOTER_VOLTAGE = 10;
+            public static final double SHOOTING_SPEAKER_SHOOTER_VOLTAGE = -10;
+
+            public static final double STORAGE_TRAP_SHOOTER_VOLTAGE = 6;
+            public static final double SHOOTING_TRAP_SHOOTER_VOLTAGE = -7;
+
         }
     }
 
