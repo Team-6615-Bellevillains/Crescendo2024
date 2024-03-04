@@ -20,8 +20,8 @@ public class IntakeRingUntilCaptured extends Command {
 
     @Override
     public void initialize() {
-        storageSubsystem.setStorageVoltage(ShooterConstants.SHOOTING_INTAKE_VOLTAGE);
-        shootingSubsystem.setShootingVoltage(ShooterConstants.STORAGE_INTAKE_VOLTAGE);
+        storageSubsystem.setStorageVoltage(ShooterConstants.STORAGE_INTAKE_VOLTAGE);
+        shootingSubsystem.setShootingVoltage(ShooterConstants.SHOOTING_INTAKE_VOLTAGE);
     }
 
     @Override
