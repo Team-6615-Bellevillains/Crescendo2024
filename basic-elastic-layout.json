@@ -1,0 +1,64 @@
+{
+    "version": 1.0,
+    "grid_size": 128,
+    "tabs": [
+        {
+            "name": "Teleoperated",
+            "grid_layout": {
+                "layouts": [],
+                "containers": [
+                    {
+                        "title": "Auton Pathing",
+                        "x": 0.0,
+                        "y": 0.0,
+                        "width": 384.0,
+                        "height": 128.0,
+                        "type": "Split Button Chooser",
+                        "properties": {
+                            "topic": "/SmartDashboard/Auton Pathing",
+                            "period": 0.06
+                        }
+                    },
+                    {
+                        "title": "Starting Position",
+                        "x": 0.0,
+                        "y": 128.0,
+                        "width": 256.0,
+                        "height": 128.0,
+                        "type": "Split Button Chooser",
+                        "properties": {
+                            "topic": "/SmartDashboard/Starting Position",
+                            "period": 0.06
+                        }
+                    },
+                    {
+                        "title": "USB Camera 0",
+                        "x": 384.0,
+                        "y": 0.0,
+                        "width": 768.0,
+                        "height": 640.0,
+                        "type": "Camera Stream",
+                        "properties": {
+                            "topic": "/CameraPublisher/USB Camera 0",
+                            "period": 0.06
+                        }
+                    },
+                    {
+                        "title": "Rotation measurement [Heartbeat]",
+                        "x": 0.0,
+                        "y": 256.0,
+                        "width": 256.0,
+                        "height": 128.0,
+                        "type": "Text Display",
+                        "properties": {
+                            "topic": "/SmartDashboard/Rotation measurement [Heartbeat]",
+                            "period": 0.06,
+                            "data_type": "double",
+                            "show_submit_button": false
+                        }
+                    }
+                ]
+            }
+        }
+    ]
+}
