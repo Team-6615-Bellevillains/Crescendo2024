@@ -4,8 +4,8 @@ import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
-import frc.robot.RobotContainer;
 import frc.robot.subsystems.arm.RotationSubsystem;
+import frc.robot.subsystems.drive.SwerveSubsystem;
 
 import java.util.function.DoubleSupplier;
 
@@ -31,9 +31,9 @@ public class ArmRotateManual extends Command {
     public void execute() {
         SmartDashboard.putNumber("Arm position degrees", rotationSubsystem.getRotationEncoderPositionInDegrees());
         if (rotationSubsystem.getRotationEncoderPositionInDegrees() < RotationConstants.SLOW_DRIVING_ANGLE_THRESHOLD_DEGREES) {
-            RobotContainer.controlMultiplier = 0.6;
+            SwerveSubsystem.controlMultiplier = 0.6;
         } else {
-            RobotContainer.controlMultiplier = 1;
+            SwerveSubsystem.controlMultiplier = 1;
         }
         double suppliedInput = MathUtil.applyDeadband(joystickInputSupplier.getAsDouble(), 0.10);
         double desiredVelocityRadiansPerSec = suppliedInput * Units.degreesToRadians(100);

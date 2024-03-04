@@ -46,6 +46,9 @@ public class SwerveSubsystem extends SubsystemBase {
      */
     public double maximumSpeed = Units.feetToMeters(14.5);
 
+    // Speed multiplier, can be reduced programmatically if the manual control of the robot needs to be limited.
+    public static double controlMultiplier = 1.0;
+
     /**
      * Initialize {@link SwerveDrive} with the directory provided.
      *

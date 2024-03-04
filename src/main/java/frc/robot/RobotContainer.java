@@ -6,9 +6,7 @@ package frc.robot;
 
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
-import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.Filesystem;
-import edu.wpi.first.wpilibj.RobotBase;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
@@ -17,9 +15,9 @@ import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
+import frc.robot.Constants.ArmConstants.ShooterConstants;
 import frc.robot.Constants.AutonConstants;
 import frc.robot.Constants.OperatorConstants;
-import frc.robot.Constants.ArmConstants.ShooterConstants;
 import frc.robot.commands.ClimbLeftCmd;
 import frc.robot.commands.ClimbRightCmd;
 import frc.robot.commands.arm.ArmRotate;
@@ -47,39 +45,40 @@ import java.io.File;
  * trigger mappings) should be declared here.
  */
 public class RobotContainer {
-
-    // The robot's subsystems and commands are defined here...
-    private final SwerveSubsystem swerveSubsystem = new SwerveSubsystem(new File(Filesystem.getDeployDirectory(),
-            "swerve/neo"));
+    // Subsystem instances for the robot, representing the layer between our code
+    // and direct motor control
+    private final SwerveSubsystem swerveSubsystem = new SwerveSubsystem(new File(Filesystem.getDeployDirectory(), "swerve/neo"));
     private final StorageSubsystem storageSubsystem = new StorageSubsystem();
     private final ShootingSubsystem shootingSubsystem = new ShootingSubsystem();
     private final RotationSubsystem rotationSubsystem = new RotationSubsystem();
     private final ClimbLeftSubsystem climbLeftSubsystem = new ClimbLeftSubsystem();
     private final ClimbRightSubsystem climbRightSubsystem = new ClimbRightSubsystem();
 
+    // Xbox controllers for driver and operator with indices 0 and 1, indicating USB
+    // order on the driver station
     private final CommandXboxController driverXbox = new CommandXboxController(0);
     private final CommandXboxController operatorXbox = new CommandXboxController(1);
 
+    // Dashboard buttons to select autonomous starting position and autonomous
+    // strategy on the dashboard
     private final SendableChooser<Position> autonStartingPositionChooser = new SendableChooser<>();
     private final SendableChooser<Pathing> autonPathingChooser = new SendableChooser<>();
 
+    // Methods to create instances of shooting commands. Necessary for composition
+    // in multiple places
     private ShootCmd getTrapShooterInstance() {
-        return new ShootCmd(shootingSubsystem, ShooterConstants.SHOOTING_TRAP_SHOOTER_VOLTAGE, storageSubsystem,
-                ShooterConstants.STORAGE_TRAP_SHOOTER_VOLTAGE);
+        return new ShootCmd(shootingSubsystem, ShooterConstants.SHOOTING_TRAP_SHOOTER_VOLTAGE, storageSubsystem, ShooterConstants.STORAGE_TRAP_SHOOTER_VOLTAGE);
     }
 
     private ShootCmd getSpeakerShooterInstance() {
-        return new ShootCmd(shootingSubsystem, ShooterConstants.SHOOTING_SPEAKER_SHOOTER_VOLTAGE, storageSubsystem,
-                ShooterConstants.STORAGE_SPEAKER_SHOOTER_VOLTAGE);
+        return new ShootCmd(shootingSubsystem, ShooterConstants.SHOOTING_SPEAKER_SHOOTER_VOLTAGE, storageSubsystem, ShooterConstants.STORAGE_SPEAKER_SHOOTER_VOLTAGE);
     }
-
-    public static Direction armHoldDirection = Direction.UP;
-    public static double controlMultiplier = 1.0;
 
     /**
      * The container for the robot. Contains subsystems, OI devices, and commands.
      */
     public RobotContainer() {
+        // Setup the dashboard to allow the user to select the starting position and auton pathing
         autonStartingPositionChooser.addOption("Amp", Position.AMP);
         autonStartingPositionChooser.addOption("Middle", Position.MIDDLE);
         autonStartingPositionChooser.addOption("Source", Position.SOURCE);
@@ -92,25 +91,21 @@ public class RobotContainer {
         autonPathingChooser.setDefaultOption("Shoot and Back Up", Pathing.BACK_UP);
         SmartDashboard.putData("Auton Pathing", autonPathingChooser);
 
-        // Configure the trigger bindings
+        // Set up trigger bindings for different controller buttons
+        // - Mapping the commands with various button presses on the Xbox controllers
         configureBindings();
 
-        Command driveFieldOrientedDirectAngleSim = swerveSubsystem.simDriveCommand(
-                () -> MathUtil.applyDeadband(driverXbox.getLeftY(), OperatorConstants.LEFT_Y_DEADBAND),
-                () -> MathUtil.applyDeadband(driverXbox.getLeftX(), OperatorConstants.LEFT_X_DEADBAND),
-                () -> driverXbox.getRawAxis(2));
-
+        // Command to drive in a field-oriented manner (up is always forwards on the
+        // field, regardless of rotation) during teleop
         FieldOrientedDrive fieldOrientedDrive = new FieldOrientedDrive(swerveSubsystem,
-                () -> -MathUtil.applyDeadband(driverXbox.getLeftY(),
-                        OperatorConstants.LEFT_Y_DEADBAND) * controlMultiplier,
-                () -> -MathUtil.applyDeadband(driverXbox.getLeftX(),
-                        OperatorConstants.LEFT_X_DEADBAND) * controlMultiplier,
-                () -> -MathUtil.applyDeadband(driverXbox.getRightX(),
-                        OperatorConstants.RIGHT_X_DEADBAND) * controlMultiplier);
+                () -> -MathUtil.applyDeadband(driverXbox.getLeftY(), OperatorConstants.LEFT_Y_DEADBAND) * SwerveSubsystem.controlMultiplier,
+                () -> -MathUtil.applyDeadband(driverXbox.getLeftX(), OperatorConstants.LEFT_X_DEADBAND) * SwerveSubsystem.controlMultiplier,
+                () -> -MathUtil.applyDeadband(driverXbox.getRightX(), OperatorConstants.RIGHT_X_DEADBAND) * SwerveSubsystem.controlMultiplier);
 
-        swerveSubsystem.setDefaultCommand(
-                !RobotBase.isSimulation() ? fieldOrientedDrive : driveFieldOrientedDirectAngleSim);
+        // Make the field-oriented drive command always run
+        swerveSubsystem.setDefaultCommand(fieldOrientedDrive);
 
+        // Activate arm hold mechanism upon robot startup
         rotationSubsystem.activateArmHold();
     }
 
@@ -129,24 +124,18 @@ public class RobotContainer {
      */
     private void configureBindings() {
         driverXbox.b().onTrue((new InstantCommand(swerveSubsystem::zeroGyro)));
-        driverXbox.y().onTrue(Commands.parallel(new ClimbLeftCmd(climbLeftSubsystem, Direction.UP),
-                new ClimbRightCmd(climbRightSubsystem, Direction.UP)));
-        driverXbox.a().onTrue(Commands.parallel(new ClimbLeftCmd(climbLeftSubsystem, Direction.DOWN),
-                new ClimbRightCmd(climbRightSubsystem, Direction.DOWN)));
+        driverXbox.y().onTrue(Commands.parallel(new ClimbLeftCmd(climbLeftSubsystem, Direction.UP), new ClimbRightCmd(climbRightSubsystem, Direction.UP)));
+        driverXbox.a().onTrue(Commands.parallel(new ClimbLeftCmd(climbLeftSubsystem, Direction.DOWN), new ClimbRightCmd(climbRightSubsystem, Direction.DOWN)));
 
         operatorXbox.b().onTrue(getTrapShooterInstance());
         operatorXbox.x().onTrue(getSpeakerShooterInstance());
-        operatorXbox.y().onTrue(new IntakeRingUntilCaptured(storageSubsystem, shootingSubsystem)
-                .andThen(new ArmRotate(rotationSubsystem)));
+        operatorXbox.y().onTrue(new IntakeRingUntilCaptured(storageSubsystem, shootingSubsystem).andThen(new ArmRotate(rotationSubsystem)));
         operatorXbox.a().onTrue(new ArmRotate(rotationSubsystem));
 
     }
 
-    /**
-     * Use this to pass the autonomous command to the main {@link Robot} class.
-     *
-     * @return the command to run in autonomous
-     */
+    // Returns the Command to run during the autonomous phase
+    // Builds a SequentialCommandGroup based on the selected autonomous strategy
     public Command getAutonomousCommand() {
         final Position startingPosition = autonStartingPositionChooser.getSelected();
         final Pathing autonPathing = autonPathingChooser.getSelected();
@@ -155,22 +144,44 @@ public class RobotContainer {
 
         commandGroup.addCommands(getSpeakerShooterInstance());
 
+        // Determine the flow of autonomous commands based on the selected Pathing
+        // option
         return switch (autonPathing) {
+            // If "Don't Move" is selected, just run the shooter which is already setup
+            // above
             case DONT_MOVE -> commandGroup;
+            // If "Back Up" is selected, a command to back up is added to the command group
+            // The second argument is true because we want to set the odometry to the position the bot starts in.
             case BACK_UP -> {
                 commandGroup.addCommands(swerveSubsystem.getAutonomousCommand(startingPosition + " back up", true));
                 yield commandGroup;
             }
+            // If "Go for Second Note" is selected, a series of commands are added to get a
+            // second note and shoot it
             case GO_FOR_SECOND_NOTE -> {
                 commandGroup.addCommands(
+                        // Move to the note based on the starting position.
+                        // The second argument is true because we want to set the odometry to the position the bot starts in.
                         swerveSubsystem.getAutonomousCommand(startingPosition + " note", true),
+                        // Rotate the arm into intake position
                         new ArmRotate(rotationSubsystem),
-                        Commands.parallel(
-                                Commands.runOnce(() -> swerveSubsystem
-                                        .driveFieldOriented(new ChassisSpeeds(AutonConstants.intakeForwardsSpeedMetersPerSecond, 0, 0))),
-                                new IntakeRingUntilCaptured(storageSubsystem, shootingSubsystem)),
+                        // Drive forwards at a slow speed while running the intake motors.
+                        // Stop once the note has been obtained or AutonConstants.INTAKE_TIMEOUT_SECONDS seconds have passed, whichever comes first
+                        Commands.race(
+                                Commands.parallel(
+                                        Commands.runOnce(() -> swerveSubsystem.driveFieldOriented(
+                                                new ChassisSpeeds(AutonConstants.intakeForwardsSpeedMetersPerSecond,
+                                                        0,
+                                                        0))),
+                                        new IntakeRingUntilCaptured(storageSubsystem, shootingSubsystem)
+                                ),
+                                Commands.waitSeconds(AutonConstants.INTAKE_TIMEOUT_SECONDS)),
+                        // Rotate arm back into shooting position
                         new ArmRotate(rotationSubsystem),
+                        // Move back to the speaker.
+                        // The second argument is false because we don't want to keep our current odometry.
                         swerveSubsystem.getAutonomousCommand(startingPosition + " note return", false),
+                        // Shoot the note!
                         getSpeakerShooterInstance());
                 yield commandGroup;
             }
