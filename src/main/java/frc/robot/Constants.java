@@ -25,14 +25,11 @@ public final class Constants {
 
     public static final class AutonConstants {
 
-        public static final PIDFConfig TranslationPID = new PIDFConfig(0.7, 0, 0);
-        public static final PIDFConfig angleAutoPID = new PIDFConfig(0.75, 0, 0);
+        public static final PIDFConfig angleAutoPID = new PIDFConfig(2.1, 0, 0);
         // speed to move forwards when going to intake during auto
-        public static final double intakeForwardsSpeedMetersPerSecond = Units.inchesToMeters(2);
+        public static final double intakeForwardsSpeedMetersPerSecond = Units.inchesToMeters(20);
 
         public static final double MAX_ACCELERATION = 2;
-
-        public static final int INTAKE_TIMEOUT_SECONDS = 5;
     }
 
     public static final class Drivebase {
@@ -95,11 +92,15 @@ public final class Constants {
             public static final double STORAGE_INTAKE_VOLTAGE = -3.0;
             public static final double SHOOTING_INTAKE_VOLTAGE = 6.0;
 
-            public static final double STORAGE_SPEAKER_SHOOTER_VOLTAGE = 10;
+            public static final double STORAGE_SPEAKER_SHOOTER_VOLTAGE = 13;
             public static final double SHOOTING_SPEAKER_SHOOTER_VOLTAGE = -10;
 
             public static final double STORAGE_TRAP_SHOOTER_VOLTAGE = 6;
             public static final double SHOOTING_TRAP_SHOOTER_VOLTAGE = -7;
+
+            // after starting the intake, wait this amount of seconds to detect if the note has been intaked
+            public static final double INTAKE_SPIN_UP_DELAY_SECONDS = 2; 
+            public static final double INTAKE_DETECTION_VELOCITY_THRESHOLD = 1.5;
 
         }
     }

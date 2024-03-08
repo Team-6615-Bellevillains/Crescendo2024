@@ -5,6 +5,7 @@ import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
+import frc.robot.RobotContainer;
 import frc.robot.subsystems.arm.RotationSubsystem;
 import frc.robot.utils.Direction;
 import frc.robot.utils.TunableProfiledPIDController;
@@ -31,15 +32,15 @@ public class ArmRotate extends Command {
 
     @Override
     public void initialize() {
-        RotationSubsystem.armHoldDirection = RotationSubsystem.armHoldDirection == Direction.UP ? Direction.DOWN : Direction.UP;
+        RobotContainer.armHoldDirection = RobotContainer.armHoldDirection == Direction.UP ? Direction.DOWN : Direction.UP;
 
         rotationSubsystem.deactivateHold();
 
-        double armSetpointRadians = Units.degreesToRadians(RotationSubsystem.armHoldDirection == Direction.UP ?
+        double armSetpointRadians = Units.degreesToRadians(RobotContainer.armHoldDirection == Direction.UP ?
                 RotationConstants.SPEAKER_SHOOTING_ANGLE_DEGREES : RotationConstants.FLOOR_RESTING_ANGLE_DEGREES);
 
         SmartDashboard.putNumber("Arm Setpoint", armSetpointRadians);
-        SmartDashboard.putString("Direction", RotationSubsystem.armHoldDirection == Direction.UP ? "Speaker" : "Floor");
+        SmartDashboard.putString("Direction", RobotContainer.armHoldDirection == Direction.UP ? "Speaker" : "Floor");
 
         radiansPositionController.getController().setGoal(armSetpointRadians);
         radiansPositionController.getController().reset(rotationSubsystem.getRotationEncoderPositionInRadians());

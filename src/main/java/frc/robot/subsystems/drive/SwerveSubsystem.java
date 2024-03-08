@@ -46,9 +46,6 @@ public class SwerveSubsystem extends SubsystemBase {
      */
     public double maximumSpeed = Units.feetToMeters(14.5);
 
-    // Speed multiplier, can be reduced programmatically if the manual control of the robot needs to be limited.
-    public static double controlMultiplier = 1.0;
-
     /**
      * Initialize {@link SwerveDrive} with the directory provided.
      *
@@ -149,7 +146,16 @@ public class SwerveSubsystem extends SubsystemBase {
         PathPlannerPath path = PathPlannerPath.fromPathFile(pathName);
 
         if (setOdomToStart) {
-            resetOdometry(new Pose2d(path.getPoint(0).position, path.getPreviewStartingHolonomicPose().getRotation()));
+            Rotation2d startingRotation = path.getPreviewStartingHolonomicPose().getRotation();
+
+            // var alliance = DriverStation.getAlliance();
+            // boolean shouldFlipRotation = alliance.isPresent() ? alliance.get() == DriverStation.Alliance.Red : false;
+
+            // if (shouldFlipRotation) {
+            //     startingRotation.minus(Rotation2d.fromDegrees(180));
+            // }
+
+            resetOdometry(new Pose2d(path.getPoint(0).position, startingRotation));
         }
 
         // Create a path following command using AutoBuilder. This will also trigger event markers.

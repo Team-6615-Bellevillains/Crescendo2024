@@ -7,6 +7,7 @@ import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import frc.robot.RobotContainer;
 import frc.robot.utils.Direction;
 import frc.robot.utils.TunableArmFeedforward;
 
@@ -16,10 +17,9 @@ public class RotationSubsystem extends SubsystemBase {
 
     private final CANSparkMax rotationMotor;
     private final RelativeEncoder rotationEncoder;
+
     private final TunableArmFeedforward rotationFeedforward = new TunableArmFeedforward("rotation", RotationConstants.kSRotation,
             RotationConstants.kGRotation, RotationConstants.kVRotation, RotationConstants.kARotation);
-
-    public static Direction armHoldDirection = Direction.UP;
 
     public RotationSubsystem() {
         rotationMotor = new CANSparkMax(RotationConstants.kRotateMotorPort, MotorType.kBrushless);
@@ -71,7 +71,7 @@ public class RotationSubsystem extends SubsystemBase {
     public void activateArmHold() {
         rotationMotor.setSmartCurrentLimit(RotationConstants.HOLDING_ANGLE_CURRENT_LIMIT);
 
-        int holdingVoltageSign = RotationSubsystem.armHoldDirection == Direction.UP ? 1 : -1;
+        int holdingVoltageSign = RobotContainer.armHoldDirection == Direction.UP ? 1 : -1;
         setMotorVoltage(holdingVoltageSign * RotationConstants.HOLDING_ANGLE_VOLTAGE);
     }
 
