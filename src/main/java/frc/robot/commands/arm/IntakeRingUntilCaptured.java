@@ -15,7 +15,7 @@ public class IntakeRingUntilCaptured extends Command {
     private final ShootingSubsystem shootingSubsystem;
     private final BooleanSupplier slowWhenIntakingSupplier;
     private double startTime;
-    private final double slowSpeed = 0.5;
+    private final double slowSpeed = 0.65;
 
     // default slow when intaking to false
     public IntakeRingUntilCaptured(StorageSubsystem storageSubsystem, ShootingSubsystem shootingSubsystem) {
