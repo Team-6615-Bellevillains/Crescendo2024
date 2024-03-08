@@ -37,6 +37,8 @@ import java.util.function.DoubleSupplier;
 
 public class SwerveSubsystem extends SubsystemBase {
 
+    // Speed multiplier, can be reduced programmatically if the manual control of the robot needs to be limited.
+    public static double controlMultiplier = 1.0;
     /**
      * Swerve drive object.
      */

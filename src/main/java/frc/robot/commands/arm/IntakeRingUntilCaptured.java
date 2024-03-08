@@ -1,16 +1,11 @@
 package frc.robot.commands.arm;
 
-import edu.wpi.first.networktables.BooleanSubscriber;
-import edu.wpi.first.networktables.TimestampedInteger;
 import edu.wpi.first.wpilibj.Timer;
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.Constants.ArmConstants.ShooterConstants;
-import frc.robot.RobotContainer;
 import frc.robot.subsystems.arm.ShootingSubsystem;
 import frc.robot.subsystems.arm.StorageSubsystem;
-
-import static frc.robot.Constants.ArmConstants.ShooterConstants;
+import frc.robot.subsystems.drive.SwerveSubsystem;
 
 import java.util.function.BooleanSupplier;
 
@@ -46,7 +41,7 @@ public class IntakeRingUntilCaptured extends Command {
         storageSubsystem.setStorageVoltage(ShooterConstants.STORAGE_INTAKE_VOLTAGE);
         shootingSubsystem.setShootingVoltage(ShooterConstants.SHOOTING_INTAKE_VOLTAGE);
 
-        RobotContainer.controlMultiplier = slowWhenIntakingSupplier.getAsBoolean() ? slowSpeed : 1.0;
+        SwerveSubsystem.controlMultiplier = slowWhenIntakingSupplier.getAsBoolean() ? slowSpeed : 1.0;
     }
 
     @Override
@@ -57,7 +52,7 @@ public class IntakeRingUntilCaptured extends Command {
         storageSubsystem.setStorageVoltage(0);
         shootingSubsystem.setShootingVoltage(0);
 
-        RobotContainer.controlMultiplier = 1.0;
+        SwerveSubsystem.controlMultiplier = 1.0;
     }
 
     @Override

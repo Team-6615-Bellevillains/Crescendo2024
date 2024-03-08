@@ -30,6 +30,8 @@ public final class Constants {
         public static final double intakeForwardsSpeedMetersPerSecond = Units.inchesToMeters(20);
 
         public static final double MAX_ACCELERATION = 2;
+
+        public static final double INTAKE_TIMEOUT_SECONDS = 5;
     }
 
     public static final class Drivebase {

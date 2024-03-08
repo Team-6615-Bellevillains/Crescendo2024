@@ -7,7 +7,6 @@ import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
-import frc.robot.RobotContainer;
 import frc.robot.utils.Direction;
 import frc.robot.utils.TunableArmFeedforward;
 
@@ -15,6 +14,7 @@ import static frc.robot.Constants.ArmConstants.RotationConstants;
 
 public class RotationSubsystem extends SubsystemBase {
 
+    public static Direction armHoldDirection = Direction.UP;
     private final CANSparkMax rotationMotor;
     private final RelativeEncoder rotationEncoder;
 
@@ -71,7 +71,7 @@ public class RotationSubsystem extends SubsystemBase {
     public void activateArmHold() {
         rotationMotor.setSmartCurrentLimit(RotationConstants.HOLDING_ANGLE_CURRENT_LIMIT);
 
-        int holdingVoltageSign = RobotContainer.armHoldDirection == Direction.UP ? 1 : -1;
+        int holdingVoltageSign = armHoldDirection == Direction.UP ? 1 : -1;
         setMotorVoltage(holdingVoltageSign * RotationConstants.HOLDING_ANGLE_VOLTAGE);
     }
 
