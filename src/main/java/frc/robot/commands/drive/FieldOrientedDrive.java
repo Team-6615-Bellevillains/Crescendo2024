@@ -1,5 +1,6 @@
 package frc.robot.commands.drive;
 
+import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
@@ -37,6 +38,12 @@ public class FieldOrientedDrive extends Command {
 
     @Override
     public void execute() {
+        // Convert from blue alliance origin rotation to red alliance
+        if (swerve.autonRan && swerve.shouldFlipRotation && !swerve.rotationHasBeenFlipped) {
+            swerve.resetOdometry(swerve.getPose().rotateBy(Rotation2d.fromDegrees(180)));
+            swerve.rotationHasBeenFlipped = true;
+        }
+
         double xCubed = Math.pow(vX.getAsDouble(), 3) * swerve.maximumSpeed;
         double yCubed = Math.pow(vY.getAsDouble(), 3) * swerve.maximumSpeed;
         double thetaCubed = Math.pow(vTheta.getAsDouble(), 3) * maxAngularVelocity;

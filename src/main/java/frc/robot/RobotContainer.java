@@ -31,6 +31,7 @@ import frc.robot.subsystems.arm.ShootingSubsystem;
 import frc.robot.subsystems.arm.StorageSubsystem;
 import frc.robot.subsystems.drive.SwerveSubsystem;
 import frc.robot.utils.Direction;
+import frc.robot.utils.FlipUtil;
 import frc.robot.utils.Pathing;
 import frc.robot.utils.Position;
 
@@ -156,6 +157,11 @@ public class RobotContainer {
 
         SequentialCommandGroup commandGroup = new SequentialCommandGroup();
 
+        commandGroup.addCommands(Commands.runOnce(() -> {
+                swerveSubsystem.autonRan = true; 
+                swerveSubsystem.shouldFlipRotation = FlipUtil.shouldFlipPath();
+        }, swerveSubsystem));
+        
         commandGroup.addCommands(getSpeakerShooterInstance());
 
         // Determine the flow of autonomous commands based on the selected Pathing

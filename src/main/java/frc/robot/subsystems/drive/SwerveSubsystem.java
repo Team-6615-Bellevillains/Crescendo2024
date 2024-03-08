@@ -7,6 +7,7 @@ package frc.robot.subsystems.drive;
 import com.pathplanner.lib.auto.AutoBuilder;
 import com.pathplanner.lib.path.PathConstraints;
 import com.pathplanner.lib.path.PathPlannerPath;
+import com.pathplanner.lib.util.GeometryUtil;
 import com.pathplanner.lib.util.HolonomicPathFollowerConfig;
 import com.pathplanner.lib.util.PIDConstants;
 import com.pathplanner.lib.util.ReplanningConfig;
@@ -17,12 +18,12 @@ import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 import edu.wpi.first.math.trajectory.Trajectory;
 import edu.wpi.first.math.util.Units;
-import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
+import frc.robot.utils.FlipUtil;
 import swervelib.SwerveController;
 import swervelib.SwerveDrive;
 import swervelib.math.SwerveMath;
@@ -39,6 +40,11 @@ public class SwerveSubsystem extends SubsystemBase {
 
     // Speed multiplier, can be reduced programmatically if the manual control of the robot needs to be limited.
     public static double controlMultiplier = 1.0;
+    // Used to detect if the field "forward" needs to be flipped
+    public boolean shouldFlipRotation = false; // will only be true if we're on red alliance
+    public boolean autonRan = false; // will be set to true after auton command runs
+    public boolean rotationHasBeenFlipped = false; // will be set to true in FieldOrientedDrive after flip
+
     /**
      * Swerve drive object.
      */
@@ -125,13 +131,7 @@ public class SwerveSubsystem extends SubsystemBase {
                         new ReplanningConfig()
                         // Default path replanning config. See the API for the options here
                 ),
-                () -> {
-                    // Boolean supplier that controls when the path will be mirrored for the red alliance
-                    // This will flip the path being followed to the red side of the field.
-                    // THE ORIGIN WILL REMAIN ON THE BLUE SIDE
-                    var alliance = DriverStation.getAlliance();
-                    return alliance.isPresent() ? alliance.get() == DriverStation.Alliance.Red : false;
-                },
+                FlipUtil::shouldFlipPath,
                 this // Reference to this subsystem to set requirements
         );
     }
@@ -148,16 +148,13 @@ public class SwerveSubsystem extends SubsystemBase {
         PathPlannerPath path = PathPlannerPath.fromPathFile(pathName);
 
         if (setOdomToStart) {
-            Rotation2d startingRotation = path.getPreviewStartingHolonomicPose().getRotation();
+            Pose2d startingPose = path.getPreviewStartingHolonomicPose();
 
-            // var alliance = DriverStation.getAlliance();
-            // boolean shouldFlipRotation = alliance.isPresent() ? alliance.get() == DriverStation.Alliance.Red : false;
+            if (FlipUtil.shouldFlipPath()) {
+                startingPose = GeometryUtil.flipFieldPose(startingPose);
+            }
 
-            // if (shouldFlipRotation) {
-            //     startingRotation.minus(Rotation2d.fromDegrees(180));
-            // }
-
-            resetOdometry(new Pose2d(path.getPoint(0).position, startingRotation));
+            resetOdometry(startingPose);
         }
 
         // Create a path following command using AutoBuilder. This will also trigger event markers.
