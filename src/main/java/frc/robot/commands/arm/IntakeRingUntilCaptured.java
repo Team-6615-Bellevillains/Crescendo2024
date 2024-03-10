@@ -15,7 +15,7 @@ public class IntakeRingUntilCaptured extends Command {
     private final ShootingSubsystem shootingSubsystem;
     private final BooleanSupplier slowWhenIntakingSupplier;
     private double startTime;
-    private final double slowSpeed = 0.65;
+    private final double slowSpeed = 0.8;
 
     // default slow when intaking to false
     public IntakeRingUntilCaptured(StorageSubsystem storageSubsystem, ShootingSubsystem shootingSubsystem) {
@@ -58,7 +58,7 @@ public class IntakeRingUntilCaptured extends Command {
     @Override
     public boolean isFinished() {
         // return Timer.getFPGATimestamp() > startTime + ShooterConstants.INTAKE_SPIN_UP_DELAY_SECONDS
-        return Math.abs(storageSubsystem.getOutputCurrent()) > 25;
+        return Math.abs(storageSubsystem.getOutputCurrent()) > ShooterConstants.NOTE_CAPTURED_STALL_CURRENT_THRESHOLD;
     }
 
 }

@@ -88,17 +88,19 @@ public final class Constants {
             public static final int kStorageMotorPort = 45;
             public static final int kShootingMotorPort = 15;
 
-            public static final double TIME_UNTIL_FEED = 0.7;
+            public static final double TIME_UNTIL_FEED = 0.9;
             public static final double LAUNCH_RUN_TIME = TIME_UNTIL_FEED + .75; //change once tested
 
             public static final double STORAGE_INTAKE_VOLTAGE = -3.0;
             public static final double SHOOTING_INTAKE_VOLTAGE = 6.0;
 
             public static final double STORAGE_SPEAKER_SHOOTER_VOLTAGE = 13;
-            public static final double SHOOTING_SPEAKER_SHOOTER_VOLTAGE = -10;
+            public static final double SHOOTING_SPEAKER_SHOOTER_VOLTAGE = -11;
 
             public static final double STORAGE_TRAP_SHOOTER_VOLTAGE = 6;
             public static final double SHOOTING_TRAP_SHOOTER_VOLTAGE = -7;
+
+            public static final double NOTE_CAPTURED_STALL_CURRENT_THRESHOLD = 30;
 
             // after starting the intake, wait this amount of seconds to detect if the note has been intaked
             public static final double INTAKE_SPIN_UP_DELAY_SECONDS = 2; 
