@@ -21,6 +21,7 @@ import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
 import frc.robot.utils.FlipUtil;
@@ -147,18 +148,18 @@ public class SwerveSubsystem extends SubsystemBase {
         // Load the path you want to follow using its name in the GUI
         PathPlannerPath path = PathPlannerPath.fromPathFile(pathName);
 
-        if (setOdomToStart) {
-            Pose2d startingPose = path.getPreviewStartingHolonomicPose();
-
-            if (FlipUtil.shouldFlipPath()) {
-                startingPose = GeometryUtil.flipFieldPose(startingPose);
-            }
-
-            resetOdometry(startingPose);
-        }
-
         // Create a path following command using AutoBuilder. This will also trigger event markers.
-        return AutoBuilder.followPath(path);
+        return Commands.runOnce(() -> {
+            if (setOdomToStart) {
+                Pose2d startingPose = path.getPreviewStartingHolonomicPose();
+
+                if (FlipUtil.shouldFlipPath()) {
+                    startingPose = GeometryUtil.flipFieldPose(startingPose);
+                }
+
+                resetOdometry(startingPose);
+            }
+        }).andThen(AutoBuilder.followPath(path));
     }
 
     /**
@@ -286,6 +287,10 @@ public class SwerveSubsystem extends SubsystemBase {
 
     @Override
     public void periodic() {
+        SmartDashboard.putBoolean("Auton ran", autonRan);
+        SmartDashboard.putBoolean("Should flip", shouldFlipRotation);
+        SmartDashboard.putBoolean("Has flipped", rotationHasBeenFlipped);
+
     }
 
     @Override
@@ -309,6 +314,7 @@ public class SwerveSubsystem extends SubsystemBase {
      * @param initialHolonomicPose The pose to set the odometry to
      */
     public void resetOdometry(Pose2d initialHolonomicPose) {
+        SmartDashboard.putNumber("Reset rotation to", initialHolonomicPose.getRotation().getDegrees());
         swerveDrive.resetOdometry(initialHolonomicPose);
     }
 

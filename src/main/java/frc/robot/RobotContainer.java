@@ -5,6 +5,9 @@
 package frc.robot;
 
 import edu.wpi.first.math.MathUtil;
+import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.wpilibj.Filesystem;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
@@ -20,6 +23,7 @@ import frc.robot.Constants.OperatorConstants;
 import frc.robot.Constants.ArmConstants.ShooterConstants;
 import frc.robot.commands.ClimbLeftCmd;
 import frc.robot.commands.ClimbRightCmd;
+import frc.robot.commands.TestClimbSensorsCmd;
 import frc.robot.commands.arm.ArmRotate;
 import frc.robot.commands.arm.IntakeRingUntilCaptured;
 import frc.robot.commands.arm.ShootCmd;
@@ -36,6 +40,9 @@ import frc.robot.utils.Pathing;
 import frc.robot.utils.Position;
 
 import java.io.File;
+
+import com.pathplanner.lib.path.PathPlannerPath;
+import com.pathplanner.lib.util.GeometryUtil;
 
 /**
  * This class is where the bulk of the robot should be declared. Since
@@ -136,8 +143,7 @@ public class RobotContainer {
      */
     private void configureBindings() {
         driverXbox.b().onTrue((new InstantCommand(swerveSubsystem::zeroGyro)));
-        driverXbox.y().onTrue(Commands.parallel(new ClimbLeftCmd(climbLeftSubsystem, Direction.UP),
-                new ClimbRightCmd(climbRightSubsystem, Direction.UP)));
+        driverXbox.y().onTrue(Commands.parallel(new ClimbLeftCmd(climbLeftSubsystem, Direction.UP),new ClimbRightCmd(climbRightSubsystem, Direction.UP)));
         driverXbox.a().onTrue(Commands.parallel(new ClimbLeftCmd(climbLeftSubsystem, Direction.DOWN),
                 new ClimbRightCmd(climbRightSubsystem, Direction.DOWN)));
 
@@ -164,16 +170,32 @@ public class RobotContainer {
         
         commandGroup.addCommands(getSpeakerShooterInstance());
 
+        final double intakeForwardsSign = FlipUtil.shouldFlipPath() ? -1 : 1;
+
         // Determine the flow of autonomous commands based on the selected Pathing
         // option
         return switch (autonPathing) {
             // If "Don't Move" is selected, just run the shooter which is already setup
             // above
-            case DONT_MOVE -> commandGroup;
+            case DONT_MOVE -> {
+                commandGroup.addCommands(Commands.runOnce(() -> {                        
+                        PathPlannerPath path = PathPlannerPath.fromPathFile(startingPosition + " back up");
+
+                        Pose2d startingPose = path.getPreviewStartingHolonomicPose();
+
+                        if (FlipUtil.shouldFlipPath()) {
+                                startingPose = GeometryUtil.flipFieldPose(startingPose);
+                        }
+
+                        swerveSubsystem.resetOdometry(startingPose);
+                }, swerveSubsystem));
+               yield commandGroup;
+            }
             // If "Back Up" is selected, a command to back up is added to the command group
             // The second argument is true because we want to set the odometry to the position the bot starts in.
             case BACK_UP -> {
-                commandGroup.addCommands(swerveSubsystem.getAutonomousCommand(startingPosition + " back up", true));
+                commandGroup.addCommands(Commands.waitSeconds(7),
+                        swerveSubsystem.getAutonomousCommand(startingPosition + " back up", true));
                 yield commandGroup;
             }
             // If "Go for Second Note" is selected, a series of commands are added to get a
@@ -189,7 +211,7 @@ public class RobotContainer {
                         // Stop once the note has been obtained or AutonConstants.INTAKE_TIMEOUT_SECONDS seconds have passed, whichever comes first
                         Commands.parallel(
                                 Commands.runOnce(() -> swerveSubsystem
-                                        .driveFieldOriented(new ChassisSpeeds(AutonConstants.intakeForwardsSpeedMetersPerSecond, 0, 0)), swerveSubsystem),
+                                        .driveFieldOriented(new ChassisSpeeds(intakeForwardsSign * AutonConstants.intakeForwardsSpeedMetersPerSecond, 0, 0)), swerveSubsystem),
                                 new IntakeRingUntilCaptured(storageSubsystem, shootingSubsystem)
                                         .withTimeout(AutonConstants.INTAKE_TIMEOUT_SECONDS)
                         ),
