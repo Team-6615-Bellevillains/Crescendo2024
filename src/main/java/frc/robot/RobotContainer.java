@@ -105,7 +105,15 @@ public class RobotContainer {
         // - Mapping the commands with various button presses on the Xbox controllers
         configureBindings();
 
-        FieldOrientedDrive fieldOrientedDrive = new FieldOrientedDrive(swerveSubsystem, () -> -MathUtil.applyDeadband(driverXbox.getLeftY(), OperatorConstants.LEFT_Y_DEADBAND) * SwerveSubsystem.controlMultiplier, () -> -MathUtil.applyDeadband(driverXbox.getLeftX(), OperatorConstants.LEFT_X_DEADBAND) * SwerveSubsystem.controlMultiplier, () -> -MathUtil.applyDeadband(driverXbox.getRightX(), OperatorConstants.RIGHT_X_DEADBAND) * SwerveSubsystem.controlMultiplier);
+        FieldOrientedDrive fieldOrientedDrive = new FieldOrientedDrive(
+                swerveSubsystem,
+                () -> -MathUtil.applyDeadband(driverXbox.getLeftY(), OperatorConstants.LEFT_Y_DEADBAND) * SwerveSubsystem.controlMultiplier,
+                () -> -MathUtil.applyDeadband(driverXbox.getLeftX(), OperatorConstants.LEFT_X_DEADBAND) * SwerveSubsystem.controlMultiplier,
+                () -> -MathUtil.applyDeadband(driverXbox.getRightX(), OperatorConstants.RIGHT_X_DEADBAND) * SwerveSubsystem.controlMultiplier,
+                () -> driverXbox.leftTrigger().getAsBoolean(),
+                () -> driverXbox.leftBumper().getAsBoolean() || driverXbox.rightBumper().getAsBoolean(),
+                () -> driverXbox.rightTrigger().getAsBoolean()
+        );
 
         // Make the field-oriented drive command always run
         swerveSubsystem.setDefaultCommand(fieldOrientedDrive);

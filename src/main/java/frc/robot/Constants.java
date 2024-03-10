@@ -4,6 +4,7 @@
 
 package frc.robot;
 
+import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation3d;
 import edu.wpi.first.math.util.Units;
 import swervelib.math.Matter;
@@ -34,10 +35,14 @@ public final class Constants {
         public static final double INTAKE_TIMEOUT_SECONDS = 5;
     }
 
-    public static final class Drivebase {
+    public static final class DriveConstants {
 
         // Hold time on motor brakes when disabled
         public static final double WHEEL_LOCK_TIME = 10; // seconds
+
+        public static final Rotation2d LEFT_SHOOTER_ANGLE = Rotation2d.fromDegrees(-120);
+        public static final Rotation2d CENTER_SHOOTER_ANGLE = Rotation2d.fromDegrees(180);
+        public static final Rotation2d RIGHT_SHOOTER_ANGLE = Rotation2d.fromDegrees(120);
     }
 
     public static final class OperatorConstants {

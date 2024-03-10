@@ -11,18 +11,26 @@ import swervelib.SwerveController;
 import swervelib.math.SwerveMath;
 
 import java.util.List;
+import java.util.function.BooleanSupplier;
 import java.util.function.DoubleSupplier;
 
 public class FieldOrientedDrive extends Command {
     private final SwerveSubsystem swerve;
     private final DoubleSupplier vX, vY, vTheta;
+    private final BooleanSupplier angleLeft, angleCenter, angleRight;
     private final double maxAngularVelocity;
 
-    public FieldOrientedDrive(SwerveSubsystem swerve, DoubleSupplier vX, DoubleSupplier vY, DoubleSupplier vTheta) {
+    public FieldOrientedDrive(SwerveSubsystem swerve, DoubleSupplier vX, DoubleSupplier vY, DoubleSupplier vTheta, BooleanSupplier angleLeft, BooleanSupplier angleCenter, BooleanSupplier angleRight) {
         this.swerve = swerve;
+
         this.vX = vX;
         this.vY = vY;
         this.vTheta = vTheta;
+
+        this.angleLeft = angleLeft;
+        this.angleCenter = angleCenter;
+        this.angleRight = angleRight;
+
         this.maxAngularVelocity = SwerveMath.calculateMaxAngularVelocity(
                 swerve.maximumSpeed,
                 Math.abs(swerve.getSwerveDriveConfiguration().moduleLocationsMeters[0].getX()),
@@ -42,13 +50,38 @@ public class FieldOrientedDrive extends Command {
         swerve.setDriveHeadingCorrection(true);
     }
 
+
+    private Rotation2d getShootingRotation() {
+        if (angleLeft.getAsBoolean()) {
+            return Constants.DriveConstants.LEFT_SHOOTER_ANGLE;
+        }
+
+        if (angleCenter.getAsBoolean()) {
+            return Constants.DriveConstants.CENTER_SHOOTER_ANGLE;
+        }
+
+        if (angleRight.getAsBoolean()) {
+            return Constants.DriveConstants.RIGHT_SHOOTER_ANGLE;
+        }
+
+        return null;
+    }
+
     @Override
     public void execute() {
         double xCubed = Math.pow(vX.getAsDouble(), 3) * swerve.maximumSpeed;
         double yCubed = Math.pow(vY.getAsDouble(), 3) * swerve.maximumSpeed;
-        double thetaCubed = Math.pow(vTheta.getAsDouble(), 3) * maxAngularVelocity;
 
-        ChassisSpeeds desiredSpeeds = swerve.getSwerveController().getRawTargetSpeeds(xCubed, yCubed, thetaCubed);
+        ChassisSpeeds desiredSpeeds;
+        Rotation2d fixedShootingRotation = getShootingRotation();
+
+        // no fixed angle button is pressed, use right joystick
+        if (fixedShootingRotation == null) {
+            double thetaCubed = Math.pow(vTheta.getAsDouble(), 3) * maxAngularVelocity;
+            desiredSpeeds = swerve.getSwerveController().getRawTargetSpeeds(xCubed, yCubed, thetaCubed);
+        } else {
+            desiredSpeeds = swerve.getSwerveController().getRawTargetSpeeds(xCubed, yCubed, fixedShootingRotation.getRadians(), swerve.getHeading().getRadians());
+        }
 
         // Limit velocity to prevent tipping
         Translation2d translation = SwerveController.getTranslation2d(desiredSpeeds);
