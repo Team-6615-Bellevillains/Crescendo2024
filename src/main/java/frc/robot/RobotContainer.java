@@ -142,7 +142,9 @@ public class RobotContainer {
 
         operatorXbox.b().onTrue(getTrapShooterInstance());
         operatorXbox.x().onTrue(getSpeakerShooterInstance());
-        operatorXbox.y().onTrue(new ArmRotate(rotationSubsystem).andThen(new IntakeRingUntilCaptured(storageSubsystem, shootingSubsystem, slowWhenIntakingChooser::getSelected).andThen(new ArmRotate(rotationSubsystem))));
+        operatorXbox.y().onTrue(new ArmRotate(rotationSubsystem)
+                .andThen(new IntakeRingUntilCaptured(storageSubsystem, shootingSubsystem, slowWhenIntakingChooser::getSelected)
+                .andThen(new ArmRotate(rotationSubsystem))));
         operatorXbox.a().onTrue(new ArmRotate(rotationSubsystem));
 
     }
@@ -176,7 +178,10 @@ public class RobotContainer {
             // If "Back Up" is selected, a command to back up is added to the command group
             // The second argument is true because we want to set the odometry to the position the bot starts in.
             case BACK_UP -> {
-                commandGroup.addCommands(Commands.waitSeconds(7), swerveSubsystem.getAutonomousCommand(startingPosition + " back up", true));
+                commandGroup.addCommands(
+                        Commands.waitSeconds(AutonConstants.BACKUP_WAIT_SECONDS), // allow teammates to pick up notes if necessary
+                        swerveSubsystem.getAutonomousCommand(startingPosition + " back up", true)
+                );
                 yield commandGroup;
             }
             // If "Go for Second Note" is selected, a series of commands are added to get a
@@ -190,7 +195,10 @@ public class RobotContainer {
                         new ArmRotate(rotationSubsystem),
                         // Drive forwards at a slow speed while running the intake motors.
                         // Stop once the note has been obtained or AutonConstants.INTAKE_TIMEOUT_SECONDS seconds have passed, whichever comes first
-                        Commands.parallel(Commands.runOnce(() -> swerveSubsystem.driveFieldOriented(new ChassisSpeeds(intakeForwardsSign * AutonConstants.intakeForwardsSpeedMetersPerSecond, 0, 0)), swerveSubsystem), new IntakeRingUntilCaptured(storageSubsystem, shootingSubsystem).withTimeout(AutonConstants.INTAKE_TIMEOUT_SECONDS)),
+                        Commands.parallel(
+                                Commands.runOnce(() -> swerveSubsystem.driveFieldOriented(new ChassisSpeeds(intakeForwardsSign * AutonConstants.intakeForwardsSpeedMetersPerSecond, 0, 0)), swerveSubsystem),
+                                new IntakeRingUntilCaptured(storageSubsystem, shootingSubsystem).withTimeout(AutonConstants.INTAKE_TIMEOUT_SECONDS)
+                        ),
                         // Rotate arm back into shooting position
                         new ArmRotate(rotationSubsystem),
                         // Move back to the speaker.

@@ -68,7 +68,6 @@ public class ArmRotate extends Command {
     @Override
     public void end(boolean interrupted) {
         SmartDashboard.putNumber("Rotation position at end", rotationSubsystem.getRotationEncoderPositionInDegrees());
-        SmartDashboard.putNumber("Rotation position at end", rotationSubsystem.getRotationEncoderPositionInDegrees());
         SmartDashboard.putNumber("Rotation velocity at end",
                 rotationSubsystem.getRotationEncoderVelocityInDegreesPerSec());
         SmartDashboard.putNumber("Rotation heartbeat at end", Timer.getFPGATimestamp());
