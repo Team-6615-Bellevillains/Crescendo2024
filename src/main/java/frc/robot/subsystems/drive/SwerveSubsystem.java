@@ -137,6 +137,18 @@ public class SwerveSubsystem extends SubsystemBase {
         );
     }
 
+    public Command resetOdometryToStartingPose(PathPlannerPath path) {
+        return Commands.runOnce(() -> {
+            Pose2d startingPose = path.getPreviewStartingHolonomicPose();
+
+            if (FlipUtil.shouldFlipPath()) {
+                startingPose = GeometryUtil.flipFieldPose(startingPose);
+            }
+
+            resetOdometry(startingPose);
+        });
+    }
+
     /**
      * Get the path follower with events.
      *
@@ -149,17 +161,9 @@ public class SwerveSubsystem extends SubsystemBase {
         PathPlannerPath path = PathPlannerPath.fromPathFile(pathName);
 
         // Create a path following command using AutoBuilder. This will also trigger event markers.
-        return Commands.runOnce(() -> {
-            if (setOdomToStart) {
-                Pose2d startingPose = path.getPreviewStartingHolonomicPose();
-
-                if (FlipUtil.shouldFlipPath()) {
-                    startingPose = GeometryUtil.flipFieldPose(startingPose);
-                }
-
-                resetOdometry(startingPose);
-            }
-        }).andThen(AutoBuilder.followPath(path));
+        return resetOdometryToStartingPose(path)
+                .onlyIf(() -> setOdomToStart)
+                .andThen(AutoBuilder.followPath(path));
     }
 
     /**

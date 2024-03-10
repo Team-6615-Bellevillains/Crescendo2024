@@ -1,6 +1,5 @@
 package frc.robot.commands.arm;
 
-import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.Constants.ArmConstants.ShooterConstants;
 import frc.robot.subsystems.arm.ShootingSubsystem;
@@ -14,8 +13,7 @@ public class IntakeRingUntilCaptured extends Command {
     private final StorageSubsystem storageSubsystem;
     private final ShootingSubsystem shootingSubsystem;
     private final BooleanSupplier slowWhenIntakingSupplier;
-    private double startTime;
-    private final double slowSpeed = 0.8;
+    private final static double slowSpeed = 0.8;
 
     // default slow when intaking to false
     public IntakeRingUntilCaptured(StorageSubsystem storageSubsystem, ShootingSubsystem shootingSubsystem) {
@@ -36,8 +34,6 @@ public class IntakeRingUntilCaptured extends Command {
 
     @Override
     public void initialize() {
-        startTime = Timer.getFPGATimestamp();
-
         storageSubsystem.setStorageVoltage(ShooterConstants.STORAGE_INTAKE_VOLTAGE);
         shootingSubsystem.setShootingVoltage(ShooterConstants.SHOOTING_INTAKE_VOLTAGE);
 
@@ -57,7 +53,6 @@ public class IntakeRingUntilCaptured extends Command {
 
     @Override
     public boolean isFinished() {
-        // return Timer.getFPGATimestamp() > startTime + ShooterConstants.INTAKE_SPIN_UP_DELAY_SECONDS
         return Math.abs(storageSubsystem.getOutputCurrent()) > ShooterConstants.NOTE_CAPTURED_STALL_CURRENT_THRESHOLD;
     }
 

@@ -101,11 +101,6 @@ public final class Constants {
             public static final double SHOOTING_TRAP_SHOOTER_VOLTAGE = -7;
 
             public static final double NOTE_CAPTURED_STALL_CURRENT_THRESHOLD = 30;
-
-            // after starting the intake, wait this amount of seconds to detect if the note has been intaked
-            public static final double INTAKE_SPIN_UP_DELAY_SECONDS = 2; 
-            public static final double INTAKE_DETECTION_VELOCITY_THRESHOLD = 1.5;
-
         }
     }
 

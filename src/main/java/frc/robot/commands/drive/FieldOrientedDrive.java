@@ -33,24 +33,24 @@ public class FieldOrientedDrive extends Command {
 
     @Override
     public void initialize() {
+        // Convert from blue alliance origin rotation to red alliance
+        if (swerve.shouldFlipRotation && !swerve.rotationHasBeenFlipped) {
+            swerve.resetOdometry(swerve.getPose().rotateBy(Rotation2d.fromDegrees(180)));
+            swerve.rotationHasBeenFlipped = true;
+        }
+
         swerve.setDriveHeadingCorrection(true);
     }
 
     @Override
     public void execute() {
-        // Convert from blue alliance origin rotation to red alliance
-        if (swerve.autonRan && swerve.shouldFlipRotation && !swerve.rotationHasBeenFlipped) {
-            swerve.resetOdometry(swerve.getPose().rotateBy(Rotation2d.fromDegrees(180)));
-            swerve.rotationHasBeenFlipped = true;
-        }
-
         double xCubed = Math.pow(vX.getAsDouble(), 3) * swerve.maximumSpeed;
         double yCubed = Math.pow(vY.getAsDouble(), 3) * swerve.maximumSpeed;
         double thetaCubed = Math.pow(vTheta.getAsDouble(), 3) * maxAngularVelocity;
 
         ChassisSpeeds desiredSpeeds = swerve.getSwerveController().getRawTargetSpeeds(xCubed, yCubed, thetaCubed);
 
-        // Limit velocity to prevent tippy
+        // Limit velocity to prevent tipping
         Translation2d translation = SwerveController.getTranslation2d(desiredSpeeds);
         translation = SwerveMath.limitVelocity(translation, swerve.getFieldVelocity(), swerve.getPose(),
                 Constants.LOOP_TIME, Constants.ROBOT_MASS, List.of(Constants.CHASSIS),
