@@ -7,6 +7,7 @@ package frc.robot;
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.wpilibj.Filesystem;
+import edu.wpi.first.wpilibj.GenericHID;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
@@ -18,9 +19,7 @@ import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.Constants.AutonConstants;
 import frc.robot.Constants.OperatorConstants;
 import frc.robot.Constants.ArmConstants.ShooterConstants;
-import frc.robot.commands.ClimbLeftCmd;
 import frc.robot.commands.ClimbLeftNoMagnetCmd;
-import frc.robot.commands.ClimbRightCmd;
 import frc.robot.commands.ClimbRightNoMagnetCmd;
 import frc.robot.commands.arm.ArmRotate;
 import frc.robot.commands.arm.IntakeRingUntilCaptured;
@@ -79,6 +78,17 @@ public class RobotContainer {
 
     private ShootCmd getSpeakerShooterInstance() {
         return new ShootCmd(shootingSubsystem, ShooterConstants.SHOOTING_SPEAKER_SHOOTER_VOLTAGE, storageSubsystem, ShooterConstants.STORAGE_SPEAKER_SHOOTER_VOLTAGE);
+    }
+
+    private void rumbleControllers(double rumblePercent) {
+        driverXbox.getHID().setRumble(GenericHID.RumbleType.kBothRumble, rumblePercent);
+        operatorXbox.getHID().setRumble(GenericHID.RumbleType.kBothRumble, rumblePercent);
+    }
+
+    private Command getRumbleControllersCmd() {
+        return Commands.runOnce(() -> rumbleControllers(OperatorConstants.RUMBLE_POWER_PERCENTAGE))
+                .withTimeout(OperatorConstants.RUMBLE_TIME)
+                .finallyDo(() -> rumbleControllers(0));
     }
 
     /**
@@ -145,8 +155,12 @@ public class RobotContainer {
         operatorXbox.b().onTrue(getTrapShooterInstance());
         operatorXbox.x().onTrue(getSpeakerShooterInstance());
         operatorXbox.y().onTrue(new ArmRotate(rotationSubsystem)
-                .andThen(new IntakeRingUntilCaptured(storageSubsystem, shootingSubsystem, slowWhenIntakingChooser::getSelected)
-                .andThen(new ArmRotate(rotationSubsystem))));
+                .andThen(new IntakeRingUntilCaptured(storageSubsystem, shootingSubsystem, slowWhenIntakingChooser::getSelected))
+                .andThen(
+                        new ArmRotate(rotationSubsystem)
+                                .alongWith(getRumbleControllersCmd())
+                )
+        );
         operatorXbox.a().onTrue(new ArmRotate(rotationSubsystem));
 
     }
