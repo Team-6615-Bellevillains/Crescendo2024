@@ -21,6 +21,8 @@ import frc.robot.Constants.OperatorConstants;
 import frc.robot.Constants.ArmConstants.ShooterConstants;
 import frc.robot.commands.ClimbLeftNoMagnetCmd;
 import frc.robot.commands.ClimbRightNoMagnetCmd;
+import frc.robot.commands.ForceClimbLeftCmd;
+import frc.robot.commands.ForceClimbRightCmd;
 import frc.robot.commands.arm.ArmRotate;
 import frc.robot.commands.arm.IntakeRingUntilCaptured;
 import frc.robot.commands.arm.ShootCmd;
@@ -163,6 +165,11 @@ public class RobotContainer {
         );
         operatorXbox.a().onTrue(new ArmRotate(rotationSubsystem));
 
+        // TODO: COMMENT THESE OUT AFTER YOU'RE DONE WITH THEM
+        operatorXbox.leftBumper().whileTrue(new ForceClimbLeftCmd(climbLeftSubsystem, Direction.UP));
+        operatorXbox.leftTrigger().whileTrue(new ForceClimbLeftCmd(climbLeftSubsystem, Direction.DOWN));
+        operatorXbox.rightBumper().whileTrue(new ForceClimbRightCmd(climbRightSubsystem, Direction.UP));
+        operatorXbox.rightTrigger().whileTrue(new ForceClimbRightCmd(climbRightSubsystem, Direction.DOWN));
     }
 
     // Returns the Command to run during the autonomous phase

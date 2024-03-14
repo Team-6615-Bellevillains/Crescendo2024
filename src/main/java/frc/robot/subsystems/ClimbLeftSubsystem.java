@@ -21,6 +21,7 @@ public class ClimbLeftSubsystem extends SubsystemBase {
     }
 
     public void setClimbSpeedPercentage(double climbSpeedPercentage) {
+        SmartDashboard.putBoolean("Right Climber Activated", climbSpeedPercentage != 0);
         climbMotorLeft.set(climbSpeedPercentage);
     }
 
