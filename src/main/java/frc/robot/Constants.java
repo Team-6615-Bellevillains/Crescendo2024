@@ -53,7 +53,7 @@ public final class Constants {
         public static final double TURN_CONSTANT = 6;
 
         public static final double RUMBLE_POWER_PERCENTAGE = 0.2;
-        public static final double RUMBLE_TIME = 0.0;
+        public static final double RUMBLE_TIME_SECONDS = 2.0;
 
     }
 

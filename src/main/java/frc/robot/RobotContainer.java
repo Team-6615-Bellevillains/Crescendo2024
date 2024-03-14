@@ -89,7 +89,7 @@ public class RobotContainer {
 
     private Command getRumbleControllersCmd() {
         return Commands.runOnce(() -> rumbleControllers(OperatorConstants.RUMBLE_POWER_PERCENTAGE))
-                .withTimeout(OperatorConstants.RUMBLE_TIME)
+                .andThen(Commands.waitSeconds(OperatorConstants.RUMBLE_TIME_SECONDS))
                 .finallyDo(() -> rumbleControllers(0));
     }
 
