@@ -118,5 +118,10 @@ public final class Constants {
         public static final int kClimbSensorRightUpPort = 2;
         public static final int kClimbSensorLeftDownPort = 5;
         public static final int kClimbSensorRightDownPort = 3;
+
+        // Separated in case one climber suffers a mechanical issue and cannot reach the same point as the other
+        // TODO: Set to proper values
+        public static final double CLIMB_LEFT_UP_THRESHOLD_ROTATIONS = 99999;
+        public static final double CLIMB_RIGHT_UP_THRESHOLD_ROTATIONS = 99999;
     }
 }

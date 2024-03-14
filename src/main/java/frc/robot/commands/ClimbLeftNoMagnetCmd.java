@@ -1,0 +1,43 @@
+package frc.robot.commands;
+
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+import edu.wpi.first.wpilibj2.command.Command;
+import frc.robot.Constants.ClimbConstants;
+import frc.robot.subsystems.ClimbLeftSubsystem;
+import frc.robot.utils.Direction;
+
+public class ClimbLeftNoMagnetCmd extends Command {
+
+    private final ClimbLeftSubsystem climbLeftSubsystem;
+    private final Direction direction;
+
+    public ClimbLeftNoMagnetCmd(ClimbLeftSubsystem climbLeftSubsystem, Direction direction) {
+        this.climbLeftSubsystem = climbLeftSubsystem;
+        this.direction = direction;
+
+        addRequirements(climbLeftSubsystem);
+    }
+
+    @Override
+    public void initialize() {
+        SmartDashboard.putBoolean("Left Climber Activated", true);
+        climbLeftSubsystem.setClimbSpeedPercentage(direction == Direction.UP ? 1 : -1);
+    }
+
+    @Override
+    public void execute() {
+    }
+
+    @Override
+    public void end(boolean interrupted) {
+        SmartDashboard.putBoolean("Left Climber Activated", false);
+        climbLeftSubsystem.setClimbSpeedPercentage(0);
+    }
+
+    @Override
+    public boolean isFinished() {
+        return direction == Direction.UP ?
+                climbLeftSubsystem.getClimbRotations() >= ClimbConstants.CLIMB_LEFT_UP_THRESHOLD_ROTATIONS
+                : climbLeftSubsystem.getClimbRotations() <= 0;
+    }
+}

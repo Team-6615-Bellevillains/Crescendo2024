@@ -19,7 +19,9 @@ import frc.robot.Constants.AutonConstants;
 import frc.robot.Constants.OperatorConstants;
 import frc.robot.Constants.ArmConstants.ShooterConstants;
 import frc.robot.commands.ClimbLeftCmd;
+import frc.robot.commands.ClimbLeftNoMagnetCmd;
 import frc.robot.commands.ClimbRightCmd;
+import frc.robot.commands.ClimbRightNoMagnetCmd;
 import frc.robot.commands.arm.ArmRotate;
 import frc.robot.commands.arm.IntakeRingUntilCaptured;
 import frc.robot.commands.arm.ShootCmd;
@@ -137,8 +139,8 @@ public class RobotContainer {
      */
     private void configureBindings() {
         driverXbox.b().onTrue((new InstantCommand(swerveSubsystem::zeroGyro)));
-        driverXbox.y().onTrue(new ClimbLeftCmd(climbLeftSubsystem, Direction.UP).alongWith(new ClimbRightCmd(climbRightSubsystem, Direction.UP)));
-        driverXbox.a().onTrue(new ClimbLeftCmd(climbLeftSubsystem, Direction.DOWN).alongWith(new ClimbRightCmd(climbRightSubsystem, Direction.DOWN)));
+        driverXbox.y().onTrue(new ClimbLeftNoMagnetCmd(climbLeftSubsystem, Direction.UP).alongWith(new ClimbRightNoMagnetCmd(climbRightSubsystem, Direction.UP)));
+        driverXbox.a().onTrue(new ClimbLeftNoMagnetCmd(climbLeftSubsystem, Direction.DOWN).alongWith(new ClimbRightNoMagnetCmd(climbRightSubsystem, Direction.DOWN)));
 
         operatorXbox.b().onTrue(getTrapShooterInstance());
         operatorXbox.x().onTrue(getSpeakerShooterInstance());
