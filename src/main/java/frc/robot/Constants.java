@@ -20,7 +20,7 @@ import swervelib.parser.PIDFConfig;
  */
 public final class Constants {
 
-    public static final double ROBOT_MASS = Units.lbsToKilograms(56); // 32lbs * kg per pound
+    public static final double ROBOT_MASS = Units.lbsToKilograms(113.9); // 32lbs * kg per pound
     public static final Matter CHASSIS = new Matter(new Translation3d(0, 0, Units.inchesToMeters(4)), ROBOT_MASS);
     public static final double LOOP_TIME = 0.13; //s, 20ms + 110ms sprk max velocity lag
 
@@ -28,11 +28,11 @@ public final class Constants {
 
         public static final PIDFConfig angleAutoPID = new PIDFConfig(2.1, 0, 0);
         // speed to move forwards when going to intake during auto
-        public static final double intakeForwardsSpeedMetersPerSecond = Units.inchesToMeters(20);
+        public static final double intakeForwardsSpeedMetersPerSecond = Units.inchesToMeters(40);
 
         public static final double MAX_ACCELERATION = 2;
 
-        public static final double INTAKE_TIMEOUT_SECONDS = 5;
+        public static final double INTAKE_TIMEOUT_SECONDS = 1;
         public static final double BACKUP_WAIT_SECONDS = 7;
     }
 
@@ -96,8 +96,8 @@ public final class Constants {
             public static final int kStorageMotorPort = 45;
             public static final int kShootingMotorPort = 15;
 
-            public static final double TIME_UNTIL_FEED = 0.9;
-            public static final double LAUNCH_RUN_TIME = TIME_UNTIL_FEED + .75; //change once tested
+            public static final double TIME_UNTIL_FEED = 0.75;
+            public static final double LAUNCH_RUN_TIME = TIME_UNTIL_FEED + .5; //change once tested
 
             public static final double STORAGE_INTAKE_VOLTAGE = -3.0;
             public static final double SHOOTING_INTAKE_VOLTAGE = 6.0;
@@ -108,7 +108,7 @@ public final class Constants {
             public static final double STORAGE_TRAP_SHOOTER_VOLTAGE = 6;
             public static final double SHOOTING_TRAP_SHOOTER_VOLTAGE = -7;
 
-            public static final double NOTE_CAPTURED_STALL_CURRENT_THRESHOLD = 30;
+            public static final double NOTE_CAPTURED_STALL_CURRENT_THRESHOLD = 45;
         }
     }
 
@@ -123,7 +123,10 @@ public final class Constants {
 
         // Separated in case one climber suffers a mechanical issue and cannot reach the same point as the other
         // TODO: Set to proper values
-        public static final double CLIMB_LEFT_UP_THRESHOLD_ROTATIONS = 99999;
-        public static final double CLIMB_RIGHT_UP_THRESHOLD_ROTATIONS = 99999;
+        public static final double CLIMB_LEFT_UP_THRESHOLD_ROTATIONS = 115.667404;
+        public static final double CLIMB_RIGHT_UP_THRESHOLD_ROTATIONS = 112.001221;
+
+        public static final double CLIMB_LEFT_DOWN_THRESHOLD_ROTATIONS = 10;
+        public static final double CLIMB_RIGHT_DOWN_THRESHOLD_ROTATIONS = 10;
     }
 }

@@ -36,9 +36,9 @@ public class RotationSubsystem extends SubsystemBase {
     public void periodic() {
         SmartDashboard.putNumber("Rotation measurement", rotationEncoder.getPosition());
         SmartDashboard.putNumber("Rotation measurement [Heartbeat]", Timer.getFPGATimestamp());
-        SmartDashboard.putNumber("Current reading arm", rotationEncoder.getPosition());
+        // SmartDashboard.putNumber("Current reading arm", rotationEncoder.getPosition());
 
-        SmartDashboard.putNumber("ACTUAL Rotation velocity ACTUAL", getRotationEncoderVelocityInRadsPerSec());
+        // SmartDashboard.putNumber("ACTUAL Rotation velocity ACTUAL", getRotationEncoderVelocityInRadsPerSec());
     }
 
     public double calculateFeedforward(double currentPositionRadians, double desiredVelocityRadians) {

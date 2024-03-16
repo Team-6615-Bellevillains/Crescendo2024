@@ -16,11 +16,11 @@
     },
     {
       "anchor": {
-        "x": 2.2594611570989525,
+        "x": 2.03,
         "y": 5.566417514601411
       },
       "prevControl": {
-        "x": 2.2594611570989525,
+        "x": 2.03,
         "y": 5.566417514601411
       },
       "nextControl": null,
@@ -30,9 +30,27 @@
   ],
   "rotationTargets": [],
   "constraintZones": [],
-  "eventMarkers": [],
+  "eventMarkers": [
+    {
+      "name": "New Event Marker",
+      "waypointRelativePos": 0.35,
+      "command": {
+        "type": "sequential",
+        "data": {
+          "commands": [
+            {
+              "type": "named",
+              "data": {
+                "name": "MoveArm"
+              }
+            }
+          ]
+        }
+      }
+    }
+  ],
   "globalConstraints": {
-    "maxVelocity": 3.0,
+    "maxVelocity": 2.0,
     "maxAcceleration": 2.0,
     "maxAngularVelocity": 1000.0,
     "maxAngularAcceleration": 2000.0

@@ -17,7 +17,7 @@ public class ClimbLeftSubsystem extends SubsystemBase {
 
     @Override
     public void periodic() {
-        SmartDashboard.putNumber("Climb Left Rotations", getClimbRotations());
+        // SmartDashboard.putNumber("Climb Left Rotations", getClimbRotations());
     }
 
     public void setClimbSpeedPercentage(double climbSpeedPercentage) {

@@ -19,7 +19,7 @@ public class StorageSubsystem extends SubsystemBase {
     // TODO: Comment this out once intake threshold has been determined.
     @Override
     public void periodic() {
-        SmartDashboard.putNumber("Storage velocity", getVelocity());
+        // SmartDashboard.putNumber("Storage velocity", getVelocity());
     }
 
     public void setStorageVoltage(double storageVoltage) {

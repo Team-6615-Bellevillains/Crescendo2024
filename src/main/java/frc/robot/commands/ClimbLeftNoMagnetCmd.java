@@ -36,6 +36,6 @@ public class ClimbLeftNoMagnetCmd extends Command {
     public boolean isFinished() {
         return direction == Direction.UP ?
                 climbLeftSubsystem.getClimbRotations() >= ClimbConstants.CLIMB_LEFT_UP_THRESHOLD_ROTATIONS
-                : climbLeftSubsystem.getClimbRotations() <= 0;
+                : climbLeftSubsystem.getClimbRotations() <= ClimbConstants.CLIMB_LEFT_DOWN_THRESHOLD_ROTATIONS;
     }
 }

@@ -11,12 +11,12 @@ import java.util.function.DoubleSupplier;
 
 import static frc.robot.Constants.ArmConstants.RotationConstants;
 
-public class ArmRotateManual extends Command {
+public class ArmRotateUsingJoystick extends Command {
 
     private final RotationSubsystem rotationSubsystem;
     private final DoubleSupplier joystickInputSupplier;
 
-    public ArmRotateManual(RotationSubsystem rotationSubsystem, DoubleSupplier joystickInputSupplier) {
+    public ArmRotateUsingJoystick(RotationSubsystem rotationSubsystem, DoubleSupplier joystickInputSupplier) {
         this.rotationSubsystem = rotationSubsystem;
         this.joystickInputSupplier = joystickInputSupplier;
 
