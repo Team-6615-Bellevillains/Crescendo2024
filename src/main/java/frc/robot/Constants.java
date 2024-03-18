@@ -33,7 +33,7 @@ public final class Constants {
         public static final double MAX_ACCELERATION = 2;
 
         public static final double INTAKE_TIMEOUT_SECONDS = 1;
-        public static final double BACKUP_WAIT_SECONDS = 7;
+        public static final double BACKUP_WAIT_SECONDS = 6;
     }
 
     public static final class DriveConstants {
@@ -41,9 +41,9 @@ public final class Constants {
         // Hold time on motor brakes when disabled
         public static final double WHEEL_LOCK_TIME = 10; // seconds
 
-        public static final Rotation2d LEFT_SHOOTER_ANGLE = Rotation2d.fromDegrees(-120);
+        public static final Rotation2d LEFT_SHOOTER_ANGLE = Rotation2d.fromDegrees(-150);
         public static final Rotation2d CENTER_SHOOTER_ANGLE = Rotation2d.fromDegrees(180);
-        public static final Rotation2d RIGHT_SHOOTER_ANGLE = Rotation2d.fromDegrees(120);
+        public static final Rotation2d RIGHT_SHOOTER_ANGLE = Rotation2d.fromDegrees(150);
     }
 
     public static final class OperatorConstants {
@@ -123,7 +123,7 @@ public final class Constants {
 
         // Separated in case one climber suffers a mechanical issue and cannot reach the same point as the other
         // TODO: Set to proper values
-        public static final double CLIMB_LEFT_UP_THRESHOLD_ROTATIONS = 115.667404;
+        public static final double CLIMB_LEFT_UP_THRESHOLD_ROTATIONS = 107.0;
         public static final double CLIMB_RIGHT_UP_THRESHOLD_ROTATIONS = 112.001221;
 
         public static final double CLIMB_LEFT_DOWN_THRESHOLD_ROTATIONS = 10;

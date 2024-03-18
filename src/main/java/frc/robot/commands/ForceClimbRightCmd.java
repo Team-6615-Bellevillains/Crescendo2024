@@ -18,7 +18,7 @@ public class ForceClimbRightCmd extends Command {
 
     @Override
     public void initialize() {
-        climbRightSubsystem.setClimbSpeedPercentage(direction == Direction.UP ? 1 : -1);
+        climbRightSubsystem.setClimbSpeedPercentage(direction == Direction.UP ? 0.05 : -0.05);
     }
 
     @Override

@@ -21,7 +21,9 @@ import frc.robot.Constants.AutonConstants;
 import frc.robot.Constants.ClimbConstants;
 import frc.robot.Constants.OperatorConstants;
 import frc.robot.Constants.ArmConstants.ShooterConstants;
+import frc.robot.commands.ClimbLeftCmd;
 import frc.robot.commands.ClimbLeftNoMagnetCmd;
+import frc.robot.commands.ClimbRightCmd;
 import frc.robot.commands.ClimbRightNoMagnetCmd;
 import frc.robot.commands.ForceClimbLeftCmd;
 import frc.robot.commands.ForceClimbRightCmd;
@@ -139,9 +141,12 @@ public class RobotContainer {
                 () -> -MathUtil.applyDeadband(driverXbox.getLeftY(), OperatorConstants.LEFT_Y_DEADBAND) * SwerveSubsystem.controlMultiplier,
                 () -> -MathUtil.applyDeadband(driverXbox.getLeftX(), OperatorConstants.LEFT_X_DEADBAND) * SwerveSubsystem.controlMultiplier,
                 () -> -MathUtil.applyDeadband(driverXbox.getRightX(), OperatorConstants.RIGHT_X_DEADBAND) * SwerveSubsystem.controlMultiplier,
-                () -> driverXbox.leftTrigger().getAsBoolean(),
-                () -> driverXbox.leftBumper().getAsBoolean() || driverXbox.rightBumper().getAsBoolean(),
-                () -> driverXbox.rightTrigger().getAsBoolean()
+                // () -> driverXbox.leftTrigger().getAsBoolean(),
+                // () -> driverXbox.leftBumper().getAsBoolean() || driverXbox.rightBumper().getAsBoolean(),
+                // () -> driverXbox.rightTrigger().getAsBoolean()
+                () -> false,
+                () -> false,
+                () -> false
         );
 
         // Make the field-oriented drive command always run
@@ -185,10 +190,10 @@ public class RobotContainer {
         operatorXbox.start().onTrue(new ArmRotate(rotationSubsystem));
 
         // TODO: COMMENT THESE OUT AFTER YOU'RE DONE WITH THEM
-        //operatorXbox.leftBumper().whileTrue(new ForceClimbLeftCmd(climbLeftSubsystem, Direction.UP));
-        //operatorXbox.leftTrigger().whileTrue(new ForceClimbLeftCmd(climbLeftSubsystem, Direction.DOWN));
-        //operatorXbox.rightBumper().whileTrue(new ForceClimbRightCmd(climbRightSubsystem, Direction.UP));
-        //operatorXbox.rightTrigger().whileTrue(new ForceClimbRightCmd(climbRightSubsystem, Direction.DOWN));
+        operatorXbox.leftBumper().whileTrue(new ForceClimbLeftCmd(climbLeftSubsystem, Direction.DOWN));
+        operatorXbox.leftTrigger().whileTrue(new ForceClimbLeftCmd(climbLeftSubsystem, Direction.UP));
+        operatorXbox.rightBumper().whileTrue(new ForceClimbRightCmd(climbRightSubsystem, Direction.DOWN));
+        operatorXbox.rightTrigger().whileTrue(new ForceClimbRightCmd(climbRightSubsystem, Direction.UP));
     }
 
     // Returns the Command to run during the autonomous phase
@@ -282,7 +287,7 @@ public class RobotContainer {
                         //Third note
                         swerveSubsystem.getAutonomousCommand("Third piece start", false),
                         Commands.parallel(
-                                Commands.runOnce(() -> swerveSubsystem.driveFieldOriented(new ChassisSpeeds( Units.inchesToMeters(25.28), Units.inchesToMeters(25.28), 0)), swerveSubsystem),
+                                Commands.runOnce(() -> swerveSubsystem.driveFieldOriented(new ChassisSpeeds(intakeForwardsSign * Units.inchesToMeters(25.28), Units.inchesToMeters(25.28), 0)), swerveSubsystem),
                                 new IntakeRingUntilCaptured(storageSubsystem, shootingSubsystem).withTimeout(AutonConstants.INTAKE_TIMEOUT_SECONDS)
                         ),
                         swerveSubsystem.getAutonomousCommand("Third piece return", false),

@@ -19,7 +19,7 @@ public class ForceClimbLeftCmd extends Command {
 
     @Override
     public void initialize() {
-        climbLeftSubsystem.setClimbSpeedPercentage(direction == Direction.UP ? 1 : -1);
+        climbLeftSubsystem.setClimbSpeedPercentage(direction == Direction.UP ? 0.05 : -0.05);
     }
 
     @Override
