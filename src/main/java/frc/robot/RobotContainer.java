@@ -28,6 +28,7 @@ import frc.robot.commands.ClimbRightNoMagnetCmd;
 import frc.robot.commands.ForceClimbLeftCmd;
 import frc.robot.commands.ForceClimbRightCmd;
 import frc.robot.commands.arm.ArmRotate;
+import frc.robot.commands.arm.ArmRotateToDistance;
 import frc.robot.commands.arm.ArmRotateUsingJoystick;
 import frc.robot.commands.arm.IntakeRingManual;
 import frc.robot.commands.arm.IntakeRingUntilCaptured;
@@ -188,8 +189,15 @@ public class RobotContainer {
         );
         operatorXbox.a().whileTrue(new IntakeRingManual(storageSubsystem, shootingSubsystem));
         operatorXbox.start().onTrue(new ArmRotate(rotationSubsystem));
+        // Uncomment the two other commands when you're sure that the rotation distance is accurate
+        operatorXbox.back().onTrue(new ArmRotateToDistance(rotationSubsystem)
+                // .andThen(getSpeakerShooterInstance())
+                // .andThen(Commands.runOnce(() -> {
+                //     RotationSubsystem.armHoldDirection = Direction.UP;
+                //     rotationSubsystem.activateArmHold();
+                // }, rotationSubsystem))
+        );
 
-        // TODO: COMMENT THESE OUT AFTER YOU'RE DONE WITH THEM
         operatorXbox.leftBumper().whileTrue(new ForceClimbLeftCmd(climbLeftSubsystem, Direction.DOWN));
         operatorXbox.leftTrigger().whileTrue(new ForceClimbLeftCmd(climbLeftSubsystem, Direction.UP));
         operatorXbox.rightBumper().whileTrue(new ForceClimbRightCmd(climbRightSubsystem, Direction.DOWN));

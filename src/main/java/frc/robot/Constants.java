@@ -87,6 +87,16 @@ public final class Constants {
             public static final double kMaxRotationVelocityRadiansPerSecond = 2.09;
             public static final double kMaxRotationAccelerationRadiansPerSecondSquared = 5.02;
 
+            // Distance rotation
+            public static final double kPDistanceRotation = 0.3;
+            public static final double kIDistanceRotation = 0.0;
+            public static final double kDDistanceRotation = 0.0;
+
+            public static final double kMaxDistanceRotationVelocityRadiansPerSecond = 2.09;
+            public static final double kMaxDistanceRotationAccelerationRadiansPerSecondSquared = 5.02;
+            public static final double DISTANCE_SHOOTING_ANGLE_DEGREES = 40 + BOX_TO_COG_ANGLE; // TODO: Measure
+            public static final double DISTANCE_ROTATION_FINISHED_THRESHOLD_RADIANS = Units.degreesToRadians(1);
+
             public static final double ROTATION_FINISHED_THRESHOLD_RADIANS = Units.degreesToRadians(5);
 
             public static final double SLOW_DRIVING_ANGLE_THRESHOLD_DEGREES = 15 + BOX_TO_COG_ANGLE;
