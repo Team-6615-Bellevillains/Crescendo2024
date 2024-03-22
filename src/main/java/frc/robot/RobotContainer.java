@@ -27,11 +27,14 @@ import frc.robot.commands.ClimbRightCmd;
 import frc.robot.commands.ClimbRightNoMagnetCmd;
 import frc.robot.commands.ForceClimbLeftCmd;
 import frc.robot.commands.ForceClimbRightCmd;
-import frc.robot.commands.arm.ArmRotate;
+import frc.robot.commands.arm.ArmRotateToExtremePositions;
+import frc.robot.commands.arm.ArmRotateToDistanceShootingAngle;
 import frc.robot.commands.arm.ArmRotateUsingJoystick;
+import frc.robot.commands.arm.FeedNote;
 import frc.robot.commands.arm.IntakeRingManual;
 import frc.robot.commands.arm.IntakeRingUntilCaptured;
 import frc.robot.commands.arm.ShootCmd;
+import frc.robot.commands.arm.SpinUp;
 import frc.robot.commands.drive.FieldOrientedDrive;
 import frc.robot.subsystems.ClimbLeftSubsystem;
 import frc.robot.subsystems.ClimbRightSubsystem;
@@ -82,8 +85,8 @@ public class RobotContainer {
 
     // Methods to create instances of shooting commands. Necessary for composition
     // in multiple places
-    private ShootCmd getTrapShooterInstance() {
-        return new ShootCmd(shootingSubsystem, ShooterConstants.SHOOTING_TRAP_SHOOTER_VOLTAGE, storageSubsystem, ShooterConstants.STORAGE_TRAP_SHOOTER_VOLTAGE);
+    private ShootCmd getAmpShooterInstance() {
+        return new ShootCmd(shootingSubsystem, ShooterConstants.SHOOTING_AMP_SHOOTER_VOLTAGE, storageSubsystem, ShooterConstants.STORAGE_TRAP_SHOOTER_VOLTAGE);
     }
 
     private ShootCmd getSpeakerShooterInstance() {
@@ -107,7 +110,7 @@ public class RobotContainer {
     public RobotContainer() {
 
         //Autonomous commands
-        NamedCommands.registerCommand("MoveArm", new ArmRotate(rotationSubsystem));
+        NamedCommands.registerCommand("MoveArm", new ArmRotateToExtremePositions(rotationSubsystem));
         NamedCommands.registerCommand("Shoot", getSpeakerShooterInstance());
 
         // Setup the dashboard to allow the user to select the starting position and auton pathing
@@ -156,6 +159,24 @@ public class RobotContainer {
         rotationSubsystem.activateArmHold();
     }
 
+    public Command farSpeakerRoutine() {
+        return new SpinUp(shootingSubsystem, ShooterConstants.SHOOTING_SPEAKER_SHOOTER_VOLTAGE)
+                .alongWith(new ArmRotateToDistanceShootingAngle(rotationSubsystem))
+                .andThen(new ArmRotateToExtremePositions(rotationSubsystem));
+    }
+
+    public Command sourceRoutine() {
+        return new IntakeRingManual(storageSubsystem, shootingSubsystem)
+            .alongWith(new ArmRotateToDistanceShootingAngle(rotationSubsystem))
+            .andThen(new ArmRotateToExtremePositions(rotationSubsystem, Direction.UP));
+    }
+
+    public Command ampRoutine() {
+        return new SpinUp(shootingSubsystem, ShooterConstants.SHOOTING_AMP_SHOOTER_VOLTAGE)
+            .alongWith(new ArmRotateToDistanceShootingAngle(rotationSubsystem))
+            .andThen(new ArmRotateToExtremePositions(rotationSubsystem, Direction.UP));
+    }
+
     /**
      * Use this method to define your trigger->command mappings. Triggers can be
      * created via the
@@ -171,29 +192,39 @@ public class RobotContainer {
      */
     private void configureBindings() {
         driverXbox.b().onTrue((new InstantCommand(swerveSubsystem::zeroGyro)));
+
         driverXbox.y().onTrue(new ClimbLeftNoMagnetCmd(climbLeftSubsystem, Direction.UP).alongWith(new ClimbRightNoMagnetCmd(climbRightSubsystem, Direction.UP)));
         driverXbox.a().onTrue(
             new ClimbLeftNoMagnetCmd(climbLeftSubsystem, Direction.DOWN).onlyIf(() -> climbLeftSubsystem.getClimbRotations() >= ClimbConstants.CLIMB_LEFT_DOWN_THRESHOLD_ROTATIONS)
             .alongWith(new ClimbRightNoMagnetCmd(climbRightSubsystem, Direction.DOWN).onlyIf(() -> climbRightSubsystem.getClimbRotations() >= ClimbConstants.CLIMB_RIGHT_DOWN_THRESHOLD_ROTATIONS))
         );
 
-        operatorXbox.b().onTrue(getTrapShooterInstance());
+        driverXbox.leftBumper().whileTrue(new ForceClimbLeftCmd(climbLeftSubsystem, Direction.DOWN));
+        driverXbox.leftTrigger().whileTrue(new ForceClimbLeftCmd(climbLeftSubsystem, Direction.UP));
+        driverXbox.rightBumper().whileTrue(new ForceClimbRightCmd(climbRightSubsystem, Direction.DOWN));
+        driverXbox.rightTrigger().whileTrue(new ForceClimbRightCmd(climbRightSubsystem, Direction.UP));
+
+    
+        operatorXbox.b().onTrue(getAmpShooterInstance());
         operatorXbox.x().onTrue(getSpeakerShooterInstance());
-        operatorXbox.y().onTrue(new ArmRotate(rotationSubsystem)
+        operatorXbox.y().onTrue(new ArmRotateToExtremePositions(rotationSubsystem)
                 .andThen(new IntakeRingUntilCaptured(storageSubsystem, shootingSubsystem, slowWhenIntakingChooser::getSelected))
                 .andThen(
-                        new ArmRotate(rotationSubsystem)
+                        new ArmRotateToExtremePositions(rotationSubsystem)
                                 .alongWith(getRumbleControllersCmd())
                 )
         );
         operatorXbox.a().whileTrue(new IntakeRingManual(storageSubsystem, shootingSubsystem));
-        operatorXbox.start().onTrue(new ArmRotate(rotationSubsystem));
 
-        // TODO: COMMENT THESE OUT AFTER YOU'RE DONE WITH THEM
-        operatorXbox.leftBumper().whileTrue(new ForceClimbLeftCmd(climbLeftSubsystem, Direction.DOWN));
-        operatorXbox.leftTrigger().whileTrue(new ForceClimbLeftCmd(climbLeftSubsystem, Direction.UP));
-        operatorXbox.rightBumper().whileTrue(new ForceClimbRightCmd(climbRightSubsystem, Direction.DOWN));
-        operatorXbox.rightTrigger().whileTrue(new ForceClimbRightCmd(climbRightSubsystem, Direction.UP));
+        operatorXbox.start().onTrue(new ArmRotateToExtremePositions(rotationSubsystem));
+
+        operatorXbox.leftBumper().whileTrue(new SpinUp(shootingSubsystem, ShooterConstants.SHOOTING_SPEAKER_SHOOTER_VOLTAGE));
+        operatorXbox.leftTrigger().whileTrue(farSpeakerRoutine());
+        operatorXbox.rightTrigger().onTrue(new FeedNote(storageSubsystem, ShooterConstants.STORAGE_SPEAKER_SHOOTER_VOLTAGE));
+       
+        operatorXbox.povDown().whileTrue(sourceRoutine());
+        operatorXbox.povLeft().whileTrue(sourceRoutine());
+        operatorXbox.povUp().whileTrue(ampRoutine());
     }
 
     // Returns the Command to run during the autonomous phase
@@ -239,7 +270,7 @@ public class RobotContainer {
                         // The second argument is true because we want to set the odometry to the position the bot starts in.
                         swerveSubsystem.getAutonomousCommand(startingPosition + " note", true),
                         // Rotate the arm into intake position
-                        new ArmRotate(rotationSubsystem),
+                        new ArmRotateToExtremePositions(rotationSubsystem),
                         // Drive forwards at a slow speed while running the intake motors.
                         // Stop once the note has been obtained or AutonConstants.INTAKE_TIMEOUT_SECONDS seconds have passed, whichever comes first
                         Commands.parallel(
@@ -247,7 +278,7 @@ public class RobotContainer {
                                 new IntakeRingUntilCaptured(storageSubsystem, shootingSubsystem).withTimeout(AutonConstants.INTAKE_TIMEOUT_SECONDS)
                         ),
                         // Rotate arm back into shooting position
-                        new ArmRotate(rotationSubsystem),
+                        new ArmRotateToExtremePositions(rotationSubsystem),
                         // Move back to the speaker.
                         // The second argument is false because we don't want to keep our current odometry.
                         swerveSubsystem.getAutonomousCommand(startingPosition + " note return", false),
@@ -278,7 +309,7 @@ public class RobotContainer {
                         // The second argument is false because we don't want to keep our current odometry.
                         Commands.parallel(
                             Commands.waitSeconds(0.3).andThen(swerveSubsystem.getAutonomousCommand("Second note return", false)),
-                            new ArmRotate(rotationSubsystem).withTimeout(2)
+                            new ArmRotateToExtremePositions(rotationSubsystem).withTimeout(2)
                         ),
                         
                         // Shoot the note!
