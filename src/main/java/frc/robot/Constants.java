@@ -63,13 +63,14 @@ public final class Constants {
 
             public static final double BOX_TO_COG_ANGLE = 90 - 13;
 
-            public static final double FLOOR_RESTING_ANGLE_DEGREES = -61 + BOX_TO_COG_ANGLE;
-            public static final double SPEAKER_SHOOTING_ANGLE_DEGREES = 57 + BOX_TO_COG_ANGLE;
-            public static final double ROTATIONS_FROM_FLOOR_REST_TO_SPEAKER = 0.565673;
+            public static final double FLOOR_RESTING_ANGLE_DEGREES = -60 + BOX_TO_COG_ANGLE;
+            public static final double SPEAKER_SHOOTING_ANGLE_DEGREES = 55.5 + BOX_TO_COG_ANGLE;
+            public static final double ROTATIONS_PER_DEGREE = 0.565673/(57 - (-61));
+            public static final double ROTATIONS_FROM_FLOOR_REST_TO_SPEAKER = ROTATIONS_PER_DEGREE* (57 - (-61));
 
             public static final double ENCODER_READING_TO_ANGLE_CONVERSION_FACTOR = (SPEAKER_SHOOTING_ANGLE_DEGREES - FLOOR_RESTING_ANGLE_DEGREES) / ROTATIONS_FROM_FLOOR_REST_TO_SPEAKER;
 
-            public static final int HOLDING_ANGLE_CURRENT_LIMIT = 7;
+            public static final int HOLDING_ANGLE_CURRENT_LIMIT = 10; // TODO: Retune
             public static final int REGULAR_CURRENT_LIMIT = 80;
             public static final int HOLDING_ANGLE_VOLTAGE = 12;
 
@@ -88,14 +89,14 @@ public final class Constants {
             public static final double kMaxRotationAccelerationRadiansPerSecondSquared = 5.02;
 
             // Distance rotation
-            public static final double kPDistanceRotation = 0.3;
+            public static final double kPDistanceRotation = 10.0;
             public static final double kIDistanceRotation = 0.0;
-            public static final double kDDistanceRotation = 0.0;
+            public static final double kDDistanceRotation = 1.0;
 
             public static final double kMaxDistanceRotationVelocityRadiansPerSecond = 2.09;
             public static final double kMaxDistanceRotationAccelerationRadiansPerSecondSquared = 5.02;
             public static final double DISTANCE_SHOOTING_ANGLE_DEGREES = 40 + BOX_TO_COG_ANGLE; // TODO: Measure
-            public static final double DISTANCE_ROTATION_FINISHED_THRESHOLD_RADIANS = Units.degreesToRadians(1);
+            public static final double DISTANCE_ROTATION_FINISHED_THRESHOLD_RADIANS = Units.degreesToRadians(0.1);
 
             public static final double ROTATION_FINISHED_THRESHOLD_RADIANS = Units.degreesToRadians(5);
 
@@ -116,7 +117,7 @@ public final class Constants {
             public static final double SHOOTING_SPEAKER_SHOOTER_VOLTAGE = -11;
 
             public static final double STORAGE_TRAP_SHOOTER_VOLTAGE = 6;
-            public static final double SHOOTING_TRAP_SHOOTER_VOLTAGE = -7;
+            public static final double SHOOTING_AMP_SHOOTER_VOLTAGE = -4.5;
 
             public static final double NOTE_CAPTURED_STALL_CURRENT_THRESHOLD = 45;
         }

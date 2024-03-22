@@ -14,7 +14,7 @@ import static frc.robot.Constants.ArmConstants.RotationConstants;
 
 public class RotationSubsystem extends SubsystemBase {
 
-    public static Direction armHoldDirection = Direction.UP;
+    private Direction armHoldDirection = Direction.UP;
     private final CANSparkMax rotationMotor;
     private final RelativeEncoder rotationEncoder;
 
@@ -35,6 +35,8 @@ public class RotationSubsystem extends SubsystemBase {
     @Override
     public void periodic() {
         SmartDashboard.putNumber("Rotation measurement", rotationEncoder.getPosition());
+                SmartDashboard.putNumber("Rotation measurement rads", getRotationEncoderPositionInRadians());
+
         SmartDashboard.putNumber("Rotation measurement [Heartbeat]", Timer.getFPGATimestamp());
         // SmartDashboard.putNumber("Current reading arm", rotationEncoder.getPosition());
 
@@ -66,6 +68,14 @@ public class RotationSubsystem extends SubsystemBase {
 
     public double getRotationEncoderVelocityInRadsPerSec() {
         return Units.degreesToRadians(getRotationEncoderVelocityInDegreesPerSec());
+    }
+
+    public Direction getArmHoldDirection() {
+        return armHoldDirection;
+    }
+
+    public void setArmHoldDirection(Direction newArmHoldDirection) {
+        this.armHoldDirection = newArmHoldDirection;
     }
 
     public void activateArmHold() {

@@ -10,19 +10,19 @@ import frc.robot.utils.TunableProfiledPIDController;
 
 import static frc.robot.Constants.ArmConstants.RotationConstants;
 
-public class ArmRotateToDistance extends Command {
+public class ArmRotateToDistanceShootingAngle extends Command {
 
     private final RotationSubsystem rotationSubsystem;
 
     private final TunableProfiledPIDController radiansPositionController;
 
-    public ArmRotateToDistance(RotationSubsystem rotationSubsystem) {
+    public ArmRotateToDistanceShootingAngle(RotationSubsystem rotationSubsystem) {
         this.rotationSubsystem = rotationSubsystem;
 
-        this.radiansPositionController = new TunableProfiledPIDController("distance arm rotation pid", RotationConstants.kPRotation,
-                RotationConstants.kIRotation, RotationConstants.kDRotation,
-                new TrapezoidProfile.Constraints(RotationConstants.kMaxRotationVelocityRadiansPerSecond,
-                        RotationConstants.kMaxRotationAccelerationRadiansPerSecondSquared),
+        this.radiansPositionController = new TunableProfiledPIDController("distance arm rotation pid", RotationConstants.kPDistanceRotation,
+                RotationConstants.kIDistanceRotation, RotationConstants.kDDistanceRotation,
+                new TrapezoidProfile.Constraints(RotationConstants.kMaxDistanceRotationVelocityRadiansPerSecond,
+                        RotationConstants.kMaxDistanceRotationAccelerationRadiansPerSecondSquared),
                 rotationSubsystem::getRotationEncoderPositionInRadians);
 
         this.addRequirements(rotationSubsystem);
@@ -62,18 +62,18 @@ public class ArmRotateToDistance extends Command {
 
     @Override
     public void end(boolean interrupted) {
-        SmartDashboard.putNumber("Rotation position at end", rotationSubsystem.getRotationEncoderPositionInDegrees());
+        SmartDashboard.putNumber("Rotation position at end", rotationSubsystem.getRotationEncoderPositionInRadians());
         SmartDashboard.putNumber("Rotation velocity at end",
-                rotationSubsystem.getRotationEncoderVelocityInDegreesPerSec());
+                rotationSubsystem.getRotationEncoderVelocityInRadsPerSec());
         SmartDashboard.putNumber("Rotation heartbeat at end", Timer.getFPGATimestamp());
 
         rotationSubsystem.setMotorVoltage(rotationSubsystem.calculateFeedforward(rotationSubsystem.getRotationEncoderPositionInRadians(), 0));
     }
 
-    @Override
-    public boolean isFinished() {
-        return Math.abs(rotationSubsystem.getRotationEncoderPositionInRadians() - radiansPositionController.getController()
-                .getGoal().position) <= RotationConstants.DISTANCE_ROTATION_FINISHED_THRESHOLD_RADIANS;
-    }
+//     @Override
+//     public boolean isFinished() {
+//         return Math.abs(rotationSubsystem.getRotationEncoderPositionInRadians() - radiansPositionController.getController()
+//                 .getGoal().position) <= RotationConstants.DISTANCE_ROTATION_FINISHED_THRESHOLD_RADIANS;
+//     }
 
 }

@@ -11,13 +11,15 @@ import frc.robot.utils.TunableProfiledPIDController;
 
 import static frc.robot.Constants.ArmConstants.RotationConstants;
 
-public class ArmRotate extends Command {
+public class ArmRotateToExtremePositions extends Command {
 
     private final RotationSubsystem rotationSubsystem;
 
     private final TunableProfiledPIDController radiansPositionController;
 
-    public ArmRotate(RotationSubsystem rotationSubsystem) {
+    private Direction holdDirection = null;
+
+    public ArmRotateToExtremePositions(RotationSubsystem rotationSubsystem) {
         this.rotationSubsystem = rotationSubsystem;
 
         this.radiansPositionController = new TunableProfiledPIDController("rotation pid", RotationConstants.kPRotation,
@@ -29,17 +31,27 @@ public class ArmRotate extends Command {
         this.addRequirements(rotationSubsystem);
     }
 
+    public ArmRotateToExtremePositions(RotationSubsystem rotationSubsystem, Direction holdDirection) {
+        this(rotationSubsystem);
+        
+        this.holdDirection = holdDirection;
+    }
+
     @Override
     public void initialize() {
-        RotationSubsystem.armHoldDirection = RotationSubsystem.armHoldDirection == Direction.UP ? Direction.DOWN : Direction.UP;
+        if (holdDirection == null) {
+            rotationSubsystem.setArmHoldDirection(rotationSubsystem.getArmHoldDirection() == Direction.UP ? Direction.DOWN : Direction.UP);
+        } else {
+            rotationSubsystem.setArmHoldDirection(holdDirection);
+        }
 
         rotationSubsystem.deactivateHold();
 
-        double armSetpointRadians = Units.degreesToRadians(RotationSubsystem.armHoldDirection == Direction.UP ?
+        double armSetpointRadians = Units.degreesToRadians(rotationSubsystem.getArmHoldDirection() == Direction.UP ?
                 RotationConstants.SPEAKER_SHOOTING_ANGLE_DEGREES : RotationConstants.FLOOR_RESTING_ANGLE_DEGREES);
 
         SmartDashboard.putNumber("Arm Setpoint", armSetpointRadians);
-        SmartDashboard.putString("Direction", RotationSubsystem.armHoldDirection == Direction.UP ? "Speaker" : "Floor");
+        SmartDashboard.putString("Direction", rotationSubsystem.getArmHoldDirection() == Direction.UP ? "Speaker" : "Floor");
 
         radiansPositionController.getController().setGoal(armSetpointRadians);
         radiansPositionController.getController().reset(rotationSubsystem.getRotationEncoderPositionInRadians());
