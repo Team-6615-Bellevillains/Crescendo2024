@@ -1,4 +1,4 @@
-package frc.robot.commands.arm;
+package frc.robot.commands.arm.rotation;
 
 import edu.wpi.first.math.trajectory.TrapezoidProfile;
 import edu.wpi.first.math.util.Units;
@@ -6,8 +6,8 @@ import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.subsystems.arm.RotationSubsystem;
-import frc.robot.utils.Direction;
-import frc.robot.utils.TunableProfiledPIDController;
+import frc.robot.utils.enums.Direction;
+import frc.robot.utils.controllers.TunableProfiledPIDController;
 
 import static frc.robot.Constants.ArmConstants.RotationConstants;
 

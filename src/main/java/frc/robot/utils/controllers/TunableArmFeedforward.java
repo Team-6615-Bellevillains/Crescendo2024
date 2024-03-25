@@ -1,4 +1,4 @@
-package frc.robot.utils;
+package frc.robot.utils.controllers;
 
 import edu.wpi.first.math.controller.ArmFeedforward;
 import edu.wpi.first.networktables.NetworkTable;

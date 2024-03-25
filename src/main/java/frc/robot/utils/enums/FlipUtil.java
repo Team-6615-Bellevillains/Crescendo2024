@@ -1,4 +1,4 @@
-package frc.robot.utils;
+package frc.robot.utils.enums;
 
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;

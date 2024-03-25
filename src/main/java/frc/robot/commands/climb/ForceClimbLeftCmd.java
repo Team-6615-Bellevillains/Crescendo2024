@@ -1,9 +1,8 @@
-package frc.robot.commands;
+package frc.robot.commands.climb;
 
 import edu.wpi.first.wpilibj2.command.Command;
-import frc.robot.Constants.ClimbConstants;
-import frc.robot.subsystems.ClimbLeftSubsystem;
-import frc.robot.utils.Direction;
+import frc.robot.subsystems.climb.ClimbLeftSubsystem;
+import frc.robot.utils.enums.Direction;
 
 public class ForceClimbLeftCmd extends Command {
 

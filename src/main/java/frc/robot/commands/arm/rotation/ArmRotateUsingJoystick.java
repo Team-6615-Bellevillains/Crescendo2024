@@ -1,4 +1,4 @@
-package frc.robot.commands.arm;
+package frc.robot.commands.arm.rotation;
 
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.util.Units;

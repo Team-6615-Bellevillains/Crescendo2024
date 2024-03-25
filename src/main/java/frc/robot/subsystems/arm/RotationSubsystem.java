@@ -7,8 +7,8 @@ import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
-import frc.robot.utils.Direction;
-import frc.robot.utils.TunableArmFeedforward;
+import frc.robot.utils.enums.Direction;
+import frc.robot.utils.controllers.TunableArmFeedforward;
 
 import static frc.robot.Constants.ArmConstants.RotationConstants;
 

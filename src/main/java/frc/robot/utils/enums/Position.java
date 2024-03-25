@@ -1,4 +1,4 @@
-package frc.robot.utils;
+package frc.robot.utils.enums;
 
 // Used to determine the starting position of the robot during autonomous mode.
 public enum Position {

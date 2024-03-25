@@ -1,8 +1,8 @@
-package frc.robot.commands;
+package frc.robot.commands.climb;
 
 import edu.wpi.first.wpilibj2.command.Command;
-import frc.robot.subsystems.ClimbRightSubsystem;
-import frc.robot.utils.Direction;
+import frc.robot.subsystems.climb.ClimbRightSubsystem;
+import frc.robot.utils.enums.Direction;
 
 public class ForceClimbRightCmd extends Command {
 
