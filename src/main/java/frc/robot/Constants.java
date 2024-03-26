@@ -44,6 +44,8 @@ public final class Constants {
         public static final Rotation2d LEFT_SHOOTER_ANGLE = Rotation2d.fromDegrees(-150);
         public static final Rotation2d CENTER_SHOOTER_ANGLE = Rotation2d.fromDegrees(180);
         public static final Rotation2d RIGHT_SHOOTER_ANGLE = Rotation2d.fromDegrees(150);
+
+        public final static double SLOW_SPEED_SCALAR = 0.8;
     }
 
     public static final class OperatorConstants {
@@ -115,9 +117,6 @@ public final class Constants {
 
             public static final double STORAGE_SPEAKER_SHOOTER_VOLTAGE = 13;
             public static final double SHOOTING_SPEAKER_SHOOTER_VOLTAGE = -11;
-
-            public static final double STORAGE_TRAP_SHOOTER_VOLTAGE = 6;
-            public static final double SHOOTING_AMP_SHOOTER_VOLTAGE = -4.5;
 
             public static final double NOTE_CAPTURED_STALL_CURRENT_THRESHOLD = 45;
         }
