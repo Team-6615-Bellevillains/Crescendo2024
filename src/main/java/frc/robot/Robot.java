@@ -4,6 +4,7 @@
 
 package frc.robot;
 
+import com.pathplanner.lib.commands.FollowPathCommand;
 import edu.wpi.first.wpilibj.Filesystem;
 import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj.Timer;
@@ -53,6 +54,9 @@ public class Robot extends TimedRobot {
         // Create a timer to disable motor brake a few seconds after disable.  This will let the robot stop
         // immediately when disabled, but then also let it be pushed more
         disabledTimer = new Timer();
+
+        // Prevent first PathPlanner path following command from being slow. Doesn't actually move the robot.
+        FollowPathCommand.warmupCommand().schedule();
     }
 
     /**
