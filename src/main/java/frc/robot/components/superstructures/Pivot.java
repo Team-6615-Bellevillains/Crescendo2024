@@ -36,8 +36,7 @@ public class Pivot {
 
     public Command aimToSpeakerThenReset() {
         return spinUp()
-                .alongWith(new ArmRotateToDistanceShootingAngle(rotationSubsystem))
-                .andThen(new RotateArmAndHold(rotationSubsystem));
+                .alongWith(new ArmRotateToDistanceShootingAngle(rotationSubsystem));
     }
 
     public Command intakeFromFloorThenReset() {
@@ -55,8 +54,7 @@ public class Pivot {
 
     public Command intakeFromSourceThenReset() {
         return new IntakeRingManual(storageSubsystem, shootingSubsystem)
-                .alongWith(new ArmRotateToDistanceShootingAngle(rotationSubsystem))
-                .andThen(new RotateArmAndHold(rotationSubsystem, Direction.UP));
+                .alongWith(new ArmRotateToDistanceShootingAngle(rotationSubsystem));
     }
 
     public IntakeRingManual intakeRingManual() {
@@ -65,6 +63,10 @@ public class Pivot {
 
     public RotateArmAndHold rotateArmAndHold() {
         return new RotateArmAndHold(rotationSubsystem);
+    }
+
+    public RotateArmAndHold rotateArmAndHold(Direction direction) {
+        return new RotateArmAndHold(rotationSubsystem, direction);
     }
 
     public FeedNote feedNote() {

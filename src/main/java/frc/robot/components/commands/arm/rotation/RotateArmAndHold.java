@@ -50,19 +50,12 @@ public class RotateArmAndHold extends Command {
         double armSetpointRadians = Units.degreesToRadians(rotationSubsystem.getArmHoldDirection() == Direction.UP ?
                 RotationConstants.SPEAKER_SHOOTING_ANGLE_DEGREES : RotationConstants.FLOOR_RESTING_ANGLE_DEGREES);
 
-        SmartDashboard.putNumber("Arm Setpoint", armSetpointRadians);
-        SmartDashboard.putString("Direction", rotationSubsystem.getArmHoldDirection() == Direction.UP ? "Speaker" : "Floor");
-
         radiansPositionController.getController().setGoal(armSetpointRadians);
         radiansPositionController.getController().reset(rotationSubsystem.getRotationEncoderPositionInRadians());
     }
 
     @Override
     public void execute() {
-        SmartDashboard.putNumber("Rotation Setpoint heartbeat", Timer.getFPGATimestamp());
-        SmartDashboard.putNumber("Rotation Setpoint Goal Position",
-                radiansPositionController.getController().getGoal().position);
-
         double pidOut = radiansPositionController.getController()
                 .calculate(rotationSubsystem.getRotationEncoderPositionInRadians());
         double ffOut = rotationSubsystem.calculateFeedforward(rotationSubsystem.getRotationEncoderPositionInRadians(),
@@ -70,20 +63,11 @@ public class RotateArmAndHold extends Command {
 
         double commandedVoltage = (pidOut + ffOut);
 
-        SmartDashboard.putNumber("Rotation pidOutput", pidOut);
-        SmartDashboard.putNumber("Rotation ffout", ffOut);
-        SmartDashboard.putNumber("Rotation commanded voltage", commandedVoltage);
-
         rotationSubsystem.setMotorVoltage(commandedVoltage);
     }
 
     @Override
     public void end(boolean interrupted) {
-        SmartDashboard.putNumber("Rotation position at end", rotationSubsystem.getRotationEncoderPositionInDegrees());
-        SmartDashboard.putNumber("Rotation velocity at end",
-                rotationSubsystem.getRotationEncoderVelocityInDegreesPerSec());
-        SmartDashboard.putNumber("Rotation heartbeat at end", Timer.getFPGATimestamp());
-
         rotationSubsystem.activateArmHold();
     }
 

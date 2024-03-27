@@ -6,12 +6,13 @@ package frc.robot;
 
 import com.pathplanner.lib.commands.FollowPathCommand;
 import edu.wpi.first.wpilibj.Filesystem;
+import edu.wpi.first.wpilibj.PowerDistribution;
 import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj.Timer;
+import edu.wpi.first.wpilibj.PowerDistribution.ModuleType;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
-import frc.robot.utils.controllers.TunableArmFeedforward;
-import frc.robot.utils.controllers.TunableProfiledPIDController;
 import swervelib.parser.SwerveParser;
 
 import java.io.File;
@@ -28,6 +29,7 @@ public class Robot extends TimedRobot {
     private Command m_autonomousCommand;
 
     private RobotContainer m_robotContainer;
+    private final PowerDistribution m_pdh = new PowerDistribution(1, ModuleType.kRev);
 
     private Timer disabledTimer;
 
@@ -73,10 +75,12 @@ public class Robot extends TimedRobot {
         // and running subsystem periodic() methods.  This must be called from the robot's periodic
         // block in order for anything in the Command-based framework to work.
 
-        TunableArmFeedforward.updateControllersIfOutdated();
-        TunableProfiledPIDController.updateControllersIfOutdated();
+        // TunableArmFeedforward.updateControllersIfOutdated();
+        // TunableProfiledPIDController.updateControllersIfOutdated();
 
         CommandScheduler.getInstance().run();
+        SmartDashboard.putNumber("Current Draw", m_pdh.getTotalCurrent());
+        SmartDashboard.putNumber("Bus Voltage", m_pdh.getVoltage());
     }
 
     /**

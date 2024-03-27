@@ -3,6 +3,7 @@ package frc.robot;
 public class State {
     public State() {
         setIntakingState(false);
+        setRumbling(false);
     }
 
     public boolean isIntaking() {

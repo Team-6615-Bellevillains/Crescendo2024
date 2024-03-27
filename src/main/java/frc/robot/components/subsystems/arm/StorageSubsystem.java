@@ -16,12 +16,6 @@ public class StorageSubsystem extends SubsystemBase {
         storageMotor = new CANSparkMax(ShooterConstants.kStorageMotorPort, MotorType.kBrushless);
     }
 
-    // TODO: Comment this out once intake threshold has been determined.
-    @Override
-    public void periodic() {
-        // SmartDashboard.putNumber("Storage velocity", getVelocity());
-    }
-
     public void setStorageVoltage(double storageVoltage) {
         storageMotor.setVoltage(storageVoltage);
     }

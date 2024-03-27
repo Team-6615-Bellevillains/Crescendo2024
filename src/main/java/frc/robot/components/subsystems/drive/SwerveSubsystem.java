@@ -290,14 +290,6 @@ public class SwerveSubsystem extends SubsystemBase {
     }
 
     @Override
-    public void periodic() {
-        SmartDashboard.putBoolean("Auton ran", autonRan);
-        SmartDashboard.putBoolean("Should flip", shouldFlipRotation);
-        SmartDashboard.putBoolean("Has flipped", rotationHasBeenFlipped);
-
-    }
-
-    @Override
     public void simulationPeriodic() {
     }
 

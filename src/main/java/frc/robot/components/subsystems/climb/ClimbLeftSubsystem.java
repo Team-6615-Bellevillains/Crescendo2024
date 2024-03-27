@@ -15,13 +15,7 @@ public class ClimbLeftSubsystem extends SubsystemBase {
         climbMotorLeft.getEncoder().setPosition(0);
     }
 
-    @Override
-    public void periodic() {
-        // SmartDashboard.putNumber("Climb Left Rotations", getClimbRotations());
-    }
-
     public void setClimbSpeedPercentage(double climbSpeedPercentage) {
-        SmartDashboard.putBoolean("Right Climber Activated", climbSpeedPercentage != 0);
         climbMotorLeft.set(climbSpeedPercentage);
     }
 

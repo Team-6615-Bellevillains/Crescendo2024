@@ -50,7 +50,7 @@ import com.pathplanner.lib.path.PathPlannerPath;
 public class RobotContainer {
 
     // Global robot state
-    public static State state;
+    public static State state = new State();
 
     // Subsystem instances for the robot, representing the layer between our code
     // and direct motor control
@@ -121,7 +121,10 @@ public class RobotContainer {
         // Activate arm hold mechanism upon robot startup
         pivot.activateArmHold();
 
-        Commands.run(() -> rumbleControllers(state.isRumbling() ? OperatorConstants.RUMBLE_POWER_PERCENTAGE : 0)).schedule();
+        new Trigger(() -> state.isRumbling())
+            .onTrue(Commands.runOnce(() -> rumbleControllers(OperatorConstants.RUMBLE_POWER_PERCENTAGE)))
+            .onFalse(Commands.runOnce(() -> rumbleControllers(0)));
+
     }
 
     /**
@@ -143,10 +146,10 @@ public class RobotContainer {
         driverXbox.y().onTrue(climb.climbUpNoMagnet());
         driverXbox.a().onTrue(climb.climbDownNoMagnet());
 
-        driverXbox.leftBumper().whileTrue(climb.forceClimbDownLeft());
-        driverXbox.leftTrigger().whileTrue(climb.forceClimbUpLeft());
-        driverXbox.rightBumper().whileTrue(climb.forceClimbDownRight());
-        driverXbox.rightTrigger().whileTrue(climb.forceClimbUpRight());
+         driverXbox.leftBumper().and(driverXbox.start()).whileTrue(climb.forceClimbDownLeft());
+         driverXbox.leftTrigger().and(driverXbox.start()).whileTrue(climb.forceClimbUpLeft());
+         driverXbox.rightBumper().and(driverXbox.start()).whileTrue(climb.forceClimbDownRight());
+         driverXbox.rightTrigger().and(driverXbox.start()).whileTrue(climb.forceClimbUpRight());
 
     
         operatorXbox.x().onTrue(pivot.speakerShooter());
@@ -156,11 +159,11 @@ public class RobotContainer {
         operatorXbox.start().onTrue(pivot.rotateArmAndHold());
 
         operatorXbox.leftBumper().whileTrue(pivot.spinUp());
-        operatorXbox.leftTrigger().whileTrue(pivot.aimToSpeakerThenReset());
+        operatorXbox.leftTrigger().whileTrue(pivot.aimToSpeakerThenReset()).onFalse(pivot.rotateArmAndHold(Direction.UP));
         operatorXbox.rightTrigger().onTrue(pivot.feedNote());
        
-        operatorXbox.povDown().whileTrue(pivot.intakeFromSourceThenReset());
-        operatorXbox.povLeft().whileTrue(pivot.intakeFromSourceThenReset());
+        operatorXbox.povDown().whileTrue(pivot.intakeFromSourceThenReset()).onFalse(pivot.rotateArmAndHold(Direction.UP));
+        operatorXbox.povLeft().whileTrue(pivot.intakeFromSourceThenReset()).onFalse(pivot.rotateArmAndHold(Direction.UP));
     }
 
     // Returns the Command to run during the autonomous phase

@@ -34,18 +34,12 @@ public class ArmRotateToDistanceShootingAngle extends Command {
 
         double armSetpointRadians = Units.degreesToRadians(RotationConstants.DISTANCE_SHOOTING_ANGLE_DEGREES);
 
-        SmartDashboard.putNumber("Arm Setpoint", armSetpointRadians);
-
         radiansPositionController.getController().setGoal(armSetpointRadians);
         radiansPositionController.getController().reset(rotationSubsystem.getRotationEncoderPositionInRadians());
     }
 
     @Override
     public void execute() {
-        SmartDashboard.putNumber("Rotation Setpoint heartbeat", Timer.getFPGATimestamp());
-        SmartDashboard.putNumber("Rotation Setpoint Goal Position",
-                radiansPositionController.getController().getGoal().position);
-
         double pidOut = radiansPositionController.getController()
                 .calculate(rotationSubsystem.getRotationEncoderPositionInRadians());
         double ffOut = rotationSubsystem.calculateFeedforward(rotationSubsystem.getRotationEncoderPositionInRadians(),
@@ -53,20 +47,11 @@ public class ArmRotateToDistanceShootingAngle extends Command {
 
         double commandedVoltage = (pidOut + ffOut);
 
-        SmartDashboard.putNumber("Rotation pidOutput", pidOut);
-        SmartDashboard.putNumber("Rotation ffout", ffOut);
-        SmartDashboard.putNumber("Rotation commanded voltage", commandedVoltage);
-
         rotationSubsystem.setMotorVoltage(commandedVoltage);
     }
 
     @Override
     public void end(boolean interrupted) {
-        SmartDashboard.putNumber("Rotation position at end", rotationSubsystem.getRotationEncoderPositionInRadians());
-        SmartDashboard.putNumber("Rotation velocity at end",
-                rotationSubsystem.getRotationEncoderVelocityInRadsPerSec());
-        SmartDashboard.putNumber("Rotation heartbeat at end", Timer.getFPGATimestamp());
-
         rotationSubsystem.setMotorVoltage(rotationSubsystem.calculateFeedforward(rotationSubsystem.getRotationEncoderPositionInRadians(), 0));
     }
 

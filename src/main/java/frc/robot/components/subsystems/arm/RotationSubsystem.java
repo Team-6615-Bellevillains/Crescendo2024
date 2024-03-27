@@ -31,26 +31,11 @@ public class RotationSubsystem extends SubsystemBase {
         rotationEncoder.setPosition(RotationConstants.SPEAKER_SHOOTING_ANGLE_DEGREES);
     }
 
-
-    @Override
-    public void periodic() {
-        SmartDashboard.putNumber("Rotation measurement", rotationEncoder.getPosition());
-                SmartDashboard.putNumber("Rotation measurement rads", getRotationEncoderPositionInRadians());
-
-        SmartDashboard.putNumber("Rotation measurement [Heartbeat]", Timer.getFPGATimestamp());
-        // SmartDashboard.putNumber("Current reading arm", rotationEncoder.getPosition());
-
-        // SmartDashboard.putNumber("ACTUAL Rotation velocity ACTUAL", getRotationEncoderVelocityInRadsPerSec());
-    }
-
     public double calculateFeedforward(double currentPositionRadians, double desiredVelocityRadians) {
         return rotationFeedforward.getController().calculate(currentPositionRadians, desiredVelocityRadians);
     }
 
     public void setMotorVoltage(double voltage) {
-        SmartDashboard.putNumber("Rotation voltage", voltage);
-        SmartDashboard.putNumber("Rotation voltage [Heartbeat]", Timer.getFPGATimestamp());
-
         rotationMotor.setVoltage(voltage);
     }
 
