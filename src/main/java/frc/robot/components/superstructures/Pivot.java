@@ -7,9 +7,9 @@ import frc.robot.RobotContainer;
 import frc.robot.components.commands.arm.rotation.ArmRotateToDistanceShootingAngle;
 import frc.robot.components.commands.arm.rotation.RotateArmAndHold;
 import frc.robot.components.commands.arm.spin.*;
-import frc.robot.components.subsystems.arm.RotationSubsystem;
-import frc.robot.components.subsystems.arm.ShootingSubsystem;
-import frc.robot.components.subsystems.arm.StorageSubsystem;
+import frc.robot.components.subsystems.pivot.RotationSubsystem;
+import frc.robot.components.subsystems.pivot.ShootingSubsystem;
+import frc.robot.components.subsystems.pivot.StorageSubsystem;
 import frc.robot.utils.enums.Direction;
 
 public class Pivot {

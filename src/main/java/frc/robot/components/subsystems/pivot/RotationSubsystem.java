@@ -1,11 +1,9 @@
-package frc.robot.components.subsystems.arm;
+package frc.robot.components.subsystems.pivot;
 
 import com.revrobotics.CANSparkLowLevel.MotorType;
 import com.revrobotics.CANSparkMax;
 import com.revrobotics.RelativeEncoder;
 import edu.wpi.first.math.util.Units;
-import edu.wpi.first.wpilibj.Timer;
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.utils.enums.Direction;
 import frc.robot.utils.controllers.TunableArmFeedforward;

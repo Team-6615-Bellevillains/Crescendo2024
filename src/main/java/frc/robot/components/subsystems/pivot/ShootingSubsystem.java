@@ -1,4 +1,4 @@
-package frc.robot.components.subsystems.arm;
+package frc.robot.components.subsystems.pivot;
 
 import com.revrobotics.CANSparkLowLevel.MotorType;
 import com.revrobotics.CANSparkMax;

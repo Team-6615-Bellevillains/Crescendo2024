@@ -5,8 +5,7 @@ import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.RobotContainer;
-import frc.robot.components.subsystems.arm.RotationSubsystem;
-import frc.robot.components.subsystems.drive.SwerveSubsystem;
+import frc.robot.components.subsystems.pivot.RotationSubsystem;
 
 import java.util.function.DoubleSupplier;
 

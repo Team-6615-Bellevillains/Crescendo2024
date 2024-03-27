@@ -3,10 +3,7 @@ package frc.robot.components.commands.arm.spin;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.Constants.ArmConstants.ShooterConstants;
-import frc.robot.components.subsystems.arm.ShootingSubsystem;
-import frc.robot.components.subsystems.arm.StorageSubsystem;
-
-import static frc.robot.Constants.ArmConstants.ShooterConstants;
+import frc.robot.components.subsystems.pivot.StorageSubsystem;
 
 public class FeedNote extends Command {
 
