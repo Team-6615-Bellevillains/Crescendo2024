@@ -3,21 +3,27 @@ package frc.robot.components.subsystems.pivot;
 import com.revrobotics.CANSparkLowLevel.MotorType;
 import com.revrobotics.CANSparkMax;
 import com.revrobotics.RelativeEncoder;
+import edu.wpi.first.math.trajectory.TrapezoidProfile;
 import edu.wpi.first.math.util.Units;
+import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
-import frc.robot.utils.enums.Direction;
+import frc.robot.utils.controllers.TunableProfiledPIDController;
 import frc.robot.utils.controllers.TunableArmFeedforward;
+import frc.robot.utils.enums.Direction;
 
 import static frc.robot.Constants.ArmConstants.RotationConstants;
 
 public class RotationSubsystem extends SubsystemBase {
 
-    private Direction armHoldDirection = Direction.UP;
     private final CANSparkMax rotationMotor;
     private final RelativeEncoder rotationEncoder;
 
-    private final TunableArmFeedforward rotationFeedforward = new TunableArmFeedforward("rotation", RotationConstants.kSRotation,
-            RotationConstants.kGRotation, RotationConstants.kVRotation, RotationConstants.kARotation);
+    private final TunableProfiledPIDController rotationProfiledPID;
+    private final TunableArmFeedforward rotationFeedforward;
+
+    private double goalPositionRadians = Units.degreesToRadians(RotationConstants.HOLD_UP_ANGLE_DEGREES);
+    private boolean holding = false;
 
     public RotationSubsystem() {
         rotationMotor = new CANSparkMax(RotationConstants.kRotateMotorPort, MotorType.kBrushless);
@@ -26,7 +32,41 @@ public class RotationSubsystem extends SubsystemBase {
         rotationMotor.setInverted(true);
         rotationEncoder.setPositionConversionFactor(RotationConstants.ENCODER_READING_TO_ANGLE_CONVERSION_FACTOR);
         rotationEncoder.setVelocityConversionFactor(RotationConstants.ENCODER_READING_TO_ANGLE_CONVERSION_FACTOR / 60.0);
-        rotationEncoder.setPosition(RotationConstants.SPEAKER_SHOOTING_ANGLE_DEGREES);
+        rotationEncoder.setPosition(RotationConstants.HOLD_UP_ANGLE_DEGREES);
+
+        // Make further configuration calls on the rotation motor non-blocking.
+        // That is, the program will continue to run without waiting for the motor to respond.
+        // Important to not have a huge delay when setting holding current limit
+        rotationMotor.setCANTimeout(0);
+
+        rotationProfiledPID = new TunableProfiledPIDController("rotation pid", RotationConstants.kPRotation,
+                RotationConstants.kIRotation, RotationConstants.kDRotation,
+                new TrapezoidProfile.Constraints(RotationConstants.kMaxRotationVelocityRadiansPerSecond,
+                        RotationConstants.kMaxRotationAccelerationRadiansPerSecondSquared),
+                this::getRotationEncoderPositionInRadians);
+        rotationProfiledPID.getController().setTolerance(RotationConstants.ROTATION_PROFILEDPID_POSITION_TOLERANCE_RADIANS, RotationConstants.ROTATION_PROFILEDPID_VELOCITY_TOLERANCE_RADS_PER_SECOND);
+
+        rotationFeedforward = new TunableArmFeedforward("rotation", RotationConstants.kSRotation,
+                RotationConstants.kGRotation, RotationConstants.kVRotation, RotationConstants.kARotation);
+    }
+
+    @Override
+    public void periodic() {
+        if ((goalPositionRadians == Units.degreesToRadians(RotationConstants.HOLD_UP_ANGLE_DEGREES)
+                || goalPositionRadians == Units.degreesToRadians(RotationConstants.HOLD_DOWN_ANGLE_DEGREES))
+                && rotationProfiledPID.getController().atGoal()) {
+            hold();
+            return;
+        }
+
+        double pidOut = rotationProfiledPID.getController()
+                .calculate(getRotationEncoderPositionInRadians());
+        double ffOut = calculateFeedforward(getRotationEncoderPositionInRadians(),
+                rotationProfiledPID.getController().getSetpoint().velocity);
+
+        double commandedVoltage = (pidOut + ffOut);
+
+        setMotorVoltage(commandedVoltage);
     }
 
     public double calculateFeedforward(double currentPositionRadians, double desiredVelocityRadians) {
@@ -53,24 +93,32 @@ public class RotationSubsystem extends SubsystemBase {
         return Units.degreesToRadians(getRotationEncoderVelocityInDegreesPerSec());
     }
 
-    public Direction getArmHoldDirection() {
-        return armHoldDirection;
+    public void setGoalPositionRadians(double newGoalPositionRadians) {
+        deactivateHold();
+
+        this.goalPositionRadians = newGoalPositionRadians;
+        rotationProfiledPID.getController().setGoal(newGoalPositionRadians);
     }
 
-    public void setArmHoldDirection(Direction newArmHoldDirection) {
-        this.armHoldDirection = newArmHoldDirection;
-    }
+    public void hold() {
+        if (holding) {
+            return;
+        }
 
-    public void activateArmHold() {
         rotationMotor.setSmartCurrentLimit(RotationConstants.HOLDING_ANGLE_CURRENT_LIMIT);
 
-        int holdingVoltageSign = armHoldDirection == Direction.UP ? 1 : -1;
+        int holdingVoltageSign = goalPositionRadians == RotationConstants.HOLD_UP_ANGLE_DEGREES ? 1 : -1;
         setMotorVoltage(holdingVoltageSign * RotationConstants.HOLDING_ANGLE_VOLTAGE);
+
+        holding = true;
     }
 
     public void deactivateHold() {
+        holding = false;
+
         rotationMotor.setSmartCurrentLimit(RotationConstants.REGULAR_CURRENT_LIMIT);
 
         setMotorVoltage(0);
     }
+
 }

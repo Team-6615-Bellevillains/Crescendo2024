@@ -18,15 +18,8 @@ import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.Constants.AutonConstants;
-import frc.robot.Constants.ClimbConstants;
 import frc.robot.Constants.OperatorConstants;
-import frc.robot.components.commands.climb.ClimbLeftNoMagnetCmd;
-import frc.robot.components.commands.climb.ClimbRightNoMagnetCmd;
-import frc.robot.components.commands.climb.ForceClimbLeftCmd;
-import frc.robot.components.commands.climb.ForceClimbRightCmd;
 import frc.robot.components.commands.drive.FieldOrientedDrive;
-import frc.robot.components.subsystems.climb.ClimbLeftSubsystem;
-import frc.robot.components.subsystems.climb.ClimbRightSubsystem;
 import frc.robot.components.subsystems.drive.SwerveSubsystem;
 import frc.robot.components.superstructures.Climb;
 import frc.robot.components.superstructures.Pivot;
@@ -156,14 +149,14 @@ public class RobotContainer {
         operatorXbox.a().whileTrue(pivot.intakeRingManual());
         operatorXbox.y().onTrue(pivot.intakeFromFloorThenReset());
 
-        operatorXbox.start().onTrue(pivot.rotateArmAndHold());
+        operatorXbox.start().onTrue(pivot.switchHoldDirectionAndHold());
 
         operatorXbox.leftBumper().whileTrue(pivot.spinUp());
-        operatorXbox.leftTrigger().whileTrue(pivot.aimToSpeakerThenReset()).onFalse(pivot.rotateArmAndHold(Direction.UP));
+        operatorXbox.leftTrigger().whileTrue(pivot.aimToSpeakerAndSpinUp()).onFalse(pivot.rotateArmAndHold(Direction.UP));
         operatorXbox.rightTrigger().onTrue(pivot.feedNote());
        
-        operatorXbox.povDown().whileTrue(pivot.intakeFromSourceThenReset()).onFalse(pivot.rotateArmAndHold(Direction.UP));
-        operatorXbox.povLeft().whileTrue(pivot.intakeFromSourceThenReset()).onFalse(pivot.rotateArmAndHold(Direction.UP));
+        operatorXbox.povDown().whileTrue(pivot.intakeFromSource()).onFalse(pivot.rotateArmAndHold(Direction.UP));
+        operatorXbox.povLeft().whileTrue(pivot.intakeFromSource()).onFalse(pivot.rotateArmAndHold(Direction.UP));
     }
 
     // Returns the Command to run during the autonomous phase
@@ -209,7 +202,7 @@ public class RobotContainer {
                         // The second argument is true because we want to set the odometry to the position the bot starts in.
                         swerveSubsystem.getAutonomousCommand(startingPosition + " note", true),
                         // Rotate the arm into intake position
-                        pivot.rotateArmAndHold(),
+                        pivot.switchHoldDirectionAndHold(),
                         // Drive forwards at a slow speed while running the intake motors.
                         // Stop once the note has been obtained or AutonConstants.INTAKE_TIMEOUT_SECONDS seconds have passed, whichever comes first
                         Commands.parallel(
@@ -217,7 +210,7 @@ public class RobotContainer {
                                 pivot.intakeRingUntilCaptured().withTimeout(AutonConstants.INTAKE_TIMEOUT_SECONDS)
                         ),
                         // Rotate arm back into shooting position
-                        pivot.rotateArmAndHold(),
+                        pivot.switchHoldDirectionAndHold(),
                         // Move back to the speaker.
                         // The second argument is false because we don't want to keep our current odometry.
                         swerveSubsystem.getAutonomousCommand(startingPosition + " note return", false),
@@ -248,7 +241,7 @@ public class RobotContainer {
                         // The second argument is false because we don't want to keep our current odometry.
                         Commands.parallel(
                             Commands.waitSeconds(0.3).andThen(swerveSubsystem.getAutonomousCommand("Second note return", false)),
-                            pivot.rotateArmAndHold().withTimeout(2)
+                            pivot.switchHoldDirectionAndHold().withTimeout(2)
                         ),
                         
                         // Shoot the note!

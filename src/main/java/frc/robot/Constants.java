@@ -65,42 +65,37 @@ public final class Constants {
 
             public static final double BOX_TO_COG_ANGLE = 90 - 13;
 
-            public static final double FLOOR_RESTING_ANGLE_DEGREES = -60 + BOX_TO_COG_ANGLE;
-            public static final double SPEAKER_SHOOTING_ANGLE_DEGREES = 55.5 + BOX_TO_COG_ANGLE;
+            public static final double HOLD_DOWN_ANGLE_DEGREES = -60 + BOX_TO_COG_ANGLE;
+            public static final double HOLD_UP_ANGLE_DEGREES = 55.5 + BOX_TO_COG_ANGLE;
             public static final double ROTATIONS_PER_DEGREE = 0.565673/(57 - (-61));
             public static final double ROTATIONS_FROM_FLOOR_REST_TO_SPEAKER = ROTATIONS_PER_DEGREE* (57 - (-61));
 
-            public static final double ENCODER_READING_TO_ANGLE_CONVERSION_FACTOR = (SPEAKER_SHOOTING_ANGLE_DEGREES - FLOOR_RESTING_ANGLE_DEGREES) / ROTATIONS_FROM_FLOOR_REST_TO_SPEAKER;
+            public static final double ENCODER_READING_TO_ANGLE_CONVERSION_FACTOR = (HOLD_UP_ANGLE_DEGREES - HOLD_DOWN_ANGLE_DEGREES) / ROTATIONS_FROM_FLOOR_REST_TO_SPEAKER;
 
             public static final int HOLDING_ANGLE_CURRENT_LIMIT = 7; // TODO: Retune
             public static final int REGULAR_CURRENT_LIMIT = 80;
             public static final int HOLDING_ANGLE_VOLTAGE = 12;
 
             // Feedforward
-            public static final double kGRotation = 0.75;
-            public static final double kVRotation = 0.92;
-            public static final double kSRotation = 0.3;
+            public static final double kGRotation = 0.0;
+            public static final double kVRotation = 0.0;
+            public static final double kSRotation = 0.0;
             public static final double kARotation = 0.0;
 
             // Feedback
-            public static final double kPRotation = 0.2;
+            public static final double kPRotation = 0.0;
             public static final double kIRotation = 0.0;
             public static final double kDRotation = 0.0;
 
             public static final double kMaxRotationVelocityRadiansPerSecond = 2.09;
             public static final double kMaxRotationAccelerationRadiansPerSecondSquared = 5.02;
 
+            public static final double ROTATION_PROFILEDPID_POSITION_TOLERANCE_RADIANS = Units.degreesToRadians(0.5);
+            public static final double ROTATION_PROFILEDPID_VELOCITY_TOLERANCE_RADS_PER_SECOND = Units.degreesToRadians(3);
+
             // Distance rotation
-            public static final double kPDistanceRotation = 16.0;
-            public static final double kIDistanceRotation = 0.0;
-            public static final double kDDistanceRotation = 1.0;
-
-            public static final double kMaxDistanceRotationVelocityRadiansPerSecond = 2.09;
-            public static final double kMaxDistanceRotationAccelerationRadiansPerSecondSquared = 5.02;
             public static final double DISTANCE_SHOOTING_ANGLE_DEGREES = 35 + BOX_TO_COG_ANGLE; // TODO: Measure
-            public static final double DISTANCE_ROTATION_FINISHED_THRESHOLD_RADIANS = Units.degreesToRadians(0.1);
-
-            public static final double ROTATION_FINISHED_THRESHOLD_RADIANS = Units.degreesToRadians(3);
+            public static final double SOURCE_INTAKE_ANGLE_DEGREES = 40 + BOX_TO_COG_ANGLE;
 
             public static final double SLOW_DRIVING_ANGLE_THRESHOLD_DEGREES = 15 + BOX_TO_COG_ANGLE;
         }
