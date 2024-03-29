@@ -66,9 +66,9 @@ public final class Constants {
             public static final double BOX_TO_COG_ANGLE = 90 - 13;
 
             public static final double HOLD_DOWN_ANGLE_DEGREES = -60 + BOX_TO_COG_ANGLE;
-            public static final double HOLD_UP_ANGLE_DEGREES = 55.5 + BOX_TO_COG_ANGLE;
-            public static final double ROTATIONS_PER_DEGREE = 0.565673/(57 - (-61));
-            public static final double ROTATIONS_FROM_FLOOR_REST_TO_SPEAKER = ROTATIONS_PER_DEGREE* (57 - (-61));
+            public static final double HOLD_UP_ANGLE_DEGREES = 54 + BOX_TO_COG_ANGLE;
+            public static final double ROTATIONS_PER_DEGREE = 0.62646484375/(54 - (-60));
+            public static final double ROTATIONS_FROM_FLOOR_REST_TO_SPEAKER = ROTATIONS_PER_DEGREE* (54 - (-60));
 
             public static final double ENCODER_READING_TO_ANGLE_CONVERSION_FACTOR = (HOLD_UP_ANGLE_DEGREES - HOLD_DOWN_ANGLE_DEGREES) / ROTATIONS_FROM_FLOOR_REST_TO_SPEAKER;
 
@@ -77,13 +77,13 @@ public final class Constants {
             public static final int HOLDING_ANGLE_VOLTAGE = 12;
 
             // Feedforward
-            public static final double kGRotation = 0.0;
-            public static final double kVRotation = 0.0;
-            public static final double kSRotation = 0.0;
+            public static final double kGRotation = 1.1;
+            public static final double kVRotation = 0.4;
+            public static final double kSRotation = 0.61;
             public static final double kARotation = 0.0;
 
             // Feedback
-            public static final double kPRotation = 0.0;
+            public static final double kPRotation = 1.2;
             public static final double kIRotation = 0.0;
             public static final double kDRotation = 0.0;
 
@@ -110,8 +110,8 @@ public final class Constants {
             public static final double STORAGE_INTAKE_VOLTAGE = -3.0;
             public static final double SHOOTING_INTAKE_VOLTAGE = 6.0;
 
-            public static final double STORAGE_SPEAKER_SHOOTER_VOLTAGE = 13;
-            public static final double SHOOTING_SPEAKER_SHOOTER_VOLTAGE = -11;
+            public static final double STORAGE_SPEAKER_SHOOTER_VOLTAGE = 12;
+            public static final double SHOOTING_SPEAKER_SHOOTER_VOLTAGE = -12;
 
             public static final double NOTE_CAPTURED_STALL_CURRENT_THRESHOLD = 45;
         }

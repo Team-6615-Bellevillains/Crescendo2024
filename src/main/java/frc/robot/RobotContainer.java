@@ -112,7 +112,7 @@ public class RobotContainer {
         swerveSubsystem.setDefaultCommand(fieldOrientedDrive);
 
         // Activate arm hold mechanism upon robot startup
-        pivot.activateArmHold();
+        // pivot.activateArmHold();
 
         new Trigger(() -> state.isRumbling())
             .onTrue(Commands.runOnce(() -> rumbleControllers(OperatorConstants.RUMBLE_POWER_PERCENTAGE)))
@@ -134,6 +134,10 @@ public class RobotContainer {
      * Flight joysticks}.
      */
     private void configureBindings() {
+        // driverXbox.a().onTrue(pivot.setArmGoalPositionCommand(Units.degreesToRadians(RotationConstants.DISTANCE_SHOOTING_ANGLE_DEGREES)));
+        // driverXbox.b().onTrue(pivot.setArmGoalPositionCommand(Units.degreesToRadians(RotationConstants.HOLD_UP_ANGLE_DEGREES)));
+        // driverXbox.b().onTrue(pivot.switchHoldDirectionAndHold());
+        
         driverXbox.b().onTrue((new InstantCommand(swerveSubsystem::zeroGyro)));
 
         driverXbox.y().onTrue(climb.climbUpNoMagnet());

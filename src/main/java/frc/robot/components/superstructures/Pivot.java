@@ -1,9 +1,11 @@
 package frc.robot.components.superstructures;
 
 import edu.wpi.first.math.util.Units;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import frc.robot.RobotContainer;
+import frc.robot.components.commands.arm.rotation.ArmRotateUsingJoystick;
 import frc.robot.components.commands.arm.spin.*;
 import frc.robot.components.subsystems.pivot.RotationSubsystem;
 import frc.robot.components.subsystems.pivot.ShootingSubsystem;
@@ -11,6 +13,9 @@ import frc.robot.components.subsystems.pivot.StorageSubsystem;
 import frc.robot.utils.enums.Direction;
 
 import static frc.robot.Constants.ArmConstants.*;
+
+import java.util.function.DoubleSupplier;
+
 import static frc.robot.Constants.OperatorConstants;
 
 public class Pivot {
@@ -24,6 +29,9 @@ public class Pivot {
         rotationSubsystem = new RotationSubsystem();
         storageSubsystem = new StorageSubsystem();
         shootingSubsystem = new ShootingSubsystem();
+
+        rotationSubsystem.setGoalPositionRadians(
+                Units.degreesToRadians(RotationConstants.HOLD_UP_ANGLE_DEGREES));
     }
 
     // Methods to create instances of shooting commands. Necessary for composition
@@ -35,6 +43,10 @@ public class Pivot {
 
     public SpinUp spinUp() {
         return new SpinUp(shootingSubsystem, ShooterConstants.SHOOTING_SPEAKER_SHOOTER_VOLTAGE);
+    }
+
+    public Command rotateArmWithJoystick(DoubleSupplier joystickInputSupplier) {
+        return new ArmRotateUsingJoystick(rotationSubsystem, joystickInputSupplier);
     }
 
     public Command aimToSpeakerAndSpinUp() {
@@ -65,8 +77,15 @@ public class Pivot {
     }
 
     public Command switchHoldDirectionAndHold() {
-        return Commands.runOnce(() -> holdingDirection = holdingDirection == Direction.UP ? Direction.DOWN : Direction.UP, rotationSubsystem)
-                .andThen(rotateArmAndHold(holdingDirection));
+        return Commands
+                .runOnce(() -> {holdingDirection = holdingDirection == Direction.UP ? Direction.DOWN : Direction.UP;
+                SmartDashboard.putBoolean("Holding up?", holdingDirection == Direction.UP);},
+                        rotationSubsystem)
+                .andThen(Commands.runOnce(
+                        () -> rotationSubsystem.setGoalPositionRadians(holdingDirection == Direction.UP
+                                ? Units.degreesToRadians(RotationConstants.HOLD_UP_ANGLE_DEGREES)
+                                : Units.degreesToRadians(RotationConstants.HOLD_DOWN_ANGLE_DEGREES)),
+                        rotationSubsystem));
     }
 
     public Command rotateArmAndHold(Direction direction) {

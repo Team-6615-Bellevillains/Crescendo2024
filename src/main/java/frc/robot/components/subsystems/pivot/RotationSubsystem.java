@@ -5,12 +5,11 @@ import com.revrobotics.CANSparkMax;
 import com.revrobotics.RelativeEncoder;
 import edu.wpi.first.math.trajectory.TrapezoidProfile;
 import edu.wpi.first.math.util.Units;
-import edu.wpi.first.wpilibj2.command.Command;
-import edu.wpi.first.wpilibj2.command.Commands;
+import edu.wpi.first.wpilibj.Timer;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.utils.controllers.TunableProfiledPIDController;
 import frc.robot.utils.controllers.TunableArmFeedforward;
-import frc.robot.utils.enums.Direction;
 
 import static frc.robot.Constants.ArmConstants.RotationConstants;
 
@@ -37,6 +36,7 @@ public class RotationSubsystem extends SubsystemBase {
         // Make further configuration calls on the rotation motor non-blocking.
         // That is, the program will continue to run without waiting for the motor to respond.
         // Important to not have a huge delay when setting holding current limit
+        rotationMotor.setSmartCurrentLimit(80);
         rotationMotor.setCANTimeout(0);
 
         rotationProfiledPID = new TunableProfiledPIDController("rotation pid", RotationConstants.kPRotation,
@@ -52,6 +52,7 @@ public class RotationSubsystem extends SubsystemBase {
 
     @Override
     public void periodic() {
+        SmartDashboard.putBoolean("At goal?", rotationProfiledPID.getController().atGoal());
         if ((goalPositionRadians == Units.degreesToRadians(RotationConstants.HOLD_UP_ANGLE_DEGREES)
                 || goalPositionRadians == Units.degreesToRadians(RotationConstants.HOLD_DOWN_ANGLE_DEGREES))
                 && rotationProfiledPID.getController().atGoal()) {
@@ -66,6 +67,13 @@ public class RotationSubsystem extends SubsystemBase {
 
         double commandedVoltage = (pidOut + ffOut);
 
+        
+        SmartDashboard.putNumber("Trap velo", rotationProfiledPID.getController().getSetpoint().velocity);
+        SmartDashboard.putNumber("Actual arm position degrees", getRotationEncoderPositionInDegrees());
+        SmartDashboard.putNumber("Actual arm position radians", getRotationEncoderPositionInRadians());
+        SmartDashboard.putNumber("Actual arm rotation", getRotationEncoderVelocityInRadsPerSec());
+        SmartDashboard.putNumber("Commanded voltage", commandedVoltage);
+        SmartDashboard.putNumber("periodic", Timer.getFPGATimestamp());
         setMotorVoltage(commandedVoltage);
     }
 
@@ -74,6 +82,8 @@ public class RotationSubsystem extends SubsystemBase {
     }
 
     public void setMotorVoltage(double voltage) {
+        SmartDashboard.putNumber("NOW Rotation voltage", voltage);
+        SmartDashboard.putNumber("NOW Rotation Timestamp", Timer.getFPGATimestamp());
         rotationMotor.setVoltage(voltage);
     }
 
@@ -97,6 +107,7 @@ public class RotationSubsystem extends SubsystemBase {
         deactivateHold();
 
         this.goalPositionRadians = newGoalPositionRadians;
+        SmartDashboard.putNumber("Goal", goalPositionRadians);
         rotationProfiledPID.getController().setGoal(newGoalPositionRadians);
     }
 

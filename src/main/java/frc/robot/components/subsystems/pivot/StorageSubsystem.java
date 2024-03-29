@@ -13,6 +13,7 @@ public class StorageSubsystem extends SubsystemBase {
 
     public StorageSubsystem() {
         storageMotor = new CANSparkMax(ShooterConstants.kStorageMotorPort, MotorType.kBrushless);
+        storageMotor.setSmartCurrentLimit(80);
     }
 
     public void setStorageVoltage(double storageVoltage) {

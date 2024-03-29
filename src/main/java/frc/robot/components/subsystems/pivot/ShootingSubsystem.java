@@ -12,6 +12,7 @@ public class ShootingSubsystem extends SubsystemBase {
 
     public ShootingSubsystem() {
         shootingMotor = new CANSparkMax(ShooterConstants.kShootingMotorPort, MotorType.kBrushless);
+        shootingMotor.setSmartCurrentLimit(80);
     }
 
     public void setShootingVoltage(double shootingVoltage) {
