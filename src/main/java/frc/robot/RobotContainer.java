@@ -19,6 +19,7 @@ import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.Constants.AutonConstants;
 import frc.robot.Constants.OperatorConstants;
+import frc.robot.Constants.ArmConstants.RotationConstants;
 import frc.robot.components.commands.drive.FieldOrientedDrive;
 import frc.robot.components.subsystems.drive.SwerveSubsystem;
 import frc.robot.components.superstructures.Climb;
@@ -158,6 +159,8 @@ public class RobotContainer {
         operatorXbox.leftBumper().whileTrue(pivot.spinUp());
         operatorXbox.leftTrigger().whileTrue(pivot.aimToSpeakerAndSpinUp()).onFalse(pivot.rotateArmAndHold(Direction.UP));
         operatorXbox.rightTrigger().onTrue(pivot.feedNote());
+        //TODO: Remove when done testing
+        operatorXbox.rightBumper().onTrue(pivot.setArmGoalPositionCommand(Units.degreesToRadians(RotationConstants.DISTANCE_SHOOTING_ANGLE_DEGREES)));
        
         operatorXbox.povDown().whileTrue(pivot.intakeFromSource()).onFalse(pivot.rotateArmAndHold(Direction.UP));
         operatorXbox.povLeft().whileTrue(pivot.intakeFromSource()).onFalse(pivot.rotateArmAndHold(Direction.UP));

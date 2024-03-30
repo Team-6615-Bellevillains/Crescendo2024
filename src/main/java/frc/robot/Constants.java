@@ -83,12 +83,12 @@ public final class Constants {
             public static final double kARotation = 0.0;
 
             // Feedback
-            public static final double kPRotation = 1.2;
+            public static final double kPRotation = 2.1;
             public static final double kIRotation = 0.0;
             public static final double kDRotation = 0.0;
 
-            public static final double kMaxRotationVelocityRadiansPerSecond = 2.09;
-            public static final double kMaxRotationAccelerationRadiansPerSecondSquared = 5.02;
+            public static final double kMaxRotationVelocityRadiansPerSecond = 3.65;
+            public static final double kMaxRotationAccelerationRadiansPerSecondSquared = 7;
 
             public static final double ROTATION_PROFILEDPID_POSITION_TOLERANCE_RADIANS = Units.degreesToRadians(0.5);
             public static final double ROTATION_PROFILEDPID_VELOCITY_TOLERANCE_RADS_PER_SECOND = Units.degreesToRadians(3);
