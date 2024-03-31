@@ -166,8 +166,6 @@ public class RobotContainer {
         operatorXbox.leftBumper().whileTrue(pivot.spinUp());
         operatorXbox.leftTrigger().whileTrue(pivot.aimToSpeakerAndSpinUp()).onFalse(pivot.rotateArmAndHold(Direction.UP));
         operatorXbox.rightTrigger().onTrue(pivot.feedNote());
-        //TODO: Remove when done testing
-        // operatorXbox.rightBumper().onTrue(pivot.setArmGoalPositionCommand(Units.degreesToRadians(RotationConstants.DISTANCE_SHOOTING_ANGLE_DEGREES)));
        
         operatorXbox.povDown().whileTrue(pivot.intakeFromSource()).onFalse(pivot.rotateArmAndHold(Direction.UP));
         operatorXbox.povLeft().whileTrue(pivot.intakeFromSource()).onFalse(pivot.rotateArmAndHold(Direction.UP));
@@ -256,7 +254,7 @@ public class RobotContainer {
 
                         Commands.parallel(
                                Commands.runOnce(() -> swerveSubsystem.driveFieldOriented(new ChassisSpeeds(intakeForwardsSign * AutonConstants.intakeForwardsSpeedMetersPerSecond, 0, 0)), swerveSubsystem),
-                               pivot.intakeRingUntilCaptured().withTimeout(AutonConstants.INTAKE_TIMEOUT_SECONDS)
+                               pivot.intakeRingUntilCaptured().withTimeout(AutonConstants.INTAKE_TIMEOUT_SECONDS).andThen(pivot.intakeRingManual().withTimeout(0.5))
                         ),
                     Commands.print("4"),
                         Commands.runOnce(() -> swerveSubsystem.setChassisSpeeds(new ChassisSpeeds()), swerveSubsystem),
@@ -275,15 +273,15 @@ public class RobotContainer {
                     Commands.print("7"),
 
                         //Third note
+                       Commands.parallel(
                         swerveSubsystem.getAutonomousCommand("Third piece start", false),
-                    Commands.print("8"),
-
-                        pivot.switchHoldDirectionAndHold(),
+                        pivot.switchHoldDirectionAndHold()
+                       ),
                     Commands.print("9"),
 
                         Commands.parallel(
-                                Commands.runOnce(() -> swerveSubsystem.driveFieldOriented(new ChassisSpeeds(intakeForwardsSign * Units.inchesToMeters(25.28), Units.inchesToMeters(25.28), 0)), swerveSubsystem),
-                                pivot.intakeRingUntilCaptured().withTimeout(AutonConstants.INTAKE_TIMEOUT_SECONDS)
+                                Commands.runOnce(() -> swerveSubsystem.driveFieldOriented(new ChassisSpeeds(intakeForwardsSign * Math.hypot(AutonConstants.intakeForwardsSpeedMetersPerSecond, AutonConstants.intakeForwardsSpeedMetersPerSecond),Math.hypot(AutonConstants.intakeForwardsSpeedMetersPerSecond, AutonConstants.intakeForwardsSpeedMetersPerSecond), 0)), swerveSubsystem),
+                                pivot.intakeRingUntilCaptured().withTimeout(AutonConstants.INTAKE_TIMEOUT_SECONDS).andThen(pivot.intakeRingManual().withTimeout(0.5))
                         ),
                     Commands.print("10"),
 
@@ -297,11 +295,11 @@ public class RobotContainer {
                     Commands.print("13"),
 
                         pivot.speakerShooter(),
-                    Commands.print("14"),
+                    Commands.print("14")
 
                         // go back across the line!
-                        swerveSubsystem.getAutonomousCommand(startingPosition + " back up", false),
-                    Commands.print("15")
+                    //     swerveSubsystem.getAutonomousCommand(startingPosition + " back up", false),
+                    // Commands.print("15")
                         );
                 yield commandGroup;
                 

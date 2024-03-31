@@ -25,11 +25,11 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
+import frc.robot.Constants.DriveConstants;
 import frc.robot.utils.enums.FlipUtil;
 import swervelib.SwerveController;
 import swervelib.SwerveDrive;
 import swervelib.SwerveDriveTest;
-import swervelib.math.SwerveMath;
 import swervelib.parser.SwerveControllerConfiguration;
 import swervelib.parser.SwerveDriveConfiguration;
 import swervelib.parser.SwerveParser;
@@ -56,7 +56,7 @@ public class SwerveSubsystem extends SubsystemBase {
     /**
      * Maximum speed of the robot in meters per second, used to limit acceleration.
      */
-    public double maximumSpeed = Units.feetToMeters(15.1);
+    public double maximumSpeed = 4.2;
 
     /**
      * Initialize {@link SwerveDrive} with the directory provided.
@@ -64,20 +64,6 @@ public class SwerveSubsystem extends SubsystemBase {
      * @param directory Directory of swerve drive config files.
      */
     public SwerveSubsystem(File directory) {
-        // Angle conversion factor is 360 / (GEAR RATIO * ENCODER RESOLUTION)
-        //  In this case the gear ratio is 12.8 motor revolutions per wheel rotation.
-        //  The encoder resolution per motor revolution is 1 per motor revolution.
-        double angleConversionFactor = SwerveMath.calculateDegreesPerSteeringRotation(12.8);
-        // Motor conversion factor is (PI * WHEEL DIAMETER IN METERS) / (GEAR RATIO * ENCODER RESOLUTION).
-        //  In this case the wheel diameter is 4 inches, which must be converted to meters to get meters/second.
-        //  The gear ratio is 6.75 motor revolutions per wheel rotation.
-        //  The encoder resolution per motor revolution is 1 per motor revolution.
-        double driveConversionFactor = SwerveMath.calculateMetersPerRotation(Units.inchesToMeters(4), 6.75);
-        System.out.println("\"conversionFactor\": {");
-        System.out.println("\t\"angle\": " + angleConversionFactor + ",");
-        System.out.println("\t\"drive\": " + driveConversionFactor);
-        System.out.println("}");
-
         // Configure the Telemetry before creating the SwerveDrive to avoid unnecessary objects being created.
         SwerveDriveTelemetry.verbosity = TelemetryVerbosity.HIGH;
         try {
@@ -90,13 +76,8 @@ public class SwerveSubsystem extends SubsystemBase {
         swerveDrive.setHeadingCorrection(false); // Heading correction should only be used while controlling the robot via angle.
 
         setupPathPlanner();
-    }
 
-    @Override
-    public void periodic() {
-        SmartDashboard.putNumber("Pose X", getPose().getTranslation().getX());
-        SmartDashboard.putNumber("Pose Y", getPose().getTranslation().getY());
-
+        swerveDrive.replaceSwerveModuleFeedforward(DriveConstants.DRIVE_FEEDFORWARD);
     }
 
     public void setDriveHeadingCorrection(boolean state) {
@@ -135,7 +116,7 @@ public class SwerveSubsystem extends SubsystemBase {
                         // Translation PID constants
                         autonRotationPIDConstants,
                         // Rotation PID constants
-                        4.5,
+                        4.2,
                         // Max module speed, in m/s
                         swerveDrive.swerveDriveConfiguration.getDriveBaseRadiusMeters(),
                         // Drive base radius in meters. Distance from robot center to furthest module.

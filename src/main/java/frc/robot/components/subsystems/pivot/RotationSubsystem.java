@@ -47,22 +47,25 @@ public class RotationSubsystem extends SubsystemBase {
                         RotationConstants.kMaxRotationAccelerationRadiansPerSecondSquared),
                 this::getRotationEncoderPositionInRadians);
         rotationProfiledPID.getController().setTolerance(
-                RotationConstants.ROTATION_PROFILEDPID_POSITION_TOLERANCE_RADIANS,
-                RotationConstants.ROTATION_PROFILEDPID_VELOCITY_TOLERANCE_RADS_PER_SECOND);
+                RotationConstants.HOLD_POSITION_TOLERANCE_RADIANS,
+                RotationConstants.VELOCITY_TOLERANCE_RADS_PER_SECOND);
 
         rotationFeedforward = new TunableArmFeedforward("rotation", RotationConstants.kSRotation,
                 RotationConstants.kGRotation, RotationConstants.kVRotation, RotationConstants.kARotation);
     }
 
-    @Override
-    public void periodic() {
-        boolean goalIsHoldingGoal = Math
+    private boolean goalIsHoldingGoal() {
+        return Math
                 .abs(goalPositionRadians - Units.degreesToRadians(RotationConstants.HOLD_UP_ANGLE_DEGREES)) < 1E-6
                 || Math.abs(
                         goalPositionRadians - Units.degreesToRadians(RotationConstants.HOLD_DOWN_ANGLE_DEGREES)) < 1E-6;
-        SmartDashboard.putBoolean("Goal is holding goal", goalIsHoldingGoal);
+    }
+
+    @Override
+    public void periodic() {
+        SmartDashboard.putBoolean("Goal is holding goal", goalIsHoldingGoal());
         SmartDashboard.putBoolean("At goal?", rotationProfiledPID.getController().atGoal());
-        if (goalIsHoldingGoal
+        if (goalIsHoldingGoal()
                 && rotationProfiledPID.getController().atGoal()) {
             hold();
         } else {
@@ -76,10 +79,13 @@ public class RotationSubsystem extends SubsystemBase {
             setMotorVoltage(commandedVoltage);
         }
 
-        // SmartDashboard.putNumber("Trap velo", rotationProfiledPID.getController().getSetpoint().velocity);
-        // SmartDashboard.putNumber("Actual arm position degrees", getRotationEncoderPositionInDegrees());
+        // SmartDashboard.putNumber("Trap velo",
+        // rotationProfiledPID.getController().getSetpoint().velocity);
+        // SmartDashboard.putNumber("Actual arm position degrees",
+        // getRotationEncoderPositionInDegrees());
         SmartDashboard.putNumber("Actual arm position radians", getRotationEncoderPositionInRadians());
-        // SmartDashboard.putNumber("Actual arm rotation", getRotationEncoderVelocityInRadsPerSec());
+        // SmartDashboard.putNumber("Actual arm rotation",
+        // getRotationEncoderVelocityInRadsPerSec());
         // SmartDashboard.putNumber("periodic", Timer.getFPGATimestamp());
         SmartDashboard.putBoolean("Holding", holding);
 
@@ -116,6 +122,10 @@ public class RotationSubsystem extends SubsystemBase {
 
         this.goalPositionRadians = newGoalPositionRadians;
         SmartDashboard.putNumber("Goal", goalPositionRadians);
+        rotationProfiledPID.getController().setTolerance(
+                goalIsHoldingGoal() ? RotationConstants.HOLD_POSITION_TOLERANCE_RADIANS
+                        : RotationConstants.DISTANCE_POSITION_TOLERANCE_RADIANS,
+                RotationConstants.VELOCITY_TOLERANCE_RADS_PER_SECOND);
         rotationProfiledPID.getController().setGoal(newGoalPositionRadians);
     }
 
@@ -126,7 +136,9 @@ public class RotationSubsystem extends SubsystemBase {
 
         rotationMotor.setSmartCurrentLimit(RotationConstants.HOLDING_ANGLE_CURRENT_LIMIT);
 
-        int holdingVoltageSign = Math.abs(goalPositionRadians - Units.degreesToRadians(RotationConstants.HOLD_UP_ANGLE_DEGREES)) < 1E-3 ? 1 : -1;
+        int holdingVoltageSign = Math
+                .abs(goalPositionRadians - Units.degreesToRadians(RotationConstants.HOLD_UP_ANGLE_DEGREES)) < 1E-3 ? 1
+                        : -1;
         setMotorVoltage(holdingVoltageSign * RotationConstants.HOLDING_ANGLE_VOLTAGE);
 
         holding = true;

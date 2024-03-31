@@ -29,7 +29,7 @@ public final class Constants {
 
         public static final PIDFConfig angleAutoPID = new PIDFConfig(2.5, 0, 0);
         // speed to move forwards when going to intake during auto
-        public static final double intakeForwardsSpeedMetersPerSecond = Units.inchesToMeters(40);
+        public static final double intakeForwardsSpeedMetersPerSecond = Units.inchesToMeters(5);
 
         public static final double MAX_ACCELERATION = 2;
 
@@ -47,6 +47,8 @@ public final class Constants {
         public static final Rotation2d RIGHT_SHOOTER_ANGLE = Rotation2d.fromDegrees(60);
 
         public final static double SLOW_SPEED_SCALAR = 0.8;
+
+        public static final SimpleMotorFeedforward DRIVE_FEEDFORWARD = new SimpleMotorFeedforward(0.2337275, 2.66335, 0.483205);
     }
 
     public static final class OperatorConstants {
@@ -84,15 +86,16 @@ public final class Constants {
             public static final double kARotation = 0.0;
 
             // Feedback
-            public static final double kPRotation = 2.1;
-            public static final double kIRotation = 0.0;
+            public static final double kPRotation = 2.2;
+            public static final double kIRotation = 0.1;
             public static final double kDRotation = 0.0;
 
             public static final double kMaxRotationVelocityRadiansPerSecond = 3.65;
             public static final double kMaxRotationAccelerationRadiansPerSecondSquared = 7;
 
-            public static final double ROTATION_PROFILEDPID_POSITION_TOLERANCE_RADIANS = Units.degreesToRadians(5);
-            public static final double ROTATION_PROFILEDPID_VELOCITY_TOLERANCE_RADS_PER_SECOND = Units.degreesToRadians(3);
+            public static final double HOLD_POSITION_TOLERANCE_RADIANS = Units.degreesToRadians(6);
+            public static final double DISTANCE_POSITION_TOLERANCE_RADIANS = Units.degreesToRadians(0.5);
+            public static final double VELOCITY_TOLERANCE_RADS_PER_SECOND = Units.degreesToRadians(3);
 
             // Distance rotation
             public static final double DISTANCE_SHOOTING_ANGLE_DEGREES = 40 + BOX_TO_COG_ANGLE; // TODO: Measure
