@@ -44,9 +44,6 @@ import com.pathplanner.lib.path.PathPlannerPath;
  */
 public class RobotContainer {
 
-    // Global robot state
-    public static State state = new State();
-
     // Subsystem instances for the robot, representing the layer between our code
     // and direct motor control
     private final SwerveSubsystem swerveSubsystem = new SwerveSubsystem(new File(Filesystem.getDeployDirectory(), "swerve/neo"));
@@ -116,7 +113,7 @@ public class RobotContainer {
         // Activate arm hold mechanism upon robot startup
         // pivot.activateArmHold();
 
-        new Trigger(() -> state.isRumbling())
+        new Trigger(() -> State.getInstance().isComingUpWithNote())
             .onTrue(Commands.runOnce(() -> rumbleControllers(OperatorConstants.RUMBLE_POWER_PERCENTAGE)))
             .onFalse(Commands.runOnce(() -> rumbleControllers(0)));
 

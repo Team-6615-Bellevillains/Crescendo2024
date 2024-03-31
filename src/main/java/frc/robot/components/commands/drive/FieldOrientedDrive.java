@@ -7,6 +7,7 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.Constants;
 import frc.robot.RobotContainer;
+import frc.robot.State;
 import frc.robot.components.subsystems.drive.SwerveSubsystem;
 import swervelib.SwerveController;
 import swervelib.math.SwerveMath;
@@ -18,14 +19,17 @@ import java.util.function.DoubleSupplier;
 import static frc.robot.Constants.DriveConstants;
 
 public class FieldOrientedDrive extends Command {
+    private static final double SQRT_2 = Math.sqrt(2);
+    private static final boolean USING_NEW_SPEED_METHOD = true;
+
     private final SwerveSubsystem swerve;
     private final DoubleSupplier vX, vY, vTheta;
-    private final BooleanSupplier angleLeft, angleCenter, angleRight, shouldSlowWhenIntaking;
+    private final BooleanSupplier angleLeft, angleCenter, angleRight, shouldSlowWhenIntakingSupplier;
     private final double maxAngularVelocity;
+    private boolean shouldSlowWhenIntaking;
 
 
-
-    public FieldOrientedDrive(SwerveSubsystem swerve, DoubleSupplier vX, DoubleSupplier vY, DoubleSupplier vTheta, BooleanSupplier angleLeft, BooleanSupplier angleCenter, BooleanSupplier angleRight, BooleanSupplier shouldSlowWhenIntaking) {
+    public FieldOrientedDrive(SwerveSubsystem swerve, DoubleSupplier vX, DoubleSupplier vY, DoubleSupplier vTheta, BooleanSupplier angleLeft, BooleanSupplier angleCenter, BooleanSupplier angleRight, BooleanSupplier shouldSlowWhenIntakingSupplier) {
         this.swerve = swerve;
 
         this.vX = vX;
@@ -36,7 +40,7 @@ public class FieldOrientedDrive extends Command {
         this.angleCenter = angleCenter;
         this.angleRight = angleRight;
 
-        this.shouldSlowWhenIntaking = shouldSlowWhenIntaking;
+        this.shouldSlowWhenIntakingSupplier = shouldSlowWhenIntakingSupplier;
 
         this.maxAngularVelocity = SwerveMath.calculateMaxAngularVelocity(
                 swerve.maximumSpeed,
@@ -55,6 +59,7 @@ public class FieldOrientedDrive extends Command {
         }
 
         swerve.setDriveHeadingCorrection(true);
+        shouldSlowWhenIntaking = shouldSlowWhenIntakingSupplier.getAsBoolean();
     }
 
 
@@ -78,12 +83,22 @@ public class FieldOrientedDrive extends Command {
     public void execute() {
         double inputScalar = 1;
 
-        if (shouldSlowWhenIntaking.getAsBoolean() && RobotContainer.state.isIntaking()) {
+        if (shouldSlowWhenIntaking && State.getInstance().isIntaking()) {
             inputScalar = DriveConstants.SLOW_SPEED_SCALAR;
         }
 
-        double xCubed = Math.pow(vX.getAsDouble(), 3) * swerve.maximumSpeed * inputScalar;
-        double yCubed = Math.pow(vY.getAsDouble(), 3) * swerve.maximumSpeed * inputScalar;
+        double xCubed = Math.pow(vX.getAsDouble(), 3) * inputScalar;
+        double yCubed = Math.pow(vY.getAsDouble(), 3) * inputScalar;
+
+        double xSpeed, ySpeed;
+        if (USING_NEW_SPEED_METHOD) {
+            double norm = Math.hypot(xCubed, yCubed);
+            xSpeed = Math.signum(xCubed) * Math.min(Math.abs(xCubed*SQRT_2), norm) * swerve.maximumSpeed;
+            ySpeed = Math.signum(yCubed) * Math.min(Math.abs(yCubed*SQRT_2), norm) * swerve.maximumSpeed;
+        } else {
+            xSpeed = xCubed * swerve.maximumSpeed;
+            ySpeed = yCubed * swerve.maximumSpeed;
+        }
 
         ChassisSpeeds desiredSpeeds;
         Rotation2d fixedShootingRotation = getShootingRotation();
@@ -91,9 +106,9 @@ public class FieldOrientedDrive extends Command {
         // no fixed angle button is pressed, use right joystick
         if (fixedShootingRotation == null) {
             double thetaCubed = Math.pow(vTheta.getAsDouble(), 3) * maxAngularVelocity * inputScalar;
-            desiredSpeeds = swerve.getSwerveController().getRawTargetSpeeds(xCubed, yCubed, thetaCubed);
+            desiredSpeeds = swerve.getSwerveController().getRawTargetSpeeds(xSpeed, ySpeed, thetaCubed);
         } else {
-            desiredSpeeds = swerve.getSwerveController().getRawTargetSpeeds(xCubed, yCubed, fixedShootingRotation.getRadians(), swerve.getHeading().getRadians());
+            desiredSpeeds = swerve.getSwerveController().getRawTargetSpeeds(xSpeed, ySpeed, fixedShootingRotation.getRadians(), swerve.getHeading().getRadians());
         }
 
         // Limit velocity to prevent tipping

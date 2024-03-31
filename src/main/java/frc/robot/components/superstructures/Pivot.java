@@ -5,7 +5,11 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.FunctionalCommand;
+import frc.robot.Constants.ArmConstants.RotationConstants;
+import frc.robot.Constants.ArmConstants.ShooterConstants;
+import frc.robot.Constants.OperatorConstants;
 import frc.robot.RobotContainer;
+import frc.robot.State;
 import frc.robot.components.commands.arm.rotation.ArmRotateUsingJoystick;
 import frc.robot.components.commands.arm.spin.*;
 import frc.robot.components.subsystems.pivot.RotationSubsystem;
@@ -61,9 +65,9 @@ public class Pivot {
                 .andThen(
                         switchHoldDirectionAndHold()
                                 .alongWith(
-                                        Commands.runOnce(() -> RobotContainer.state.setRumbling(true))
+                                        Commands.runOnce(() -> State.getInstance().setComingUpWithNote(true))
                                                 .andThen(Commands.waitSeconds(OperatorConstants.RUMBLE_TIME_SECONDS))
-                                                .andThen(Commands.runOnce(() -> RobotContainer.state.setRumbling(false)))
+                                                .andThen(Commands.runOnce(() -> State.getInstance().setComingUpWithNote(false)))
                                 )
                 );
     }

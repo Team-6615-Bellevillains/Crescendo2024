@@ -1,9 +1,15 @@
 package frc.robot;
 
+// Global Robot State
 public class State {
-    public State() {
-        setIntakingState(false);
-        setRumbling(false);
+    private static State instance;
+
+    private State() {
+        instance = this;
+    }
+
+    public static State getInstance() {
+        return instance;
     }
 
     public boolean isIntaking() {
@@ -14,14 +20,14 @@ public class State {
         this.intaking = intaking;
     }
 
-    public boolean isRumbling() {
-        return rumbling;
+    public boolean isComingUpWithNote() {
+        return comingUpWithNote;
     }
 
-    public void setRumbling(boolean rumbling) {
-        this.rumbling = rumbling;
+    public void setComingUpWithNote(boolean rumbling) {
+        this.comingUpWithNote = rumbling;
     }
 
     public boolean intaking;
-    public boolean rumbling;
+    public boolean comingUpWithNote;
 }
