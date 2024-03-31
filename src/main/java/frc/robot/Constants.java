@@ -4,6 +4,7 @@
 
 package frc.robot;
 
+import edu.wpi.first.math.controller.SimpleMotorFeedforward;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation3d;
 import edu.wpi.first.math.util.Units;
@@ -26,7 +27,7 @@ public final class Constants {
 
     public static final class AutonConstants {
 
-        public static final PIDFConfig angleAutoPID = new PIDFConfig(2.1, 0, 0);
+        public static final PIDFConfig angleAutoPID = new PIDFConfig(2.5, 0, 0);
         // speed to move forwards when going to intake during auto
         public static final double intakeForwardsSpeedMetersPerSecond = Units.inchesToMeters(40);
 
@@ -65,14 +66,14 @@ public final class Constants {
 
             public static final double BOX_TO_COG_ANGLE = 90 - 13;
 
-            public static final double HOLD_DOWN_ANGLE_DEGREES = -60 + BOX_TO_COG_ANGLE;
-            public static final double HOLD_UP_ANGLE_DEGREES = 54 + BOX_TO_COG_ANGLE;
+            public static final double HOLD_DOWN_ANGLE_DEGREES = -62 + BOX_TO_COG_ANGLE;
+            public static final double HOLD_UP_ANGLE_DEGREES = 55 + BOX_TO_COG_ANGLE;
             public static final double ROTATIONS_PER_DEGREE = 0.62646484375/(54 - (-60));
             public static final double ROTATIONS_FROM_FLOOR_REST_TO_SPEAKER = ROTATIONS_PER_DEGREE* (54 - (-60));
 
             public static final double ENCODER_READING_TO_ANGLE_CONVERSION_FACTOR = (HOLD_UP_ANGLE_DEGREES - HOLD_DOWN_ANGLE_DEGREES) / ROTATIONS_FROM_FLOOR_REST_TO_SPEAKER;
 
-            public static final int HOLDING_ANGLE_CURRENT_LIMIT = 7; // TODO: Retune
+            public static final int HOLDING_ANGLE_CURRENT_LIMIT = 15; // TODO: Retune
             public static final int REGULAR_CURRENT_LIMIT = 80;
             public static final int HOLDING_ANGLE_VOLTAGE = 12;
 
@@ -90,11 +91,11 @@ public final class Constants {
             public static final double kMaxRotationVelocityRadiansPerSecond = 3.65;
             public static final double kMaxRotationAccelerationRadiansPerSecondSquared = 7;
 
-            public static final double ROTATION_PROFILEDPID_POSITION_TOLERANCE_RADIANS = Units.degreesToRadians(0.5);
+            public static final double ROTATION_PROFILEDPID_POSITION_TOLERANCE_RADIANS = Units.degreesToRadians(5);
             public static final double ROTATION_PROFILEDPID_VELOCITY_TOLERANCE_RADS_PER_SECOND = Units.degreesToRadians(3);
 
             // Distance rotation
-            public static final double DISTANCE_SHOOTING_ANGLE_DEGREES = 35 + BOX_TO_COG_ANGLE; // TODO: Measure
+            public static final double DISTANCE_SHOOTING_ANGLE_DEGREES = 40 + BOX_TO_COG_ANGLE; // TODO: Measure
             public static final double SOURCE_INTAKE_ANGLE_DEGREES = 40 + BOX_TO_COG_ANGLE;
 
             public static final double SLOW_DRIVING_ANGLE_THRESHOLD_DEGREES = 15 + BOX_TO_COG_ANGLE;

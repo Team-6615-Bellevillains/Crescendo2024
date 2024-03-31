@@ -30,11 +30,13 @@ public class RotationSubsystem extends SubsystemBase {
 
         rotationMotor.setInverted(true);
         rotationEncoder.setPositionConversionFactor(RotationConstants.ENCODER_READING_TO_ANGLE_CONVERSION_FACTOR);
-        rotationEncoder.setVelocityConversionFactor(RotationConstants.ENCODER_READING_TO_ANGLE_CONVERSION_FACTOR / 60.0);
+        rotationEncoder
+                .setVelocityConversionFactor(RotationConstants.ENCODER_READING_TO_ANGLE_CONVERSION_FACTOR / 60.0);
         rotationEncoder.setPosition(RotationConstants.HOLD_UP_ANGLE_DEGREES);
 
         // Make further configuration calls on the rotation motor non-blocking.
-        // That is, the program will continue to run without waiting for the motor to respond.
+        // That is, the program will continue to run without waiting for the motor to
+        // respond.
         // Important to not have a huge delay when setting holding current limit
         rotationMotor.setSmartCurrentLimit(80);
         rotationMotor.setCANTimeout(0);
@@ -44,7 +46,9 @@ public class RotationSubsystem extends SubsystemBase {
                 new TrapezoidProfile.Constraints(RotationConstants.kMaxRotationVelocityRadiansPerSecond,
                         RotationConstants.kMaxRotationAccelerationRadiansPerSecondSquared),
                 this::getRotationEncoderPositionInRadians);
-        rotationProfiledPID.getController().setTolerance(RotationConstants.ROTATION_PROFILEDPID_POSITION_TOLERANCE_RADIANS, RotationConstants.ROTATION_PROFILEDPID_VELOCITY_TOLERANCE_RADS_PER_SECOND);
+        rotationProfiledPID.getController().setTolerance(
+                RotationConstants.ROTATION_PROFILEDPID_POSITION_TOLERANCE_RADIANS,
+                RotationConstants.ROTATION_PROFILEDPID_VELOCITY_TOLERANCE_RADS_PER_SECOND);
 
         rotationFeedforward = new TunableArmFeedforward("rotation", RotationConstants.kSRotation,
                 RotationConstants.kGRotation, RotationConstants.kVRotation, RotationConstants.kARotation);
@@ -52,29 +56,33 @@ public class RotationSubsystem extends SubsystemBase {
 
     @Override
     public void periodic() {
+        boolean goalIsHoldingGoal = Math
+                .abs(goalPositionRadians - Units.degreesToRadians(RotationConstants.HOLD_UP_ANGLE_DEGREES)) < 1E-6
+                || Math.abs(
+                        goalPositionRadians - Units.degreesToRadians(RotationConstants.HOLD_DOWN_ANGLE_DEGREES)) < 1E-6;
+        SmartDashboard.putBoolean("Goal is holding goal", goalIsHoldingGoal);
         SmartDashboard.putBoolean("At goal?", rotationProfiledPID.getController().atGoal());
-        if ((goalPositionRadians == Units.degreesToRadians(RotationConstants.HOLD_UP_ANGLE_DEGREES)
-                || goalPositionRadians == Units.degreesToRadians(RotationConstants.HOLD_DOWN_ANGLE_DEGREES))
+        if (goalIsHoldingGoal
                 && rotationProfiledPID.getController().atGoal()) {
             hold();
-            return;
+        } else {
+            double pidOut = rotationProfiledPID.getController()
+                    .calculate(getRotationEncoderPositionInRadians());
+            double ffOut = calculateFeedforward(getRotationEncoderPositionInRadians(),
+                    rotationProfiledPID.getController().getSetpoint().velocity);
+
+            double commandedVoltage = (pidOut + ffOut);
+            // SmartDashboard.putNumber("Commanded voltage", commandedVoltage);
+            setMotorVoltage(commandedVoltage);
         }
 
-        double pidOut = rotationProfiledPID.getController()
-                .calculate(getRotationEncoderPositionInRadians());
-        double ffOut = calculateFeedforward(getRotationEncoderPositionInRadians(),
-                rotationProfiledPID.getController().getSetpoint().velocity);
-
-        double commandedVoltage = (pidOut + ffOut);
-
-        
-        SmartDashboard.putNumber("Trap velo", rotationProfiledPID.getController().getSetpoint().velocity);
-        SmartDashboard.putNumber("Actual arm position degrees", getRotationEncoderPositionInDegrees());
+        // SmartDashboard.putNumber("Trap velo", rotationProfiledPID.getController().getSetpoint().velocity);
+        // SmartDashboard.putNumber("Actual arm position degrees", getRotationEncoderPositionInDegrees());
         SmartDashboard.putNumber("Actual arm position radians", getRotationEncoderPositionInRadians());
-        SmartDashboard.putNumber("Actual arm rotation", getRotationEncoderVelocityInRadsPerSec());
-        SmartDashboard.putNumber("Commanded voltage", commandedVoltage);
-        SmartDashboard.putNumber("periodic", Timer.getFPGATimestamp());
-        setMotorVoltage(commandedVoltage);
+        // SmartDashboard.putNumber("Actual arm rotation", getRotationEncoderVelocityInRadsPerSec());
+        // SmartDashboard.putNumber("periodic", Timer.getFPGATimestamp());
+        SmartDashboard.putBoolean("Holding", holding);
+
     }
 
     public double calculateFeedforward(double currentPositionRadians, double desiredVelocityRadians) {
@@ -83,7 +91,7 @@ public class RotationSubsystem extends SubsystemBase {
 
     public void setMotorVoltage(double voltage) {
         SmartDashboard.putNumber("NOW Rotation voltage", voltage);
-        SmartDashboard.putNumber("NOW Rotation Timestamp", Timer.getFPGATimestamp());
+        // SmartDashboard.putNumber("NOW Rotation Timestamp", Timer.getFPGATimestamp());
         rotationMotor.setVoltage(voltage);
     }
 
@@ -118,7 +126,7 @@ public class RotationSubsystem extends SubsystemBase {
 
         rotationMotor.setSmartCurrentLimit(RotationConstants.HOLDING_ANGLE_CURRENT_LIMIT);
 
-        int holdingVoltageSign = goalPositionRadians == RotationConstants.HOLD_UP_ANGLE_DEGREES ? 1 : -1;
+        int holdingVoltageSign = Math.abs(goalPositionRadians - Units.degreesToRadians(RotationConstants.HOLD_UP_ANGLE_DEGREES)) < 1E-3 ? 1 : -1;
         setMotorVoltage(holdingVoltageSign * RotationConstants.HOLDING_ANGLE_VOLTAGE);
 
         holding = true;
@@ -130,6 +138,10 @@ public class RotationSubsystem extends SubsystemBase {
         rotationMotor.setSmartCurrentLimit(RotationConstants.REGULAR_CURRENT_LIMIT);
 
         setMotorVoltage(0);
+    }
+
+    public boolean atGoal() {
+        return holding || rotationProfiledPID.getController().atGoal();
     }
 
 }

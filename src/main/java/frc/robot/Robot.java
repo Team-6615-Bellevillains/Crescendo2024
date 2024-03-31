@@ -77,12 +77,12 @@ public class Robot extends TimedRobot {
         // and running subsystem periodic() methods.  This must be called from the robot's periodic
         // block in order for anything in the Command-based framework to work.
 
-        TunableArmFeedforward.updateControllersIfOutdated();
+        // TunableArmFeedforward.updateControllersIfOutdated();
         TunableProfiledPIDController.updateControllersIfOutdated();
 
         CommandScheduler.getInstance().run();
-        SmartDashboard.putNumber("Current Draw", m_pdh.getTotalCurrent());
-        SmartDashboard.putNumber("Bus Voltage", m_pdh.getVoltage());
+        // SmartDashboard.putNumber("Current Draw", m_pdh.getTotalCurrent());
+        // SmartDashboard.putNumber("Bus Voltage", m_pdh.getVoltage());
     }
 
     /**

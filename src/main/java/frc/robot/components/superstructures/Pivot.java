@@ -4,6 +4,7 @@ import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
+import edu.wpi.first.wpilibj2.command.FunctionalCommand;
 import frc.robot.RobotContainer;
 import frc.robot.components.commands.arm.rotation.ArmRotateUsingJoystick;
 import frc.robot.components.commands.arm.spin.*;
@@ -77,15 +78,14 @@ public class Pivot {
     }
 
     public Command switchHoldDirectionAndHold() {
-        return Commands
-                .runOnce(() -> {holdingDirection = holdingDirection == Direction.UP ? Direction.DOWN : Direction.UP;
-                SmartDashboard.putBoolean("Holding up?", holdingDirection == Direction.UP);},
-                        rotationSubsystem)
-                .andThen(Commands.runOnce(
-                        () -> rotationSubsystem.setGoalPositionRadians(holdingDirection == Direction.UP
-                                ? Units.degreesToRadians(RotationConstants.HOLD_UP_ANGLE_DEGREES)
-                                : Units.degreesToRadians(RotationConstants.HOLD_DOWN_ANGLE_DEGREES)),
-                        rotationSubsystem));
+        return new FunctionalCommand(() -> {
+                    holdingDirection = holdingDirection == Direction.UP ? Direction.DOWN : Direction.UP;
+                    rotationSubsystem.setGoalPositionRadians(holdingDirection == Direction.UP
+                                            ? Units.degreesToRadians(RotationConstants.HOLD_UP_ANGLE_DEGREES)
+                                            : Units.degreesToRadians(RotationConstants.HOLD_DOWN_ANGLE_DEGREES));
+        }, 
+        () -> {}, interrupted -> { }, rotationSubsystem::atGoal, 
+        rotationSubsystem);
     }
 
     public Command rotateArmAndHold(Direction direction) {
