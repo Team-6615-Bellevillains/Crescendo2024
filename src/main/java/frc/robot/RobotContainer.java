@@ -151,10 +151,10 @@ public class RobotContainer {
         driverXbox.a().onTrue(climb.climbDownNoMagnet());
         driverXbox.x().whileTrue(new WheelRadiusCharacterization(swerveSubsystem));
 
-         driverXbox.leftBumper().and(driverXbox.start()).whileTrue(climb.forceClimbDownLeft());
-         driverXbox.leftTrigger().and(driverXbox.start()).whileTrue(climb.forceClimbUpLeft());
-         driverXbox.rightBumper().and(driverXbox.start()).whileTrue(climb.forceClimbDownRight());
-         driverXbox.rightTrigger().and(driverXbox.start()).whileTrue(climb.forceClimbUpRight());
+        driverXbox.povDown().and(driverXbox.start()).whileTrue(climb.forceClimbDownLeft());
+        driverXbox.povUp().and(driverXbox.start()).whileTrue(climb.forceClimbUpLeft());
+        driverXbox.povDown().and(driverXbox.back()).whileTrue(climb.forceClimbDownRight());
+        driverXbox.povUp().and(driverXbox.back()).whileTrue(climb.forceClimbUpRight());
 
     
         operatorXbox.x().onTrue(pivot.speakerShooter());
