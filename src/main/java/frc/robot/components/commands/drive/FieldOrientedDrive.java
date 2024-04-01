@@ -70,15 +70,15 @@ public class FieldOrientedDrive extends Command {
 
     private Rotation2d getShootingRotation() {
         if (angleLeft.getAsBoolean()) {
-            return DriveConstants.LEFT_SHOOTER_ANGLE;
+            return DriveConstants.LEFT_TRAP_ROTATION;
         }
 
         if (angleCenter.getAsBoolean()) {
-            return DriveConstants.CENTER_SHOOTER_ANGLE;
+            return DriveConstants.CENTER_TRAP_ROTATION;
         }
 
         if (angleRight.getAsBoolean()) {
-            return DriveConstants.RIGHT_SHOOTER_ANGLE;
+            return DriveConstants.RIGHT_TRAP_ROTATION;
         }
 
         return null;

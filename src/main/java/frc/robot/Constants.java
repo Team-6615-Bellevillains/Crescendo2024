@@ -42,9 +42,10 @@ public final class Constants {
         // Hold time on motor brakes when disabled
         public static final double WHEEL_LOCK_TIME = 10; // seconds
 
-        public static final Rotation2d LEFT_SHOOTER_ANGLE = Rotation2d.fromDegrees(-60);
-        public static final Rotation2d CENTER_SHOOTER_ANGLE = Rotation2d.fromDegrees(180);
-        public static final Rotation2d RIGHT_SHOOTER_ANGLE = Rotation2d.fromDegrees(60);
+
+        public static final Rotation2d LEFT_TRAP_ROTATION = Rotation2d.fromDegrees(-60);
+        public static final Rotation2d CENTER_TRAP_ROTATION = Rotation2d.fromDegrees(180);
+        public static final Rotation2d RIGHT_TRAP_ROTATION = Rotation2d.fromDegrees(60);
 
         public final static double SLOW_SPEED_SCALAR = 0.8;
 
@@ -137,5 +138,9 @@ public final class Constants {
 
         public static final double CLIMB_LEFT_DOWN_THRESHOLD_ROTATIONS = 10;
         public static final double CLIMB_RIGHT_DOWN_THRESHOLD_ROTATIONS = 10;
+    }
+
+    public static class DebugConstants {
+        public static final boolean ENABLE_CLIMBER_RESET = false;
     }
 }

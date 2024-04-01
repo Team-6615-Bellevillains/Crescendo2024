@@ -34,6 +34,8 @@ import java.io.File;
 
 import com.pathplanner.lib.path.PathPlannerPath;
 
+import static frc.robot.Constants.DebugConstants;
+
 /**
  * This class is where the bulk of the robot should be declared. Since
  * Command-based is a "declarative" paradigm, very
@@ -146,13 +148,13 @@ public class RobotContainer {
 
         driverXbox.y().onTrue(climb.climbUpNoMagnet());
         driverXbox.a().onTrue(climb.climbDownNoMagnet());
-        driverXbox.x().whileTrue(new WheelRadiusCharacterization(swerveSubsystem));
 
-        driverXbox.povDown().and(driverXbox.start()).whileTrue(climb.forceClimbDownLeft());
-        driverXbox.povUp().and(driverXbox.start()).whileTrue(climb.forceClimbUpLeft());
-        driverXbox.povDown().and(driverXbox.back()).whileTrue(climb.forceClimbDownRight());
-        driverXbox.povUp().and(driverXbox.back()).whileTrue(climb.forceClimbUpRight());
-
+        if (DebugConstants.ENABLE_CLIMBER_RESET) {
+            driverXbox.povDown().and(driverXbox.start()).whileTrue(climb.forceClimbDownLeft());
+            driverXbox.povUp().and(driverXbox.start()).whileTrue(climb.forceClimbUpLeft());
+            driverXbox.povDown().and(driverXbox.back()).whileTrue(climb.forceClimbDownRight());
+            driverXbox.povUp().and(driverXbox.back()).whileTrue(climb.forceClimbUpRight());
+        }
 
         operatorXbox.x().onTrue(pivot.speakerShooter());
         operatorXbox.a().whileTrue(pivot.intakeRingManual());
