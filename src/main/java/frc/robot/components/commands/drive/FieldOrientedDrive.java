@@ -91,14 +91,22 @@ public class FieldOrientedDrive extends Command {
         double xInput = vX.getAsDouble();
         double yInput = vY.getAsDouble();
 
-        Translation2d inputTranslation = new Translation2d(xInput, yInput);
-        // clamp between [0, 1] to prevent any weirdness
-        double magnitude = Math.max(0.0, Math.min(inputTranslation.getNorm(), 1.0));
-        Rotation2d angle = inputTranslation.getAngle();
+        double magnitude = Math.hypot(xInput, yInput);
+
+        // small magnitude impl. from Rotation2d
+        double cos, sin;
+        if (magnitude > 1e-6) {
+            sin = yInput / magnitude;
+            cos = xInput / magnitude;
+        } else {
+            sin = 0.0;
+            cos = 1.0;
+        }
+
         double curvedMagnitude = USING_NEW_SPEED_CURVE ? POWER_LERP.get(magnitude) : Math.pow(magnitude, 3);
 
-        double xVelocity = curvedMagnitude * angle.getCos() * swerve.maximumSpeed * velocityScalar;
-        double yVelocity = curvedMagnitude * angle.getSin() * swerve.maximumSpeed * velocityScalar;
+        double xVelocity = curvedMagnitude * cos * swerve.maximumSpeed * velocityScalar;
+        double yVelocity = curvedMagnitude * sin * swerve.maximumSpeed * velocityScalar;
 
         ChassisSpeeds desiredSpeeds;
         Rotation2d fixedShootingRotation = getShootingRotation();
