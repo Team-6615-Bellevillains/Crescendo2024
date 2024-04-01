@@ -2,11 +2,10 @@ package frc.robot.components.commands.drive;
 
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
+import edu.wpi.first.math.interpolation.InterpolatingDoubleTreeMap;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.Constants;
-import frc.robot.RobotContainer;
 import frc.robot.State;
 import frc.robot.components.subsystems.drive.SwerveSubsystem;
 import swervelib.SwerveController;
@@ -19,8 +18,8 @@ import java.util.function.DoubleSupplier;
 import static frc.robot.Constants.DriveConstants;
 
 public class FieldOrientedDrive extends Command {
-    private static final double SQRT_2 = Math.sqrt(2);
-    private static final boolean USING_NEW_SPEED_METHOD = true;
+    private static final boolean USING_NEW_SPEED_CURVE = false;
+    private static final InterpolatingDoubleTreeMap POWER_LERP = new InterpolatingDoubleTreeMap();
 
     private final SwerveSubsystem swerve;
     private final DoubleSupplier vX, vY, vTheta;
@@ -47,6 +46,12 @@ public class FieldOrientedDrive extends Command {
                 Math.abs(swerve.getSwerveDriveConfiguration().moduleLocationsMeters[0].getX()),
                 Math.abs(swerve.getSwerveDriveConfiguration().moduleLocationsMeters[0].getY()));
 
+
+        POWER_LERP.clear();
+        POWER_LERP.put(0.0, 0.0);
+        POWER_LERP.put(0.15, 0.4 * 0.15); // scale the first 15% of power input down 60%
+        POWER_LERP.put(1.0, 1.0);
+
         addRequirements(swerve);
     }
 
@@ -65,15 +70,15 @@ public class FieldOrientedDrive extends Command {
 
     private Rotation2d getShootingRotation() {
         if (angleLeft.getAsBoolean()) {
-            return Constants.DriveConstants.LEFT_SHOOTER_ANGLE;
+            return DriveConstants.LEFT_SHOOTER_ANGLE;
         }
 
         if (angleCenter.getAsBoolean()) {
-            return Constants.DriveConstants.CENTER_SHOOTER_ANGLE;
+            return DriveConstants.CENTER_SHOOTER_ANGLE;
         }
 
         if (angleRight.getAsBoolean()) {
-            return Constants.DriveConstants.RIGHT_SHOOTER_ANGLE;
+            return DriveConstants.RIGHT_SHOOTER_ANGLE;
         }
 
         return null;
@@ -81,34 +86,29 @@ public class FieldOrientedDrive extends Command {
 
     @Override
     public void execute() {
-        double inputScalar = 1;
+        double velocityScalar = shouldSlowWhenIntaking && State.getInstance().isIntaking() ? DriveConstants.SLOW_SPEED_SCALAR : 1;
 
-        if (shouldSlowWhenIntaking && State.getInstance().isIntaking()) {
-            inputScalar = DriveConstants.SLOW_SPEED_SCALAR;
-        }
+        double xInput = vX.getAsDouble();
+        double yInput = vY.getAsDouble();
 
-        double xCubed = Math.pow(vX.getAsDouble(), 3) * inputScalar;
-        double yCubed = Math.pow(vY.getAsDouble(), 3) * inputScalar;
+        Translation2d inputTranslation = new Translation2d(xInput, yInput);
+        // clamp between [0, 1] to prevent any weirdness
+        double magnitude = Math.max(0.0, Math.min(inputTranslation.getNorm(), 1.0));
+        Rotation2d angle = inputTranslation.getAngle();
+        double curvedMagnitude = USING_NEW_SPEED_CURVE ? POWER_LERP.get(magnitude) : Math.pow(magnitude, 3);
 
-        double xSpeed, ySpeed;
-        if (USING_NEW_SPEED_METHOD) {
-            double norm = Math.hypot(xCubed, yCubed);
-            xSpeed = Math.signum(xCubed) * Math.min(Math.abs(xCubed*SQRT_2), norm) * swerve.maximumSpeed;
-            ySpeed = Math.signum(yCubed) * Math.min(Math.abs(yCubed*SQRT_2), norm) * swerve.maximumSpeed;
-        } else {
-            xSpeed = xCubed * swerve.maximumSpeed;
-            ySpeed = yCubed * swerve.maximumSpeed;
-        }
+        double xVelocity = curvedMagnitude * angle.getCos() * swerve.maximumSpeed * velocityScalar;
+        double yVelocity = curvedMagnitude * angle.getSin() * swerve.maximumSpeed * velocityScalar;
 
         ChassisSpeeds desiredSpeeds;
         Rotation2d fixedShootingRotation = getShootingRotation();
 
         // no fixed angle button is pressed, use right joystick
         if (fixedShootingRotation == null) {
-            double thetaCubed = Math.pow(vTheta.getAsDouble(), 3) * maxAngularVelocity * inputScalar;
-            desiredSpeeds = swerve.getSwerveController().getRawTargetSpeeds(xSpeed, ySpeed, thetaCubed);
+            double thetaCubed = Math.pow(vTheta.getAsDouble(), 3) * maxAngularVelocity * velocityScalar;
+            desiredSpeeds = swerve.getSwerveController().getRawTargetSpeeds(xVelocity, yVelocity, thetaCubed);
         } else {
-            desiredSpeeds = swerve.getSwerveController().getRawTargetSpeeds(xSpeed, ySpeed, fixedShootingRotation.getRadians(), swerve.getHeading().getRadians());
+            desiredSpeeds = swerve.getSwerveController().getRawTargetSpeeds(xVelocity, yVelocity, fixedShootingRotation.getRadians(), swerve.getHeading().getRadians());
         }
 
         // Limit velocity to prevent tipping
