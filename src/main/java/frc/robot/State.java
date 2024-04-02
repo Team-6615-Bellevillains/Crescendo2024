@@ -9,6 +9,10 @@ public class State {
     }
 
     public static State getInstance() {
+        if (instance == null) {
+            new State();
+        }
+
         return instance;
     }
 
@@ -28,6 +32,6 @@ public class State {
         this.comingUpWithNote = rumbling;
     }
 
-    public boolean intaking;
-    public boolean comingUpWithNote;
+    public boolean intaking = false;
+    public boolean comingUpWithNote = false;
 }
