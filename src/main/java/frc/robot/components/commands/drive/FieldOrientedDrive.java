@@ -5,6 +5,7 @@ import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.interpolation.InterpolatingDoubleTreeMap;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.Constants;
 import frc.robot.State;
 import frc.robot.components.subsystems.drive.SwerveSubsystem;
@@ -22,13 +23,16 @@ public class FieldOrientedDrive extends Command {
     private static final InterpolatingDoubleTreeMap POWER_LERP = new InterpolatingDoubleTreeMap();
 
     private final SwerveSubsystem swerve;
+    
     private final DoubleSupplier vX, vY, vTheta;
-    private final BooleanSupplier angleLeft, angleCenter, angleRight, shouldSlowWhenIntakingSupplier;
+    private final Trigger angleLeft, angleCenter, angleRight;
+    private final BooleanSupplier shouldSlowWhenIntakingSupplier;
+
     private final double maxAngularVelocity;
     private boolean shouldSlowWhenIntaking;
 
 
-    public FieldOrientedDrive(SwerveSubsystem swerve, DoubleSupplier vX, DoubleSupplier vY, DoubleSupplier vTheta, BooleanSupplier angleLeft, BooleanSupplier angleCenter, BooleanSupplier angleRight, BooleanSupplier shouldSlowWhenIntakingSupplier) {
+    public FieldOrientedDrive(SwerveSubsystem swerve, DoubleSupplier vX, DoubleSupplier vY, DoubleSupplier vTheta, Trigger angleLeft, Trigger angleCenter, Trigger angleRight, BooleanSupplier shouldSlowWhenIntakingSupplier) {
         this.swerve = swerve;
 
         this.vX = vX;

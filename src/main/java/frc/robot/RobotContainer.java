@@ -103,9 +103,9 @@ public class RobotContainer {
                 () -> -MathUtil.applyDeadband(driverXbox.getLeftY(), OperatorConstants.LEFT_Y_DEADBAND),
                 () -> -MathUtil.applyDeadband(driverXbox.getLeftX(), OperatorConstants.LEFT_X_DEADBAND),
                 () -> -MathUtil.applyDeadband(driverXbox.getRightX(), OperatorConstants.RIGHT_X_DEADBAND),
-                () -> driverXbox.leftTrigger().getAsBoolean(),
-                () -> driverXbox.leftBumper().getAsBoolean() || driverXbox.rightBumper().getAsBoolean(),
-                () -> driverXbox.rightTrigger().getAsBoolean(),
+                driverXbox.leftTrigger(),
+                driverXbox.leftBumper().or(driverXbox.rightBumper()),
+                driverXbox.rightTrigger(),
                 slowWhenIntakingChooser::getSelected
         );
 
