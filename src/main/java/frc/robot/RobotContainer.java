@@ -258,11 +258,11 @@ public class RobotContainer {
 
             case GO_FOR_THIRD_NOTE -> {
                 commandGroup.addCommands(
-                    swerveSubsystem.getAutonomousCommand("slight backup from middle", true),
-                    Commands.print("1"),
+                    // swerveSubsystem.getAutonomousCommand("slight backup from middle", true),
+                    // Commands.print("1"),
                         // Move to the note based on the starting position.
                         // The second argument is true because we want to set the odometry to the position the bot starts in.
-                        swerveSubsystem.getAutonomousCommand("Three piece first pickup", false),
+                    swerveSubsystem.getAutonomousCommand("Three piece first pickup", true),
                         // Rotate the arm into intake position
                         // Drive forwards at a slow speed while running the intake motors.
                         // Stop once the note has been obtained or AutonConstants.INTAKE_TIMEOUT_SECONDS seconds have passed, whichever comes first
@@ -274,15 +274,13 @@ public class RobotContainer {
                                Commands.runOnce(() -> swerveSubsystem.driveFieldOriented(new ChassisSpeeds(intakeForwardsSign * AutonConstants.intakeForwardsSpeedMetersPerSecond, 0, 0)), swerveSubsystem),
                                pivot.intakeRingUntilCaptured().withTimeout(AutonConstants.INTAKE_TIMEOUT_SECONDS).andThen(pivot.intakeRingManual().withTimeout(0.5))
                         ),
-                    Commands.print("4"),
-                        Commands.runOnce(() -> swerveSubsystem.setChassisSpeeds(new ChassisSpeeds()), swerveSubsystem),
                     Commands.print("5"),
                     // Rotate arm back into shooting position
                         // Move back to the speaker.
                         // The second argument is false because we don't want to keep our current odometry.
                         Commands.parallel(
                             Commands.waitSeconds(0.3).andThen(swerveSubsystem.getAutonomousCommand("Three piece second shot", false)),
-                            pivot.switchHoldDirectionAndHold()
+                            pivot.switchHoldDirectionAndHold().withTimeout(2)
                         ),
                     Commands.print("6"),
 
@@ -298,13 +296,11 @@ public class RobotContainer {
                     Commands.print("9"),
 
                         Commands.parallel(
-                                Commands.runOnce(() -> swerveSubsystem.driveFieldOriented(new ChassisSpeeds(intakeForwardsSign * Math.hypot(AutonConstants.intakeForwardsSpeedMetersPerSecond, AutonConstants.intakeForwardsSpeedMetersPerSecond),Math.hypot(AutonConstants.intakeForwardsSpeedMetersPerSecond, AutonConstants.intakeForwardsSpeedMetersPerSecond), 0)), swerveSubsystem),
+                                Commands.runOnce(() -> swerveSubsystem.driveFieldOriented(new ChassisSpeeds(intakeForwardsSign * AutonConstants.intakeForwardsSpeedMetersPerSecond, 0, 0)), swerveSubsystem),
                                 pivot.intakeRingUntilCaptured().withTimeout(AutonConstants.INTAKE_TIMEOUT_SECONDS).andThen(pivot.intakeRingManual().withTimeout(0.5))
                         ),
                     Commands.print("10"),
 
-                        Commands.runOnce(() -> swerveSubsystem.setChassisSpeeds(new ChassisSpeeds()), swerveSubsystem),
-                    Commands.print("11"),
 
                         pivot.switchHoldDirectionAndHold(),
                     Commands.print("12"),

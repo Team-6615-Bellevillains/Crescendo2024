@@ -56,7 +56,7 @@ public class SwerveSubsystem extends SubsystemBase {
     /**
      * Maximum speed of the robot in meters per second, used to limit acceleration.
      */
-    public double maximumSpeed = 4.2;
+    public double maximumSpeed = 4.3;
 
     /**
      * Initialize {@link SwerveDrive} with the directory provided.
@@ -112,7 +112,7 @@ public class SwerveSubsystem extends SubsystemBase {
                 this::getRobotVelocity, // ChassisSpeeds supplier. MUST BE ROBOT RELATIVE
                 this::setChassisSpeeds, // Method that will drive the robot given ROBOT RELATIVE ChassisSpeeds
                 new HolonomicPathFollowerConfig( // HolonomicPathFollowerConfig, this should likely live in your Constants class
-                        new PIDConstants(5.0, 0.0, 0.0),
+                        new PIDConstants(5.4, 0.0, 0.0),
                         // Translation PID constants
                         autonRotationPIDConstants,
                         // Rotation PID constants

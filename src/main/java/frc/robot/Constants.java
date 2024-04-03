@@ -27,9 +27,9 @@ public final class Constants {
 
     public static final class AutonConstants {
 
-        public static final PIDFConfig angleAutoPID = new PIDFConfig(2.5, 0, 0);
+        public static final PIDFConfig angleAutoPID = new PIDFConfig(2.3, 0, 0);
         // speed to move forwards when going to intake during auto
-        public static final double intakeForwardsSpeedMetersPerSecond = Units.inchesToMeters(5);
+        public static final double intakeForwardsSpeedMetersPerSecond = Units.inchesToMeters(10);
 
         public static final double MAX_ACCELERATION = 2;
 
@@ -109,7 +109,7 @@ public final class Constants {
             public static final int kStorageMotorPort = 45;
             public static final int kShootingMotorPort = 15;
 
-            public static final double TIME_UNTIL_FEED = 0.75;
+            public static final double TIME_UNTIL_FEED = 0.4;
             public static final double LAUNCH_RUN_TIME = TIME_UNTIL_FEED + .5; //change once tested
 
             public static final double STORAGE_INTAKE_VOLTAGE = -3.0;
