@@ -16,6 +16,7 @@ import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
+import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.trajectory.Trajectory;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.Timer;
@@ -24,15 +25,17 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
+import frc.robot.Constants.DriveConstants;
 import frc.robot.utils.enums.FlipUtil;
 import swervelib.SwerveController;
 import swervelib.SwerveDrive;
-import swervelib.math.SwerveMath;
+import swervelib.SwerveDriveTest;
 import swervelib.parser.SwerveControllerConfiguration;
 import swervelib.parser.SwerveDriveConfiguration;
 import swervelib.parser.SwerveParser;
 import swervelib.telemetry.SwerveDriveTelemetry;
 import swervelib.telemetry.SwerveDriveTelemetry.TelemetryVerbosity;
+import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine.Config;
 
 import java.io.File;
 import java.util.function.DoubleSupplier;
@@ -53,7 +56,7 @@ public class SwerveSubsystem extends SubsystemBase {
     /**
      * Maximum speed of the robot in meters per second, used to limit acceleration.
      */
-    public double maximumSpeed = Units.feetToMeters(14.5);
+    public double maximumSpeed = 4.3;
 
     /**
      * Initialize {@link SwerveDrive} with the directory provided.
@@ -61,20 +64,6 @@ public class SwerveSubsystem extends SubsystemBase {
      * @param directory Directory of swerve drive config files.
      */
     public SwerveSubsystem(File directory) {
-        // Angle conversion factor is 360 / (GEAR RATIO * ENCODER RESOLUTION)
-        //  In this case the gear ratio is 12.8 motor revolutions per wheel rotation.
-        //  The encoder resolution per motor revolution is 1 per motor revolution.
-        double angleConversionFactor = SwerveMath.calculateDegreesPerSteeringRotation(12.8);
-        // Motor conversion factor is (PI * WHEEL DIAMETER IN METERS) / (GEAR RATIO * ENCODER RESOLUTION).
-        //  In this case the wheel diameter is 4 inches, which must be converted to meters to get meters/second.
-        //  The gear ratio is 6.75 motor revolutions per wheel rotation.
-        //  The encoder resolution per motor revolution is 1 per motor revolution.
-        double driveConversionFactor = SwerveMath.calculateMetersPerRotation(Units.inchesToMeters(4), 6.75);
-        System.out.println("\"conversionFactor\": {");
-        System.out.println("\t\"angle\": " + angleConversionFactor + ",");
-        System.out.println("\t\"drive\": " + driveConversionFactor);
-        System.out.println("}");
-
         // Configure the Telemetry before creating the SwerveDrive to avoid unnecessary objects being created.
         SwerveDriveTelemetry.verbosity = TelemetryVerbosity.HIGH;
         try {
@@ -87,6 +76,8 @@ public class SwerveSubsystem extends SubsystemBase {
         swerveDrive.setHeadingCorrection(false); // Heading correction should only be used while controlling the robot via angle.
 
         setupPathPlanner();
+
+        swerveDrive.replaceSwerveModuleFeedforward(DriveConstants.DRIVE_FEEDFORWARD);
     }
 
     public void setDriveHeadingCorrection(boolean state) {
@@ -111,9 +102,9 @@ public class SwerveSubsystem extends SubsystemBase {
                 Constants.AutonConstants.angleAutoPID.i,
                 Constants.AutonConstants.angleAutoPID.d);
 
-        SmartDashboard.putNumber("Auton Rotation P", autonRotationPIDConstants.kP);
-        SmartDashboard.putNumber("Auton Rotation I", autonRotationPIDConstants.kI);
-        SmartDashboard.putNumber("Auton Rotation D", autonRotationPIDConstants.kD);
+        // SmartDashboard.putNumber("Auton Rotation P", autonRotationPIDConstants.kP);
+        // SmartDashboard.putNumber("Auton Rotation I", autonRotationPIDConstants.kI);
+        // SmartDashboard.putNumber("Auton Rotation D", autonRotationPIDConstants.kD);
 
         AutoBuilder.configureHolonomic(
                 this::getPose, // Robot pose supplier
@@ -121,11 +112,11 @@ public class SwerveSubsystem extends SubsystemBase {
                 this::getRobotVelocity, // ChassisSpeeds supplier. MUST BE ROBOT RELATIVE
                 this::setChassisSpeeds, // Method that will drive the robot given ROBOT RELATIVE ChassisSpeeds
                 new HolonomicPathFollowerConfig( // HolonomicPathFollowerConfig, this should likely live in your Constants class
-                        new PIDConstants(5.0, 0.0, 0.0),
+                        new PIDConstants(5.4, 0.0, 0.0),
                         // Translation PID constants
                         autonRotationPIDConstants,
                         // Rotation PID constants
-                        4.5,
+                        4.2,
                         // Max module speed, in m/s
                         swerveDrive.swerveDriveConfiguration.getDriveBaseRadiusMeters(),
                         // Drive base radius in meters. Distance from robot center to furthest module.
@@ -310,7 +301,7 @@ public class SwerveSubsystem extends SubsystemBase {
      * @param initialHolonomicPose The pose to set the odometry to
      */
     public void resetOdometry(Pose2d initialHolonomicPose) {
-        SmartDashboard.putNumber("Reset rotation to", initialHolonomicPose.getRotation().getDegrees());
+        // SmartDashboard.putNumber("Reset rotation to", initialHolonomicPose.getRotation().getDegrees());
         swerveDrive.resetOdometry(initialHolonomicPose);
     }
 
@@ -464,5 +455,45 @@ public class SwerveSubsystem extends SubsystemBase {
      */
     public void addFakeVisionReading() {
         swerveDrive.addVisionMeasurement(new Pose2d(3, 3, Rotation2d.fromDegrees(65)), Timer.getFPGATimestamp());
+    }
+
+
+
+  /**
+   * Command to characterize the robot drive motors using SysId
+   *
+   * @return SysId Drive Command
+   */
+  public Command sysIdDriveMotorCommand()
+  {
+    return SwerveDriveTest.generateSysIdCommand(
+        SwerveDriveTest.setDriveSysIdRoutine(
+            new Config(),
+            this, swerveDrive, 12),
+        3.0, 5.0, 2.0);
+  }
+
+  /**
+   * Command to characterize the robot angle motors using SysId
+   *
+   * @return SysId Angle Command
+   */
+  public Command sysIdAngleMotorCommand()
+  {
+    return SwerveDriveTest.generateSysIdCommand(
+        SwerveDriveTest.setAngleSysIdRoutine(
+            new Config(),
+            this, swerveDrive),
+        3.0, 5.0, 3.0);
+  }
+
+    public double[] getWheelRadiusCharacterizationPosition() {
+        SwerveModulePosition[] regPosition = swerveDrive.getModulePositions();
+        double[] wheelRadiusCharacterizationPosition = new double[]{0, 0, 0, 0};
+        for (int i = 0; i < 4; i++) {
+            wheelRadiusCharacterizationPosition[i] = Units.rotationsToRadians(regPosition[i].distanceMeters/(Math.PI * Units.inchesToMeters(4)));
+        }
+
+        return wheelRadiusCharacterizationPosition;
     }
 }

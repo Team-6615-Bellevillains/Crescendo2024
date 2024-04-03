@@ -2,8 +2,8 @@ package frc.robot.components.commands.arm.spin;
 
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.Command;
-import frc.robot.components.subsystems.arm.ShootingSubsystem;
-import frc.robot.components.subsystems.arm.StorageSubsystem;
+import frc.robot.components.subsystems.pivot.ShootingSubsystem;
+import frc.robot.components.subsystems.pivot.StorageSubsystem;
 
 import static frc.robot.Constants.ArmConstants.ShooterConstants;
 

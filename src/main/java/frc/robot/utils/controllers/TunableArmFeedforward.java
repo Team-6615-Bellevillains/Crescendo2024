@@ -58,7 +58,7 @@ public class TunableArmFeedforward {
                 || armFeedforward.kg != tableKG
                 || armFeedforward.kv != tableKV
                 || armFeedforward.ka != tableKA) {
-            SmartDashboard.putNumber(String.format("Last update to %s", identifier), Timer.getFPGATimestamp());
+            // SmartDashboard.putNumber(String.format("Last update to %s", identifier), Timer.getFPGATimestamp());
 
             armFeedforward = new ArmFeedforward(tableKS, tableKG, tableKV, tableKA);
         }

@@ -22,12 +22,12 @@ public class TestClimbSensorsCmd extends Command {
 
     @Override
     public void execute() {
-        SmartDashboard.putBoolean("rightDrop", rightDrop.get());
-        SmartDashboard.putBoolean("rightClimb", rightClimb.get());
-        SmartDashboard.putBoolean("leftDrop", leftDrop.get());
-        SmartDashboard.putBoolean("leftClimb", leftClimb.get());
+        // SmartDashboard.putBoolean("rightDrop", rightDrop.get());
+        // SmartDashboard.putBoolean("rightClimb", rightClimb.get());
+        // SmartDashboard.putBoolean("leftDrop", leftDrop.get());
+        // SmartDashboard.putBoolean("leftClimb", leftClimb.get());
 
-        SmartDashboard.putNumber("heartbeat", Timer.getFPGATimestamp());
+        // SmartDashboard.putNumber("heartbeat", Timer.getFPGATimestamp());
     }
 
     @Override
