@@ -9,7 +9,7 @@ public class FeedNote extends Command {
 
     private final StorageSubsystem storageSubsystem;
     private final double storageVoltage;
-    private double startTime;
+    private Timer feedTimer = new Timer();
 
     public FeedNote(StorageSubsystem storageSubsystem, double storageVoltage) {
         this.storageSubsystem = storageSubsystem;
@@ -20,7 +20,7 @@ public class FeedNote extends Command {
 
     @Override
     public void initialize() {
-        startTime = Timer.getFPGATimestamp();
+        feedTimer.restart();
     }
 
     @Override
@@ -35,6 +35,6 @@ public class FeedNote extends Command {
 
     @Override
     public boolean isFinished() {
-        return Timer.getFPGATimestamp() > startTime + ShooterConstants.LAUNCH_RUN_TIME-ShooterConstants.TIME_UNTIL_FEED;
+        return feedTimer.hasElapsed(ShooterConstants.LAUNCH_RUN_TIME-ShooterConstants.TIME_UNTIL_FEED);
     }
 }

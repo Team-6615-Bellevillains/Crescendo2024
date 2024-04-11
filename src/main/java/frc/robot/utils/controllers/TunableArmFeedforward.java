@@ -18,7 +18,7 @@ public class TunableArmFeedforward {
     private ArmFeedforward armFeedforward;
     private String identifier;
 
-    private double lastUpdatedTS = Timer.getFPGATimestamp();
+    private Timer updateTimer = new Timer();
 
     public TunableArmFeedforward(String identifier, double ks, double kg, double kv) {
         this(identifier, ks, kg, kv, 0);
@@ -35,6 +35,8 @@ public class TunableArmFeedforward {
         tuningTable.getEntry(appendIdentifier("ka")).setDouble(ka);
 
         feedforwards.add(this);
+
+        updateTimer.restart();
     }
 
     public ArmFeedforward getController() {
@@ -46,7 +48,7 @@ public class TunableArmFeedforward {
     }
 
     public void updateConstantsIfOutdated() {
-        if (Timer.getFPGATimestamp() - lastUpdatedTS < updateInterval)
+        if (!updateTimer.hasElapsed(updateInterval))
             return;
 
         double tableKS = tuningTable.getValue(appendIdentifier("ks")).getDouble();
@@ -62,8 +64,6 @@ public class TunableArmFeedforward {
 
             armFeedforward = new ArmFeedforward(tableKS, tableKG, tableKV, tableKA);
         }
-
-        lastUpdatedTS = Timer.getFPGATimestamp();
     }
 
     public static void updateControllersIfOutdated() {
