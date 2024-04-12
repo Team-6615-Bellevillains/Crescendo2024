@@ -13,7 +13,7 @@ public class ShootCmd extends Command {
     private final StorageSubsystem storageSubsystem;
     private final double shootVoltage;
     private final double storageVoltage;
-    private double startTime;
+    private Timer shootTimer;
 
     public ShootCmd(ShootingSubsystem shootingSubsystem, double shootVoltage, StorageSubsystem storageSubsystem, double storageVoltage) {
         this.shootingSubsystem = shootingSubsystem;
@@ -26,13 +26,14 @@ public class ShootCmd extends Command {
 
     @Override
     public void initialize() {
-        startTime = Timer.getFPGATimestamp();
+        shootTimer.restart();
+
         shootingSubsystem.setShootingVoltage(shootVoltage);
     }
 
     @Override
     public void execute() {
-        if (Timer.getFPGATimestamp() > startTime + ShooterConstants.TIME_UNTIL_FEED) {
+        if (shootTimer.hasElapsed(ShooterConstants.TIME_UNTIL_FEED)) {
             storageSubsystem.setStorageVoltage(storageVoltage);
         }
     }
@@ -45,6 +46,6 @@ public class ShootCmd extends Command {
 
     @Override
     public boolean isFinished() {
-        return Timer.getFPGATimestamp() > startTime + ShooterConstants.LAUNCH_RUN_TIME;
+        return shootTimer.hasElapsed(ShooterConstants.LAUNCH_RUN_TIME);
     }
 }

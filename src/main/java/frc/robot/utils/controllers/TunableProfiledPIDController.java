@@ -22,7 +22,7 @@ public class TunableProfiledPIDController {
 
     private final DoubleSupplier measurementSupplier;
 
-    private double lastUpdatedTS = Timer.getFPGATimestamp();
+    private Timer updateTimer = new Timer();
     private double lastMeasurement;
 
     private ProfiledPIDController profiledPIDController;
@@ -49,6 +49,8 @@ public class TunableProfiledPIDController {
         }
 
         controllers.add(this);
+
+        updateTimer.restart();
     }
 
     public ProfiledPIDController getController() {
@@ -76,7 +78,7 @@ public class TunableProfiledPIDController {
     }
 
     public void updateConstantsIfOutdated() {
-        if (Timer.getFPGATimestamp() - lastUpdatedTS < updateInterval)
+        if (!updateTimer.hasElapsed(updateInterval))
             return;
 
         double tableKP = tuningTable.getValue(appendIdentifier("Kp")).getDouble();
@@ -99,8 +101,6 @@ public class TunableProfiledPIDController {
                     .setConstraints(new TrapezoidProfile.Constraints(tableMaxVelocity, tableMaxAcceleration));
             profiledPIDController.reset(measurementSupplier.getAsDouble());
         }
-
-        lastUpdatedTS = Timer.getFPGATimestamp();
     }
 
     public TrapezoidProfile.Constraints getConstraints() {
