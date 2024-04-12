@@ -29,11 +29,11 @@ public final class Constants {
 
         public static final PIDFConfig angleAutoPID = new PIDFConfig(2.3, 0, 0);
         // speed to move forwards when going to intake during auto
-        public static final double intakeForwardsSpeedMetersPerSecond = Units.inchesToMeters(10);
+        public static final double intakeForwardsSpeedMetersPerSecond = Units.inchesToMeters(20);
 
         public static final double MAX_ACCELERATION = 2;
 
-        public static final double INTAKE_TIMEOUT_SECONDS = 1;
+        public static final double INTAKE_TIMEOUT_SECONDS = .7;
         public static final double BACKUP_WAIT_SECONDS = 6;
     }
 
@@ -47,7 +47,7 @@ public final class Constants {
         public static final Rotation2d CENTER_TRAP_ROTATION = Rotation2d.fromDegrees(180);
         public static final Rotation2d RIGHT_TRAP_ROTATION = Rotation2d.fromDegrees(60);
 
-        public final static double SLOW_SPEED_SCALAR = 0.8;
+        public final static double SLOW_SPEED_SCALAR = 0.6;
 
         public static final SimpleMotorFeedforward DRIVE_FEEDFORWARD = new SimpleMotorFeedforward(0.2337275, 2.66335, 0.483205);
     }
@@ -141,6 +141,6 @@ public final class Constants {
     }
 
     public static class DebugConstants {
-        public static final boolean ENABLE_CLIMBER_RESET = false;
+        public static final boolean ENABLE_CLIMBER_RESET = true;
     }
 }

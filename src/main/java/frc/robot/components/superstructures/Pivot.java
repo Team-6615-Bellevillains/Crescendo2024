@@ -55,8 +55,8 @@ public class Pivot {
     }
 
     public Command aimToSpeakerAndSpinUp() {
-        return spinUp()
-                .alongWith(setArmGoalPositionCommand(Units.degreesToRadians(RotationConstants.DISTANCE_SHOOTING_ANGLE_DEGREES)));
+        return Commands.runOnce(()->resetPivotToBackHold()).andThen(spinUp()
+                .alongWith(setArmGoalPositionCommand(Units.degreesToRadians(RotationConstants.DISTANCE_SHOOTING_ANGLE_DEGREES))));
     }
 
     public Command intakeFromFloorThenReset() {
@@ -114,4 +114,15 @@ public class Pivot {
         rotationSubsystem.hold();
     }
 
+    public void resetPivotToBackHold() {
+        rotationSubsystem.resetPivotToBackHold();
+    }
+
+    public Command spinUpAndCoast() {
+        return Commands.runOnce(() ->  shootingSubsystem.setShootingVoltage(ShooterConstants.SHOOTING_SPEAKER_SHOOTER_VOLTAGE), shootingSubsystem);
+    }
+
+    public Command spinDown() {
+        return Commands.runOnce(() ->  shootingSubsystem.setShootingVoltage(0), shootingSubsystem);
+    }
 }

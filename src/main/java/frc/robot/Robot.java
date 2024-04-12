@@ -78,7 +78,7 @@ public class Robot extends TimedRobot {
         // block in order for anything in the Command-based framework to work.
 
         // TunableArmFeedforward.updateControllersIfOutdated();
-        // TunableProfiledPIDController.updateControllersIfOutdated();
+        TunableProfiledPIDController.updateControllersIfOutdated();
 
         CommandScheduler.getInstance().run();
         // SmartDashboard.putNumber("Current Draw", m_pdh.getTotalCurrent());

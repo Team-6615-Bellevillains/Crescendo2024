@@ -23,11 +23,9 @@ public class FieldOrientedDrive extends Command {
     private static final InterpolatingDoubleTreeMap POWER_LERP = new InterpolatingDoubleTreeMap();
 
     private final SwerveSubsystem swerve;
-    
     private final DoubleSupplier vX, vY, vTheta;
     private final Trigger angleLeft, angleCenter, angleRight;
     private final BooleanSupplier shouldSlowWhenIntakingSupplier;
-
     private final double maxAngularVelocity;
     private boolean shouldSlowWhenIntaking;
 
@@ -95,19 +93,32 @@ public class FieldOrientedDrive extends Command {
         double xInput = vX.getAsDouble();
         double yInput = vY.getAsDouble();
 
-        double magnitude = Math.hypot(xInput, yInput);
+        // x = sqrt(2)/2 = 0.7071
+        // y = sqrt(2)/2 = 0.7071
+
+        // sqrt(x^2 + y^2) = 1
+
+        // x = cube(sqrt(2)/2) = .3535
+        // y = cube(sqrt(2)/2) = .3535
+
+        // sqrt(x^2 + y^2) = 0.50!!!
+
+        // x = rcos(theta)
+        // y = rsin(theta)
+
+        double magnitude = Math.hypot(xInput, yInput); // r
 
         // small magnitude impl. from Rotation2d
         double cos, sin;
-        if (magnitude > 1e-6) {
-            sin = yInput / magnitude;
-            cos = xInput / magnitude;
+        if (magnitude > 1e-6) { // SOHCAHTOA
+            sin = yInput / magnitude; // opposite/ hypo
+            cos = xInput / magnitude; // adj / hypo
         } else {
             sin = 0.0;
             cos = 1.0;
         }
 
-        double curvedMagnitude = USING_NEW_SPEED_CURVE ? POWER_LERP.get(magnitude) : Math.pow(magnitude, 3);
+        double curvedMagnitude = USING_NEW_SPEED_CURVE ? POWER_LERP.get(magnitude) : Math.pow(magnitude, 3); // new R
 
         double xVelocity = curvedMagnitude * cos * swerve.maximumSpeed * velocityScalar;
         double yVelocity = curvedMagnitude * sin * swerve.maximumSpeed * velocityScalar;

@@ -86,7 +86,7 @@ public class RotationSubsystem extends SubsystemBase {
         SmartDashboard.putNumber("Actual arm position radians", getRotationEncoderPositionInRadians());
         // SmartDashboard.putNumber("Actual arm rotation",
         // getRotationEncoderVelocityInRadsPerSec());
-        // SmartDashboard.putNumber("periodic", Timer.getFPGATimestamp());
+        SmartDashboard.putNumber("periodic", Timer.getFPGATimestamp());
         SmartDashboard.putBoolean("Holding", holding);
 
     }
@@ -154,6 +154,14 @@ public class RotationSubsystem extends SubsystemBase {
 
     public boolean atGoal() {
         return holding || rotationProfiledPID.getController().atGoal();
+    }
+
+    public void resetPivotToBackHold() {
+         if (holding && Math
+                 .abs(goalPositionRadians - Units.degreesToRadians(RotationConstants.HOLD_UP_ANGLE_DEGREES)) < 1E-6) {
+                    rotationProfiledPID.getController().reset(Units.degreesToRadians(RotationConstants.HOLD_UP_ANGLE_DEGREES));
+                    rotationEncoder.setPosition(RotationConstants.HOLD_UP_ANGLE_DEGREES);
+         }
     }
 
 }
