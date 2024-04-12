@@ -199,24 +199,24 @@ public class RobotContainer {
             // above
             case DONT_MOVE -> {
                 commandGroup.addCommands(
-                    pivot.speakerShooter(),
+                    pivot.speakerShooter(), // Shoot pre-load
                     swerveSubsystem.resetOdometryToStartingPose(PathPlannerPath.fromPathFile(startingPosition + " back up"))
                 );
                 yield commandGroup;
             }
             case CLEAR_MIDDLE -> {
                 commandGroup.addCommands(
-                    pivot.speakerShooter(),
-                    swerveSubsystem.getAutonomousCommand("Clear Middle", true)
+                    pivot.speakerShooter(), // Shoot pre-load
+                    swerveSubsystem.getAutonomousCommand("Clear Middle", true) // Bump all of the notes at the mid-line
                 );
                 yield commandGroup;
             } // If "Back Up" is selected, a command to back up is added to the command group
             // The second argument is true because we want to set the odometry to the position the bot starts in.
             case BACK_UP -> {
                 commandGroup.addCommands(
-                    pivot.speakerShooter(),
+                    pivot.speakerShooter(), // Shoot pre-load
                     Commands.waitSeconds(AutonConstants.BACKUP_WAIT_SECONDS), // allow teammates to pick up notes if necessary
-                    swerveSubsystem.getAutonomousCommand(startingPosition + " back up", true)
+                    swerveSubsystem.getAutonomousCommand(startingPosition + " back up", true) // Move to mid-line
                 );
                 yield commandGroup;
             }
@@ -224,18 +224,18 @@ public class RobotContainer {
             // second note and shoot it
             case GO_FOR_SECOND_NOTE -> {
                 commandGroup.addCommands(
-                    pivot.speakerShooter(),
+                    pivot.speakerShooter(), // Shoot pre-load
                     Commands.print("1"),
-                    swerveSubsystem.getAutonomousCommand(startingPosition + " note", true),
+                    swerveSubsystem.getAutonomousCommand(startingPosition + " note", true), // Move to floor note
                     Commands.print("2"),
-                    pivot.autonIntake(),
+                    pivot.autonIntake(), // Intake note
                     Commands.print("3"),
-                    returnWithShooterPrep(startingPosition + " note return"),
+                    returnWithShooterPrep(startingPosition + " note return"), // Return to speaker while spinning up shooter
                     Commands.print("4"),
-                    pivot.feedNote(),
+                    pivot.feedNote(), // Shoot note
                     Commands.print("5"),
-                    swerveSubsystem.getAutonomousCommand(startingPosition + " back up", false)
-                        .alongWith(pivot.spinDown()),
+                    swerveSubsystem.getAutonomousCommand(startingPosition + " back up", false) // Move to mid-line
+                        .alongWith(pivot.spinDown()), // while spinning down the outside rollers
                     Commands.print("6")
                 );
                 yield commandGroup;
@@ -245,26 +245,26 @@ public class RobotContainer {
             // third note and shoot it
             case GO_FOR_THIRD_NOTE -> {
                 commandGroup.addCommands(
-                    pivot.speakerShooter(),
+                    pivot.speakerShooter(), // Shoot pre-load
                     Commands.print("1"),
-                    swerveSubsystem.getAutonomousCommand("threepiece1", true),
+                    swerveSubsystem.getAutonomousCommand("threepiece1", true), // Move to floor note
                     Commands.print("2"),
-                    pivot.autonIntake(),
+                    pivot.autonIntake(), // Intake note
                     Commands.print("3"),
-                    returnWithShooterPrep("threepiece2"),
+                    returnWithShooterPrep("threepiece2"), // Return to speaker while spinning up shooter
                     Commands.print("4"),
-                    pivot.feedNote(),
+                    pivot.feedNote(), // Shoot note
                     Commands.print("5"),
-                    swerveSubsystem.getAutonomousCommand("threepiece3", false)
-                        .alongWith(pivot.spinDown()),
+                    swerveSubsystem.getAutonomousCommand("threepiece3", false) // Move to floor note
+                        .alongWith(pivot.spinDown()), // while spinning down the outside rollers
                     Commands.print("6"),
-                    pivot.autonIntake(),
+                    pivot.autonIntake(), // Intake note
                     Commands.print("7"),
-                    returnWithShooterPrep("threepiece4"),
+                    returnWithShooterPrep("threepiece4"), // Return to speaker while spinning up shooter
                     Commands.print("8"),
-                    pivot.feedNote(),
+                    pivot.feedNote(), // Shoot note
                     Commands.print("9"),
-                    pivot.spinDown(),
+                    pivot.spinDown(), // Spin down shooter
                     Commands.print("10")
                 );
                 yield commandGroup;
