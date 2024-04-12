@@ -16,12 +16,9 @@ import frc.robot.components.subsystems.pivot.RotationSubsystem;
 import frc.robot.components.subsystems.pivot.ShootingSubsystem;
 import frc.robot.components.subsystems.pivot.StorageSubsystem;
 import frc.robot.utils.enums.Direction;
-
-import static frc.robot.Constants.ArmConstants.*;
-
 import java.util.function.DoubleSupplier;
 
-import static frc.robot.Constants.OperatorConstants;
+import static frc.robot.Constants.AutonConstants;
 
 public class Pivot {
     private final RotationSubsystem rotationSubsystem;
@@ -70,6 +67,15 @@ public class Pivot {
                                                 .finallyDo(() -> State.getInstance().setComingUpWithNote(false))
                                 )
                 );
+    }
+
+    public Command autonIntake() {
+        return switchHoldDirectionAndHold()
+                .alongWith(
+                        new IntakeRingUntilCaptured(storageSubsystem, shootingSubsystem)
+                            .withTimeout(AutonConstants.INTAKE_TIMEOUT_SECONDS)
+                )
+                .andThen(switchHoldDirectionAndHold());
     }
 
     public Command intakeFromSource() {

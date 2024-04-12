@@ -5,8 +5,6 @@
 package frc.robot;
 
 import edu.wpi.first.math.MathUtil;
-import edu.wpi.first.math.kinematics.ChassisSpeeds;
-import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.Filesystem;
 import edu.wpi.first.wpilibj.GenericHID;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
@@ -20,9 +18,7 @@ import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.Constants.AutonConstants;
 import frc.robot.Constants.DebugConstants;
 import frc.robot.Constants.OperatorConstants;
-import frc.robot.Constants.ArmConstants.RotationConstants;
 import frc.robot.components.commands.drive.FieldOrientedDrive;
-import frc.robot.components.commands.drive.WheelRadiusCharacterization;
 import frc.robot.components.subsystems.drive.SwerveSubsystem;
 import frc.robot.components.superstructures.Climb;
 import frc.robot.components.superstructures.Pivot;
@@ -34,8 +30,6 @@ import frc.robot.utils.enums.Position;
 import java.io.File;
 
 import com.pathplanner.lib.path.PathPlannerPath;
-
-import static frc.robot.Constants.DebugConstants;
 
 /**
  * This class is where the bulk of the robot should be declared. Since
@@ -88,7 +82,7 @@ public class RobotContainer {
         autonPathingChooser.addOption("Three Note", Pathing.GO_FOR_THIRD_NOTE);
 
         //Middle clear
-         autonPathingChooser.addOption("Clear Middle", Pathing.GO_TO_MIDDLE);
+         autonPathingChooser.addOption("Clear Middle", Pathing.CLEAR_MIDDLE);
 
         autonPathingChooser.setDefaultOption("Shoot and Back Up", Pathing.BACK_UP);
         SmartDashboard.putData("Auton Pathing", autonPathingChooser);
@@ -174,12 +168,20 @@ public class RobotContainer {
         operatorXbox.povLeft().whileTrue(pivot.intakeFromSource()).onFalse(pivot.rotateArmAndHold(Direction.UP));
     }
 
+    public Command returnWithShooterPrep(String returnPathName) {
+        return swerveSubsystem.getAutonomousCommand(returnPathName, false)
+                    .alongWith(
+                        pivot.intakeRingManual().withTimeout(0.2)
+                            .andThen(pivot.spinUpAndCoast())
+                    );
+    }
+
     // Returns the Command to run during the autonomous phase
     // Builds a SequentialCommandGroup based on the selected autonomous strategy
     public Command getAutonomousCommand() {
         // return Commands.print("Autonomous");
         // REAL AUTON STARTs
-       final Position startingPosition = autonStartingPositionChooser.getSelected();
+        final Position startingPosition = autonStartingPositionChooser.getSelected();
         final Pathing autonPathing = autonPathingChooser.getSelected();
 
         SequentialCommandGroup commandGroup = new SequentialCommandGroup();
@@ -190,187 +192,81 @@ public class RobotContainer {
         }, swerveSubsystem));
 
 
-        final double intakeForwardsSign = FlipUtil.shouldFlipPath() ? -1 : 1;
-
         // Determine the flow of autonomous commands based on the selected Pathing
         // option
         return switch (autonPathing) {
             // If "Don't Move" is selected, just run the shooter which is already setup
             // above
             case DONT_MOVE -> {
-                
-                commandGroup.addCommands(pivot.speakerShooter(),
-                    swerveSubsystem.resetOdometryToStartingPose(PathPlannerPath.fromPathFile(startingPosition + " back up")));
+                commandGroup.addCommands(
+                    pivot.speakerShooter(),
+                    swerveSubsystem.resetOdometryToStartingPose(PathPlannerPath.fromPathFile(startingPosition + " back up"))
+                );
                 yield commandGroup;
             }
-            case GO_TO_MIDDLE -> {
-                commandGroup.addCommands(swerveSubsystem.getAutonomousCommand("Clear Middle", true));
+            case CLEAR_MIDDLE -> {
+                commandGroup.addCommands(
+                    pivot.speakerShooter(),
+                    swerveSubsystem.getAutonomousCommand("Clear Middle", true)
+                );
                 yield commandGroup;
             } // If "Back Up" is selected, a command to back up is added to the command group
             // The second argument is true because we want to set the odometry to the position the bot starts in.
             case BACK_UP -> {
                 commandGroup.addCommands(
                     pivot.speakerShooter(),
-                        Commands.waitSeconds(AutonConstants.BACKUP_WAIT_SECONDS), // allow teammates to pick up notes if necessary
-                        swerveSubsystem.getAutonomousCommand(startingPosition + " back up", true)
+                    Commands.waitSeconds(AutonConstants.BACKUP_WAIT_SECONDS), // allow teammates to pick up notes if necessary
+                    swerveSubsystem.getAutonomousCommand(startingPosition + " back up", true)
                 );
                 yield commandGroup;
             }
             // If "Go for Second Note" is selected, a series of commands are added to get a
             // second note and shoot it
             case GO_FOR_SECOND_NOTE -> {
-                if (startingPosition == Position.MIDDLE) {
-                    commandGroup.addCommands(
-                        pivot.speakerShooter(),
-                            swerveSubsystem.getAutonomousCommand("slight backup from middle", true),
-                            Commands.print("1a"),
-                            swerveSubsystem.getAutonomousCommand(startingPosition + " note", false),
-                            Commands.print("2a")
-                    );
-                } else {
-                    commandGroup.addCommands(
-                        pivot.speakerShooter(),
-                            swerveSubsystem.getAutonomousCommand(startingPosition + " note", true),
-                            Commands.print("1b")
-                    );
-                }
                 commandGroup.addCommands(
-                        // Rotate the arm into intake position
-                        pivot.switchHoldDirectionAndHold(),
-                        Commands.print("2"),
-                        // Drive forwards at a slow speed while running the intake motors.
-                        // Stop once the note has been obtained or AutonConstants.INTAKE_TIMEOUT_SECONDS seconds have passed, whichever comes first
-                        Commands.parallel(
-                                Commands.runOnce(() -> swerveSubsystem.driveFieldOriented(new ChassisSpeeds(intakeForwardsSign * AutonConstants.intakeForwardsSpeedMetersPerSecond, 0, 0)), swerveSubsystem),
-                                pivot.intakeRingUntilCaptured().withTimeout(AutonConstants.INTAKE_TIMEOUT_SECONDS)
-                        ),
-                        Commands.print("3"),
-                        Commands.runOnce(() -> swerveSubsystem.setChassisSpeeds(new ChassisSpeeds()), swerveSubsystem),
-                        Commands.print("4"),
-                        // Rotate arm back into shooting position
-                        pivot.switchHoldDirectionAndHold(),
-                        Commands.print("5"),
-                        // Move back to the speaker.
-                        // The second argument is false because we don't want to keep our current odometry.
-                        Commands.parallel(
-                            swerveSubsystem.getAutonomousCommand(startingPosition + " note return", false),
-                            pivot.intakeRingManual().withTimeout(1)
-                        ),
-                        Commands.print("6"),
-                        // Shoot the note!
-                        pivot.speakerShooter(),
-                        Commands.print("7"),
-                        // go back across the line!
-                        swerveSubsystem.getAutonomousCommand(startingPosition + " back up", false),
-                        Commands.print("8")
-                        );
+                    pivot.speakerShooter(),
+                    Commands.print("1"),
+                    swerveSubsystem.getAutonomousCommand(startingPosition + " note", true),
+                    Commands.print("2"),
+                    pivot.autonIntake(),
+                    Commands.print("3"),
+                    returnWithShooterPrep(startingPosition + " note return"),
+                    Commands.print("4"),
+                    pivot.feedNote(),
+                    Commands.print("5"),
+                    swerveSubsystem.getAutonomousCommand(startingPosition + " back up", false)
+                        .alongWith(pivot.spinDown()),
+                    Commands.print("6")
+                );
                 yield commandGroup;
             }
 
             //If "Go for Third Note" is selected, a series of commands are added to get a
             // third note and shoot it
-
             case GO_FOR_THIRD_NOTE -> {
                 commandGroup.addCommands(
                     pivot.speakerShooter(),
-                    //Commands.waitSeconds(1),
-                    // swerveSubsystem.getAutonomousCommand("slight backup from middle", true),
-                    // Commands.print("1"),
-                        // Move to the note based on the starting position.
-                        // The second argument is true because we want to set the odometry to the position the bot starts in.
-                    swerveSubsystem.getAutonomousCommand("Three piece first pickup", true),
-                        // Rotate the arm into intake position
-                        // Drive forwards at a slow speed while running the intake motors.
-                        // Stop once the note has been obtained or AutonConstants.INTAKE_TIMEOUT_SECONDS seconds have passed, whichever comes first
+                    Commands.print("1"),
+                    swerveSubsystem.getAutonomousCommand("threepiece1", true),
                     Commands.print("2"),
-                    pivot.switchHoldDirectionAndHold(),
+                    pivot.autonIntake(),
                     Commands.print("3"),
-
-                        Commands.parallel(
-                               Commands.runOnce(() -> swerveSubsystem.driveFieldOriented(new ChassisSpeeds(intakeForwardsSign * Units.inchesToMeters(14), intakeForwardsSign * Units.inchesToMeters(-14), 0)), swerveSubsystem),
-                               pivot.intakeRingUntilCaptured().withTimeout(AutonConstants.INTAKE_TIMEOUT_SECONDS).andThen(pivot.intakeRingManual().withTimeout(0.5))
-                        ),
+                    returnWithShooterPrep("threepiece2"),
+                    Commands.print("4"),
+                    pivot.feedNote(),
                     Commands.print("5"),
-                    // Rotate arm back into shooting position
-                        // Move back to the speaker.
-                        // The second argument is false because we don't want to keep our current odometry.
-                        Commands.parallel(
-                            Commands.waitSeconds(0.3).andThen(swerveSubsystem.getAutonomousCommand("Three piece second shot", false)),
-                            pivot.switchHoldDirectionAndHold().withTimeout(2)
-                        ),
+                    swerveSubsystem.getAutonomousCommand("threepiece3", false)
+                        .alongWith(pivot.spinDown()),
                     Commands.print("6"),
-
-                        // Shoot the note!
-                        pivot.speakerShooter(),
+                    pivot.autonIntake(),
                     Commands.print("7"),
-
-                        //Third note
-                       Commands.parallel(
-                        swerveSubsystem.getAutonomousCommand("Three piece second pickup", false),
-                        pivot.switchHoldDirectionAndHold()
-                       ),
+                    returnWithShooterPrep("threepiece4"),
+                    Commands.print("8"),
+                    pivot.feedNote(),
                     Commands.print("9"),
-
-                        Commands.parallel(
-                                Commands.runOnce(() -> swerveSubsystem.driveFieldOriented(new ChassisSpeeds(intakeForwardsSign * Units.inchesToMeters(14), intakeForwardsSign * Units.inchesToMeters(-14), 0)), swerveSubsystem),
-                                pivot.intakeRingUntilCaptured().withTimeout(AutonConstants.INTAKE_TIMEOUT_SECONDS).andThen(pivot.intakeRingManual().withTimeout(0.5))
-                        ),
-                    Commands.print("10"),
-
-
-                        pivot.switchHoldDirectionAndHold(),
-                    Commands.print("12"),
-
-                        swerveSubsystem.getAutonomousCommand("Three piece third shot", false),
-                    Commands.print("13"),
-
-                        pivot.speakerShooter(),
-                    Commands.print("14"),
-
-                        // go back across the line!
-                    //     swerveSubsystem.getAutonomousCommand(startingPosition + " back up", false),
-                     Commands.print("15")
-                        );
-                yield commandGroup;
-
-            }
-
-            case GET_MID_NOTE -> {
-                commandGroup.addCommands(
-                        pivot.speakerShooter(),
-
-                        Commands.parallel(
-                                swerveSubsystem.getAutonomousCommand("Mid Note", true),
-                                Commands.waitSeconds(2)
-                                    .andThen(pivot.switchHoldDirectionAndHold()
-                                    .andThen(pivot.intakeRingUntilCaptured().withTimeout(2)))));
-                
-                commandGroup.addCommands(
-                        // Rotate the arm into intake position
-                        Commands.print("2"),
-                        // Drive forwards at a slow speed while running the intake motors.
-                        // Stop once the note has been obtained or AutonConstants.INTAKE_TIMEOUT_SECONDS seconds have passed, whichever comes first
-                       
-                       
-                        // Rotate arm back into shooting position
-                        Commands.print("5"),
-                        // Move back to the speaker.
-                        // The second argument is false because we don't want to keep our current odometry.
-                        Commands.parallel(
-                            pivot.switchHoldDirectionAndHold().andThen(pivot.intakeRingManual().withTimeout(1)),
-                            swerveSubsystem.getAutonomousCommand("Mid Note Return", false), 
-                            Commands.waitSeconds(2).andThen(pivot.spinUpAndCoast())
-                        ),
-                        Commands.print("6"),
-                        pivot.feedNote(),
-                        // Shoot the note!
-                        Commands.print("7"),
-                        pivot.spinDown(),
-                        Commands.print("down"),
-                        // go back across the line!
-                        swerveSubsystem.getAutonomousCommand("amp back up", false),
-                        Commands.print("8")
-                        );
+                    pivot.spinDown(),
+                    Commands.print("10")
+                );
                 yield commandGroup;
             }
         };
