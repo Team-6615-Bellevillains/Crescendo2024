@@ -52,7 +52,7 @@ public class Pivot {
     }
 
     public Command aimToSpeakerAndSpinUp() {
-        return Commands.runOnce(()->resetPivotToBackHold()).andThen(spinUp()
+        return Commands.runOnce(this::resetPivotToBackHold).andThen(spinUp()
                 .alongWith(setArmGoalPositionCommand(Units.degreesToRadians(RotationConstants.DISTANCE_SHOOTING_ANGLE_DEGREES))));
     }
 
@@ -88,14 +88,11 @@ public class Pivot {
     }
 
     public Command switchHoldDirectionAndHold() {
-        return new FunctionalCommand(() -> {
+        return Commands.runOnce(() -> {
                     holdingDirection = holdingDirection == Direction.UP ? Direction.DOWN : Direction.UP;
-                    rotationSubsystem.setGoalPositionRadians(holdingDirection == Direction.UP
-                                            ? Units.degreesToRadians(RotationConstants.HOLD_UP_ANGLE_DEGREES)
-                                            : Units.degreesToRadians(RotationConstants.HOLD_DOWN_ANGLE_DEGREES));
-        }, 
-        () -> {}, interrupted -> { }, rotationSubsystem::atGoal, 
-        rotationSubsystem);
+        }).andThen(setArmGoalPositionCommand(holdingDirection == Direction.UP
+                ? Units.degreesToRadians(RotationConstants.HOLD_UP_ANGLE_DEGREES)
+                : Units.degreesToRadians(RotationConstants.HOLD_DOWN_ANGLE_DEGREES)));
     }
 
     public Command rotateArmAndHold(Direction direction) {
@@ -105,7 +102,10 @@ public class Pivot {
     }
 
     public Command setArmGoalPositionCommand(double goalPositionRadians) {
-        return Commands.runOnce(() -> rotationSubsystem.setGoalPositionRadians(goalPositionRadians), rotationSubsystem);
+        return new FunctionalCommand(() -> {
+            rotationSubsystem.setGoalPositionRadians(goalPositionRadians);
+        },
+        () -> {}, interrupted -> { }, rotationSubsystem::atGoal, rotationSubsystem);
     }
 
     public FeedNote feedNote() {
