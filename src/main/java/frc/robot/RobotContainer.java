@@ -24,10 +24,7 @@ import frc.robot.components.commands.drive.FieldOrientedDrive;
 import frc.robot.components.subsystems.drive.SwerveSubsystem;
 import frc.robot.components.superstructures.Climb;
 import frc.robot.components.superstructures.Pivot;
-import frc.robot.utils.enums.Direction;
-import frc.robot.utils.enums.FlipUtil;
-import frc.robot.utils.enums.Pathing;
-import frc.robot.utils.enums.Position;
+import frc.robot.utils.enums.*;
 
 import java.io.File;
 
@@ -58,6 +55,8 @@ public class RobotContainer {
     // strategy, and whether to slowdown when intaking on the dashboard
     private final SendableChooser<Position> autonStartingPositionChooser = new SendableChooser<>();
     private final SendableChooser<Pathing> autonPathingChooser = new SendableChooser<>();
+    private final SendableChooser<Distance> autonBackupDistanceChooser = new SendableChooser<>();
+    private final SendableChooser<Double> autonBackupWaitTimeChooser = new SendableChooser<>();
     private final SendableChooser<Boolean> slowWhenIntakingChooser = new SendableChooser<>();
 
     private void rumbleControllers(double rumblePercent) {
@@ -79,15 +78,23 @@ public class RobotContainer {
         autonPathingChooser.addOption("Just Shoot", Pathing.DONT_MOVE);
         autonPathingChooser.addOption("Shoot and Back Up", Pathing.BACK_UP);
         autonPathingChooser.addOption("Two Note", Pathing.GO_FOR_SECOND_NOTE);
-
-        //Three note autonomous paths
         autonPathingChooser.addOption("Three Note", Pathing.GO_FOR_THIRD_NOTE);
-
-        //Middle clear
-         autonPathingChooser.addOption("Clear Middle", Pathing.CLEAR_MIDDLE);
-
+        autonPathingChooser.addOption("Clear Middle", Pathing.CLEAR_MIDDLE);
         autonPathingChooser.setDefaultOption("Shoot and Back Up", Pathing.BACK_UP);
         SmartDashboard.putData("Auton Pathing", autonPathingChooser);
+
+        autonBackupDistanceChooser.addOption("Far", Distance.FAR);
+        autonBackupDistanceChooser.addOption("Close", Distance.CLOSE);
+        autonBackupDistanceChooser.setDefaultOption("Far", Distance.FAR);
+        SmartDashboard.putData("Auton Backup Distance", autonBackupDistanceChooser);
+
+        // Add 1s-12s backup wait time options
+        for(int i = 1; i <= 12; i++) {
+            autonBackupWaitTimeChooser.addOption(i + "s", (double) i);
+        }
+        // Default time is defined in Constants.java
+        autonBackupWaitTimeChooser.setDefaultOption(AutonConstants.BACKUP_WAIT_SECONDS + "s", (double) AutonConstants.BACKUP_WAIT_SECONDS);
+        SmartDashboard.putData("Auton Backup Wait Time", autonBackupWaitTimeChooser);
 
         slowWhenIntakingChooser.addOption("Yes", true);
         slowWhenIntakingChooser.addOption("No", false);
@@ -188,6 +195,8 @@ public class RobotContainer {
         // REAL AUTON STARTs
         final Position startingPosition = autonStartingPositionChooser.getSelected();
         final Pathing autonPathing = autonPathingChooser.getSelected();
+        final Distance backupDistance = autonBackupDistanceChooser.getSelected();
+        final double backupWaitTime = autonBackupWaitTimeChooser.getSelected();
 
         SequentialCommandGroup commandGroup = new SequentialCommandGroup();
 
@@ -205,7 +214,7 @@ public class RobotContainer {
             case DONT_MOVE -> {
                 commandGroup.addCommands(
                     pivot.speakerShooter(), // Shoot pre-load
-                    swerveSubsystem.resetOdometryToStartingPose(PathPlannerPath.fromPathFile(startingPosition + " back up"))
+                    swerveSubsystem.resetOdometryToStartingPose(PathPlannerPath.fromPathFile(startingPosition + " back up " + backupDistance))
                 );
                 yield commandGroup;
             }
@@ -219,9 +228,9 @@ public class RobotContainer {
             // The second argument is true because we want to set the odometry to the position the bot starts in.
             case BACK_UP -> {
                 commandGroup.addCommands(
-                    pivot.speakerShooter(), // Shoot pre-load
-                    Commands.waitSeconds(AutonConstants.BACKUP_WAIT_SECONDS), // allow teammates to pick up notes if necessary
-                    swerveSubsystem.getAutonomousCommand(startingPosition + " back up", true) // Move to mid-line
+                    pivot.speakerShooter() // Shoot pre-load
+                            .alongWith(Commands.waitSeconds(backupWaitTime)), // allow teammates to pick up notes, if necessary
+                    swerveSubsystem.getAutonomousCommand(startingPosition + " back up " + backupDistance, true) // Move to mid-line
                 );
                 yield commandGroup;
             }
@@ -239,7 +248,7 @@ public class RobotContainer {
                     Commands.print("4"),
                     pivot.feedNote(), // Shoot note
                     Commands.print("5"),
-                    swerveSubsystem.getAutonomousCommand(startingPosition + " back up", false) // Move to mid-line
+                        swerveSubsystem.getAutonomousCommand(startingPosition + " back up " + backupDistance, false) // Move to mid-line
                         .alongWith(pivot.spinDown()), // while spinning down the outside rollers
                     Commands.print("6")
                 );
