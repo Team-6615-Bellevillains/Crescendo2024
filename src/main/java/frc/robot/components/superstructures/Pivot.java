@@ -71,11 +71,7 @@ public class Pivot {
 
     public Command autonIntake() {
         return switchHoldDirectionAndHold()
-                .alongWith(
-                        new IntakeRingUntilCaptured(storageSubsystem, shootingSubsystem)
-                            .withTimeout(AutonConstants.INTAKE_TIMEOUT_SECONDS)
-                )
-                .andThen(switchHoldDirectionAndHold());
+                .alongWith(new IntakeRingUntilCaptured(storageSubsystem, shootingSubsystem));
     }
 
     public Command intakeFromSource() {

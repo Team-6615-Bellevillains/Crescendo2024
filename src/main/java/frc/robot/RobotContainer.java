@@ -4,7 +4,9 @@
 
 package frc.robot;
 
+import com.pathplanner.lib.auto.NamedCommands;
 import edu.wpi.first.math.MathUtil;
+import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.Filesystem;
 import edu.wpi.first.wpilibj.GenericHID;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
@@ -117,6 +119,9 @@ public class RobotContainer {
             .onTrue(Commands.runOnce(() -> rumbleControllers(OperatorConstants.RUMBLE_POWER_PERCENTAGE)))
             .onFalse(Commands.runOnce(() -> rumbleControllers(0)));
 
+        // Must register named commands BEFORE PathPlanner runs
+        NamedCommands.registerCommand("Intake", pivot.autonIntake());
+        swerveSubsystem.setupPathPlanner();
     }
 
     /**
@@ -226,9 +231,9 @@ public class RobotContainer {
                 commandGroup.addCommands(
                     pivot.speakerShooter(), // Shoot pre-load
                     Commands.print("1"),
-                    swerveSubsystem.getAutonomousCommand(startingPosition + " note", true), // Move to floor note
+                    swerveSubsystem.getAutonomousCommand(startingPosition + " note", true), // Move to floor note and intake
                     Commands.print("2"),
-                    pivot.autonIntake(), // Intake note
+                    pivot.switchHoldDirectionAndHold(), // Bring intake up
                     Commands.print("3"),
                     returnWithShooterPrep(startingPosition + " note return"), // Return to speaker while spinning up shooter
                     Commands.print("4"),
@@ -247,18 +252,18 @@ public class RobotContainer {
                 commandGroup.addCommands(
                     pivot.speakerShooter(), // Shoot pre-load
                     Commands.print("1"),
-                    swerveSubsystem.getAutonomousCommand("threepiece1", true), // Move to floor note
+                    swerveSubsystem.getAutonomousCommand("threepiece1", true), // Move to floor note and intake
                     Commands.print("2"),
-                    pivot.autonIntake(), // Intake note
+                    pivot.switchHoldDirectionAndHold(), // Bring intake up
                     Commands.print("3"),
                     returnWithShooterPrep("threepiece2"), // Return to speaker while spinning up shooter
                     Commands.print("4"),
                     pivot.feedNote(), // Shoot note
                     Commands.print("5"),
-                    swerveSubsystem.getAutonomousCommand("threepiece3", false) // Move to floor note
+                    swerveSubsystem.getAutonomousCommand("threepiece3", false) // Move to floor note and intake
                         .alongWith(pivot.spinDown()), // while spinning down the outside rollers
                     Commands.print("6"),
-                    pivot.autonIntake(), // Intake note
+                    pivot.switchHoldDirectionAndHold(), // Bring intake up
                     Commands.print("7"),
                     returnWithShooterPrep("threepiece4"), // Return to speaker while spinning up shooter
                     Commands.print("8"),
