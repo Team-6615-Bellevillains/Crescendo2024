@@ -86,13 +86,13 @@ public class Pivot {
     public Command switchHoldDirectionAndHold() {
         return Commands.runOnce(() -> {
                     holdingDirection = holdingDirection == Direction.UP ? Direction.DOWN : Direction.UP;
-        }).andThen(setArmGoalPositionCommand(holdingDirection == Direction.UP
+        }).andThen(setArmGoalPositionCommand(() -> holdingDirection == Direction.UP
                 ? Units.degreesToRadians(RotationConstants.HOLD_UP_ANGLE_DEGREES)
                 : Units.degreesToRadians(RotationConstants.HOLD_DOWN_ANGLE_DEGREES)));
     }
 
     public Command rotateArmAndHold(Direction direction) {
-        return setArmGoalPositionCommand(direction == Direction.UP ?
+        return setArmGoalPositionCommand(() -> direction == Direction.UP ?
                 Units.degreesToRadians(RotationConstants.HOLD_UP_ANGLE_DEGREES)
                 : Units.degreesToRadians(RotationConstants.HOLD_DOWN_ANGLE_DEGREES));
     }
@@ -100,6 +100,15 @@ public class Pivot {
     public Command setArmGoalPositionCommand(double goalPositionRadians) {
         return new FunctionalCommand(() -> {
             rotationSubsystem.setGoalPositionRadians(goalPositionRadians);
+        },
+        () -> {}, interrupted -> { }, rotationSubsystem::atGoal, rotationSubsystem);
+    }
+
+
+
+    public Command setArmGoalPositionCommand(DoubleSupplier goalPositionRadiansSupplier) {
+        return new FunctionalCommand(() -> {
+            rotationSubsystem.setGoalPositionRadians(goalPositionRadiansSupplier.getAsDouble());
         },
         () -> {}, interrupted -> { }, rotationSubsystem::atGoal, rotationSubsystem);
     }
