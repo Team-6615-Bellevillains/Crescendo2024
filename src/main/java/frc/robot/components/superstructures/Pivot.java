@@ -67,7 +67,7 @@ public class Pivot {
                                 .alongWith(
                                         Commands.runOnce(() -> State.getInstance().setComingUpWithNote(true))
                                                 .andThen(Commands.waitSeconds(OperatorConstants.RUMBLE_TIME_SECONDS))
-                                                .andThen(Commands.runOnce(() -> State.getInstance().setComingUpWithNote(false)))
+                                                .finallyDo(() -> State.getInstance().setComingUpWithNote(false))
                                 )
                 );
     }
