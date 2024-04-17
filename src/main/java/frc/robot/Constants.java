@@ -119,8 +119,8 @@ public final class Constants {
             public static final double SHOOTING_SPEAKER_SHOOTER_VOLTAGE = -12;
 
             public static final double NOTE_CAPTURED_STALL_CURRENT_THRESHOLD = 45;
-            public static final double NOTE_CAPTURED_SPIN_UP_WAIT = 0.25; // Wait NOTE_CAPTURED_SPIN_UP_WAIT seconds before detecting if a note has been captured
-            public static final double NOTE_CAPTURED_INTERNAL_ROLLER_STALL_RPM_THRESHOLD = 60;
+            public static final double NOTE_CAPTURED_SPIN_UP_WAIT = 1.25; // Wait NOTE_CAPTURED_SPIN_UP_WAIT seconds before detecting if a note has been captured
+            public static final double NOTE_CAPTURED_INTERNAL_ROLLER_STALL_RPM_THRESHOLD = 0.75;
         }
     }
 
