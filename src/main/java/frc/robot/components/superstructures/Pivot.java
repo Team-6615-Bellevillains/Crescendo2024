@@ -16,12 +16,9 @@ import frc.robot.components.subsystems.pivot.RotationSubsystem;
 import frc.robot.components.subsystems.pivot.ShootingSubsystem;
 import frc.robot.components.subsystems.pivot.StorageSubsystem;
 import frc.robot.utils.enums.Direction;
-
-import static frc.robot.Constants.ArmConstants.*;
-
 import java.util.function.DoubleSupplier;
 
-import static frc.robot.Constants.OperatorConstants;
+import static frc.robot.Constants.AutonConstants;
 
 public class Pivot {
     private final RotationSubsystem rotationSubsystem;
@@ -55,7 +52,7 @@ public class Pivot {
     }
 
     public Command aimToSpeakerAndSpinUp() {
-        return Commands.runOnce(()->resetPivotToBackHold()).andThen(spinUp()
+        return Commands.runOnce(this::resetPivotToBackHold).andThen(spinUp()
                 .alongWith(setArmGoalPositionCommand(Units.degreesToRadians(RotationConstants.DISTANCE_SHOOTING_ANGLE_DEGREES))));
     }
 
@@ -72,6 +69,11 @@ public class Pivot {
                 );
     }
 
+    public Command autonIntake() {
+        return switchHoldDirectionAndHold()
+                .alongWith(new IntakeRingUntilCaptured(storageSubsystem, shootingSubsystem));
+    }
+
     public Command intakeFromSource() {
         return new IntakeRingManual(storageSubsystem, shootingSubsystem)
                 .alongWith(setArmGoalPositionCommand(Units.degreesToRadians(RotationConstants.SOURCE_INTAKE_ANGLE_DEGREES)));
@@ -82,24 +84,33 @@ public class Pivot {
     }
 
     public Command switchHoldDirectionAndHold() {
-        return new FunctionalCommand(() -> {
+        return Commands.runOnce(() -> {
                     holdingDirection = holdingDirection == Direction.UP ? Direction.DOWN : Direction.UP;
-                    rotationSubsystem.setGoalPositionRadians(holdingDirection == Direction.UP
-                                            ? Units.degreesToRadians(RotationConstants.HOLD_UP_ANGLE_DEGREES)
-                                            : Units.degreesToRadians(RotationConstants.HOLD_DOWN_ANGLE_DEGREES));
-        }, 
-        () -> {}, interrupted -> { }, rotationSubsystem::atGoal, 
-        rotationSubsystem);
+        }).andThen(setArmGoalPositionCommand(() -> holdingDirection == Direction.UP
+                ? Units.degreesToRadians(RotationConstants.HOLD_UP_ANGLE_DEGREES)
+                : Units.degreesToRadians(RotationConstants.HOLD_DOWN_ANGLE_DEGREES)));
     }
 
     public Command rotateArmAndHold(Direction direction) {
-        return setArmGoalPositionCommand(direction == Direction.UP ?
+        return setArmGoalPositionCommand(() -> direction == Direction.UP ?
                 Units.degreesToRadians(RotationConstants.HOLD_UP_ANGLE_DEGREES)
                 : Units.degreesToRadians(RotationConstants.HOLD_DOWN_ANGLE_DEGREES));
     }
 
     public Command setArmGoalPositionCommand(double goalPositionRadians) {
-        return Commands.runOnce(() -> rotationSubsystem.setGoalPositionRadians(goalPositionRadians), rotationSubsystem);
+        return new FunctionalCommand(() -> {
+            rotationSubsystem.setGoalPositionRadians(goalPositionRadians);
+        },
+        () -> {}, interrupted -> { }, rotationSubsystem::atGoal, rotationSubsystem);
+    }
+
+
+
+    public Command setArmGoalPositionCommand(DoubleSupplier goalPositionRadiansSupplier) {
+        return new FunctionalCommand(() -> {
+            rotationSubsystem.setGoalPositionRadians(goalPositionRadiansSupplier.getAsDouble());
+        },
+        () -> {}, interrupted -> { }, rotationSubsystem::atGoal, rotationSubsystem);
     }
 
     public FeedNote feedNote() {

@@ -34,7 +34,7 @@ public final class Constants {
         public static final double MAX_ACCELERATION = 2;
 
         public static final double INTAKE_TIMEOUT_SECONDS = .7;
-        public static final double BACKUP_WAIT_SECONDS = 6;
+        public static final int BACKUP_WAIT_SECONDS = 9;
     }
 
     public static final class DriveConstants {

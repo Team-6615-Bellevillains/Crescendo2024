@@ -126,6 +126,7 @@ public class RotationSubsystem extends SubsystemBase {
                 goalIsHoldingGoal() ? RotationConstants.HOLD_POSITION_TOLERANCE_RADIANS
                         : RotationConstants.DISTANCE_POSITION_TOLERANCE_RADIANS,
                 RotationConstants.VELOCITY_TOLERANCE_RADS_PER_SECOND);
+        rotationProfiledPID.getController().reset(getRotationEncoderPositionInRadians());
         rotationProfiledPID.getController().setGoal(newGoalPositionRadians);
     }
 
